@@ -20,6 +20,18 @@ function HomepageHeader() {
             to="/docs/intro">
             Docusaurus Tutorial - 5min ⏱️
           </Link>
+          <Link
+            className="button button--secondary button--lg"
+            style={{marginLeft: '0.2rem'}}
+            to="/docs/learn-notes">
+            Docusaurus Notes
+          </Link>
+          <Link
+            className="button button--secondary button--lg"
+            style={{marginLeft: '0.2rem'}}
+            to="/helloReact">
+            Look custom page
+          </Link>
         </div>
       </div>
     </header>
@@ -30,8 +42,8 @@ export default function Home(): JSX.Element {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      title={siteConfig.title}
+      description="fqishuai's site">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

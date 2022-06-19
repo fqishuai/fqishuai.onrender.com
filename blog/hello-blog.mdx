@@ -1,0 +1,69 @@
+---
+title: Hello Blog
+---
+
+### Details element example
+
+<details>
+  <summary>Toggle me!</summary>
+  <div>
+    <div>This is the detailed content</div>
+    <br/>
+    <details>
+      <summary>
+        Nested toggle! 内含惊喜……
+      </summary>
+      <div>
+        😲😲😲😲😲
+      </div>
+    </details>
+  </div>
+</details>
+
+### mdx export
+export const Highlight = ({children, color}) => (
+  <span
+    style={{
+      backgroundColor: color,
+      borderRadius: '2px',
+      color: '#fff',
+      padding: '0.2rem',
+    }}>
+    {children}
+  </span>
+);
+
+<Highlight color="#25c2a0">Docusaurus 绿</Highlight> 和 <Highlight color="#1877F2">Facebook 蓝</Highlight> 是我最喜欢的颜色。
+
+### mdx import
+import HomepageFeatures from '@site/src/components/HomepageFeatures';
+
+<HomepageFeatures />
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="apple" label="苹果" default>
+    这是个苹果 🍎
+  </TabItem>
+  <TabItem value="orange" label="橙子">
+    这是个橙子 🍊
+  </TabItem>
+  <TabItem value="banana" label="香蕉">
+    这是个香蕉 🍌
+  </TabItem>
+</Tabs>
+
+:::tip 在告示中使用选项卡
+
+<Tabs>
+  <TabItem value="apple" label="苹果">这是个苹果 🍎</TabItem>
+  <TabItem value="orange" label="橙子">这是个橙子 🍊</TabItem>
+  <TabItem value="banana" label="香蕉">这是个香蕉 🍌</TabItem>
+</Tabs>
+
+:::
+
+### mdx全局作用域
+<underline>MDXComponents</underline>
