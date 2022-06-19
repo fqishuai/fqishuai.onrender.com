@@ -24,7 +24,7 @@ const config = {
   // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en','zh-Hans'],
   },
 
   presets: [
@@ -81,9 +81,9 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'docNotes',
             position: 'left',
-            label: 'Tutorial',
+            label: 'Notes',
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -100,8 +100,8 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'Notes',
+                to: '/docs/learn-notes',
               },
             ],
           },

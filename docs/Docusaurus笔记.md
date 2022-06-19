@@ -1,10 +1,10 @@
 ---
+id: docNotes
 sidebar_position: 1
 # pagination_prev: intro
 # pagination_next: tutorial-basics/create-a-document
 slug: /learn-notes
 tags: [Docusaurus学习笔记]
-date: 2022-06-19T18:00
 ---
 
 # Docusaurus的知识点
@@ -50,6 +50,10 @@ tags: [演示, 开始上手]
 - `sidebar_class_name`设置className
 - `sidebar_custom_props`设置customProps
 - 可以用 `pagination_next` 和 `pagination_prev` 自定义分页导航
+
+### 2.6 文档id
+- 每个文档均有唯一的 id（标识符）。 默认情况下，文档 id 是文件相对文档根目录(docs)的路径（不包括后缀）。
+- 可以在前言中指定 id 的最后一部分。注意：前面还是相对路径，比如：docs/guide/hello.md 指定id: part1，则其最终的 id 则为 guide/part1。
 
 ## 3. blog
 - 博客日期可以写在标题里，或者使用前言，如：
