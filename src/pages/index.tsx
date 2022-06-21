@@ -17,20 +17,8 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
-          </Link>
-          <Link
-            className="button button--secondary button--lg"
-            style={{marginLeft: '0.2rem'}}
-            to="/docs/learn-notes">
-            Docusaurus Notes
-          </Link>
-          <Link
-            className="button button--secondary button--lg"
-            style={{marginLeft: '0.2rem'}}
-            to="/helloReact">
-            Look custom page
+            to="/todo-list">
+            Todo List
           </Link>
         </div>
       </div>

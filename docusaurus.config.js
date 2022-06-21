@@ -87,7 +87,7 @@ const config = {
             type: 'doc',
             docId: 'docNotes',
             position: 'left',
-            label: 'Notes',
+            label: 'Docs',
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -101,17 +101,25 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'Pages',
             items: [
               {
-                label: 'Notes',
-                to: '/docs/learn-notes',
+                label: 'TodoList',
+                to: '/todo-list',
+              },
+              {
+                label: 'Hello',
+                to: '/helloReact',
               },
             ],
           },
           {
             title: 'Community',
             items: [
+              {
+                label: 'Segmentfault',
+                href: 'https://segmentfault.com/',
+              },
               {
                 label: '掘金',
                 href: 'https://juejin.cn',
@@ -121,8 +129,8 @@ const config = {
                 href: 'https://cloud.tencent.com/developer/devdocs',
               },
               {
-                label: 'Dev.to',
-                href: 'https://dev.to/',
+                label: 'Google Developers',
+                href: 'https://developers.googleblog.com/',
               },
             ],
           },
@@ -130,12 +138,28 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
+                label: 'Dev.to',
+                href: 'https://dev.to/',
               },
               {
-                label: 'GitHub',
-                href: 'https://github.com/fqishuai/blog',
+                label: 'Web.dev',
+                href: 'https://web.dev/',
+              },
+              {
+                label: 'Dot',
+                href: 'https://www.thisdot.co/blog',
+              },
+              {
+                label: '政采云前端',
+                to: 'https://zoo.team/',
+              },
+              {
+                label: '美团前端',
+                to: 'https://tech.meituan.com/tags/%E5%89%8D%E7%AB%AF.html',
+              },
+              {
+                label: '转转前端',
+                href: 'https://www.zhihu.com/people/da-zhuan-zhuan-fe',
               },
             ],
           },
