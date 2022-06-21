@@ -244,3 +244,39 @@ function Clock(props) {
 - `:::info   :::`
 - `:::caution   :::`
 - `:::danger   :::`
+
+## 8. 插件
+:::tip
+Docusaurus 可以从本地目录加载插件，可以通过本地写个插件的方式来使用TailwindCSS
+:::
+
+> [Using TailwindCSS v3 in Docusaurus in 5 steps](https://dev.to/sajclarke_62/using-tailwindcss-v3-in-docusaurus-in-5-steps-5c26)
+
+- `npm install -D tailwindcss postcss autoprefixer`
+- `npx tailwindcss init`
+- 创建一个自定义插件
+```js
+plugins: [
+  async function myPlugin(context, options) {
+    return {
+      name: "docusaurus-tailwindcss",
+      configurePostCss(postcssOptions) {
+        // Appends TailwindCSS and AutoPrefixer.
+        postcssOptions.plugins.push(require("tailwindcss"));
+        postcssOptions.plugins.push(require("autoprefixer"));
+        return postcssOptions;
+      },
+    };
+  },
+],
+```
+
+- 修改`src/css/custom.css`
+- 然后使用tailwind css，发现会影响docusaurus原有样式
+
+> [如何在 Docusaurus 中引入 TailwindCSS](https://farer.org/2021/10/08/docusaurus-with-tailwindcss/)
+
+- `npm install --save-dev postcss-nested`
+- 修改`src/css/custom.css`，把tailwindcss的基础样式放在`.tailwind`中，使用 postcss-nested，这样可以把 tailwind 的样式限制在带有 tailwind class 的容器中，不会干扰 docusaurus 已有的样式
+- 在所有需要用 tailwind 写样式的部分，就在最外层容器加一个 className="tailwind" 即可生效
+- 可以不影响docusaurus原有样式使用tailwindcss了，但是控制台有warning： No serializer registered for Warning，这个warning咋解决？虽然不影响，但是有点强迫症😂

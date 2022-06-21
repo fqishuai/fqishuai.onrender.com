@@ -27,6 +27,10 @@ const config = {
     locales: ['en','zh-Hans'],
   },
 
+  plugins: [
+    "./src/plugins/postcss-tailwind",
+  ],
+
   presets: [
     [
       'classic',
