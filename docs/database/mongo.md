@@ -122,6 +122,9 @@ db.demo.insert({title:'demo'})
 db.demo.remove({title:'demo1'}) // 删除所有满足条件的
 
 db.demo.remove({title:'demo3'}，1) // 删除第一条满足条件的
+
+// 使用remove({})删除集合的所有文档
+db.demo.remove({})
 ```
 
 ### 3.3 改
@@ -166,3 +169,5 @@ db.集合名.find(
 ![where](img/where.png)
 
 - 查看一个文档：`db.集合名.findOne()`
+
+## 4. [mongoosejs](https://mongoosejs.com/)
