@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Blog - fqishuai',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'There is no royal road to learning',
   url: 'https://blog-fqishuai.vercel.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -83,13 +83,14 @@ const config = {
           src: 'img/logo.svg',
         },
         items: [
+          {label: 'there is no royal road to learning', position: 'left', href: '/'},
           {
             type: 'doc',
             docId: 'docNotes',
-            position: 'left',
+            position: 'right',
             label: 'Docs',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {to: '/blog', label: 'Blog', position: 'right'},
           {
             href: 'https://github.com/fqishuai/blog',
             label: 'GitHub',

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Layout from '@theme/Layout';
 
 interface ITodoList {
   _id: string,
@@ -77,18 +78,20 @@ export default function TodoList() {
   }
 
   return (
-    <div className='tailwind'>
-      <button onClick={handleCreate}>新建</button>
-      <button onClick={handleUpdate}>更新</button>
-      <button onClick={handleDelete}>删除</button>
-      <button onClick={handleFindAll}>查询</button>
-      {
-        todoList.map((item,index) => <div key={item._id}>
-          <input type="checkbox" />
-          <span>{item.content}</span>
-          <span className='ml-3'>创建于{item.createTime}</span>
-        </div>)
-      }
-    </div>
+    <Layout>
+      <div className='tailwind'>
+        <button onClick={handleCreate}>新建</button>
+        <button onClick={handleUpdate}>更新</button>
+        <button onClick={handleDelete}>删除</button>
+        <button onClick={handleFindAll}>查询</button>
+        {
+          todoList.map((item,index) => <div key={item._id}>
+            <input type="checkbox" />
+            <span>{item.content}</span>
+            <span className='ml-3'>创建于{item.createTime}</span>
+          </div>)
+        }
+      </div>
+    </Layout>
   )
 }
