@@ -17,7 +17,7 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         If you added <code>slug: /</code> to a doc to make it the homepage, 
-        you should delete the existing homepage at <code>./src/pages/index.js</code>.
+        you should delete the existing homepage(/pages/index.tsx).
       </>
     ),
     linkUrl: '/docs/react/usage',

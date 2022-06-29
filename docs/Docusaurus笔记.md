@@ -7,7 +7,7 @@ slug: /learn-notes
 tags: [Docusaurus学习笔记]
 ---
 
-# Docusaurus的知识点
+# Docusaurus笔记
 
 ## 1. 路由
 - 在 /src/pages/ 目录下所创建的任何 JavaScript/TypeScript 文件都会自动生成相应的网站路径
