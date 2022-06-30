@@ -101,7 +101,7 @@ export default function TodoList() {
                 </div>
                 <div className='ml-3 w-80'>创建于{item.startTime}</div>
                 <div className={`ml-3 ${!item.doneTime && 'hidden'}`}>完成于{item.doneTime}</div>
-                <div className='cursor-pointer w-14' onClick={() => handleDelete(item._id)}>删除</div>
+                <div className='cursor-pointer w-14 hidden' onClick={() => handleDelete(item._id)}>删除</div>
               </div>
             ))
           }

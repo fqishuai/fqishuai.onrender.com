@@ -91,6 +91,7 @@ const config = {
             label: 'Docs',
           },
           {to: '/blog', label: 'Blog', position: 'right'},
+          {to: '/todo-list', label: 'Pages', position: 'right'},
           {
             href: 'https://github.com/fqishuai/blog',
             label: 'GitHub',
