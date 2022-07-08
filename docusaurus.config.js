@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Blog - fqishuai',
-  tagline: 'There is no royal road to learning',
+  tagline: '记录不仅仅是沉淀，也是个理解的过程，杜绝复制粘贴，更禁止只记录别人文章的跳转链接！',
   url: 'https://blog-fqishuai.vercel.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -86,12 +86,13 @@ const config = {
           {label: 'there is no royal road to learning', position: 'left', href: '/'},
           {
             type: 'doc',
-            docId: 'docNotes',
+            docId: 'react/learnReact',
             position: 'right',
             label: 'Docs',
           },
           {to: '/blog', label: 'Blog', position: 'right'},
           {to: '/todo-list', label: 'Pages', position: 'right'},
+          {label: '图谱', position: 'right', href: 'https://f2e.tech/'},
           {
             href: 'https://github.com/fqishuai/blog',
             label: 'GitHub',

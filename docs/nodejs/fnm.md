@@ -13,12 +13,18 @@ tags: [管理node版本]
 - fnm -V
 - fnm list(fnm ls)
 - fnm install
+```bash
 fnm install 14.14.0
 fnm install 16.16.0
+```
 - fnm use
+```bash
 fnm use 14.14.0
 fnm use a2
+```
 - fnm alias
+```bash
 fnm alias 16.16.0 a1
 fnm alias 14.14.0 a2
+```
 - fnm unalias
