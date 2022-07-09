@@ -86,7 +86,7 @@ const config = {
           {label: 'there is no royal road to learning', position: 'left', href: '/'},
           {
             type: 'doc',
-            docId: 'react/learnReact',
+            docId: 'js/learnJS',
             position: 'right',
             label: 'Docs',
           },

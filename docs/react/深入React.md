@@ -1,7 +1,6 @@
 ---
 id: learnReact
-slug: principle
+slug: insight
 tags: [react]
 ---
 
-# 原理学习
