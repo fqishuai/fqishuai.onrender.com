@@ -3,8 +3,6 @@ slug: usage
 tags: [vue]
 ---
 
-# 使用记录
-
 ## 1. 渲染函数 & JSX
 ### 1.1 记录一次webpack5搭建的vue工程使用elementui的Tree组件遇到的问题
 - Tree组件可以通过两种方法进行树节点内容的自定义：`render-content`和 `scoped slot`
@@ -74,3 +72,27 @@ npm install -D @vue/babel-preset-jsx @vue/babel-helper-vue-jsx-merge-props
 
 - 这就引出3个值得深究的点：1）`v-model`是如何实现的？ 2）事件的向上/向下传递过程 3）vue的事件修饰符及如何实现的
 > [Vue事件修饰符](https://vuetechworld.com/blog/detail/9570e28eab4b3dcf074a8f2bacdc29c9)
+
+## 2. filters
+- filters里面this为undefined，为啥这样设计？
+- 解决办法：使用computed或method或filter传this
+```jsx
+<template>
+<div>
+{{state | theFilter(this)}}
+</div>
+</template>
+<script>
+filters: {
+  theFilter: function(value,that) {
+    // that.xxx
+  },
+},
+</script>
+```
+
+## 3. v-if对computed无效；key对computed无效
+如果想通过v-if或key控制一个dom内部的数据清空，那么该dom内部由computed控制的数据是不会被清空的。
+- 为啥会这样？
+- computed缓存是怎么实现的？怎么让它不缓存？
+- 用inject reload?
