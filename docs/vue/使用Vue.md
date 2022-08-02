@@ -96,3 +96,12 @@ filters: {
 - 为啥会这样？
 - computed缓存是怎么实现的？怎么让它不缓存？
 - 用inject reload?
+
+## 4. Array触发视图更新的API
+- concat不能更新视图
+```js
+// 使用中间变量解决concat不能更新视图的问题
+let temArr = this.sourceData.concat(targetData);
+this.sourceData = temArr;
+```
+- Array.prototype.push.apply(this.sourceData, targetData); // 这种方式可以更新视图但watch不到
