@@ -93,3 +93,50 @@ deepClone(obj, hash = new WeakMap()) {
 ```
 
 ### 4. 数组转树；树转数组
+
+
+
+### demo
+```jsx live
+function AsyncDemo(props) {
+  
+  const showResult = () => {
+    async function async1() {
+      alert('async1 start');
+      await async2();
+      alert('async1 end');
+    }
+    async function async2() {
+      alert('async2');
+    }
+    alert('script start');
+    setTimeout(function() {
+      alert('setTimeout');
+    }, 0);
+    async1();
+    new Promise(function(resolve) {
+      alert('promise1');
+      resolve();
+    }).then(function() {
+      alert('promise2');
+    });
+    alert('script end');
+    /*
+    正确结果：
+    script start
+    async1 start
+    async2
+    promise1
+    script end
+    async1 end
+    promise2
+    setTimeout
+    */
+  }
+  return (
+    <div>
+      <p onClick={showResult}>查看执行结果</p>
+    </div>
+  );
+}
+```

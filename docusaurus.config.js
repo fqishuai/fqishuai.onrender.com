@@ -98,6 +98,7 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          {label: '脑图', position: 'right', href: 'https://naotu.baidu.com/home'},
         ],
       },
       footer: {
