@@ -3,7 +3,55 @@ slug: usage
 tags: [原生js]
 ---
 
-## 一、API
+## 一、基础
+### 1. 循环
+
+### 2. 异步
+```jsx live
+function AsyncDemo(props) {
+  
+  const showResult = () => {
+    async function async1() {
+      alert('async1 start');
+      await async2();
+      alert('async1 end');
+    }
+    async function async2() {
+      alert('async2');
+    }
+    alert('script start');
+    setTimeout(function() {
+      alert('setTimeout');
+    }, 0);
+    async1();
+    new Promise(function(resolve) {
+      alert('promise1');
+      resolve();
+    }).then(function() {
+      alert('promise2');
+    });
+    alert('script end');
+    /*
+    正确结果：
+    script start
+    async1 start
+    async2
+    promise1
+    script end
+    async1 end
+    promise2
+    setTimeout
+    */
+  }
+  return (
+    <div>
+      <p onClick={showResult}>查看执行结果</p>
+    </div>
+  );
+}
+```
+
+## 二、API
 ### 1. Object.fromEntries
 :::note
 Object.fromEntries() 方法接收一个键值对的列表参数，并返回一个带有这些键值对的新对象。这个迭代参数应该是一个能够实现@@iterator方法的的对象，返回一个迭代器对象。它生成一个具有两个元素的类数组的对象，第一个元素是将用作属性键的值，第二个元素是与该属性键关联的值。
@@ -21,7 +69,7 @@ const obj = Object.fromEntries(arr);
 console.log(obj); // { 0: "a", 1: "b", 2: "c" }
 ```
 
-## 二、手写函数
+## 三、手写函数
 ### 1. 去重
 ```js
 /**
@@ -93,50 +141,4 @@ deepClone(obj, hash = new WeakMap()) {
 ```
 
 ### 4. 数组转树；树转数组
-
-
-
-### demo
-```jsx live
-function AsyncDemo(props) {
-  
-  const showResult = () => {
-    async function async1() {
-      alert('async1 start');
-      await async2();
-      alert('async1 end');
-    }
-    async function async2() {
-      alert('async2');
-    }
-    alert('script start');
-    setTimeout(function() {
-      alert('setTimeout');
-    }, 0);
-    async1();
-    new Promise(function(resolve) {
-      alert('promise1');
-      resolve();
-    }).then(function() {
-      alert('promise2');
-    });
-    alert('script end');
-    /*
-    正确结果：
-    script start
-    async1 start
-    async2
-    promise1
-    script end
-    async1 end
-    promise2
-    setTimeout
-    */
-  }
-  return (
-    <div>
-      <p onClick={showResult}>查看执行结果</p>
-    </div>
-  );
-}
-```
+> 参考：[list和tree的相互转换](https://juejin.cn/post/6952442048708345863)
