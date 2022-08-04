@@ -105,3 +105,29 @@ let temArr = this.sourceData.concat(targetData);
 this.sourceData = temArr;
 ```
 - Array.prototype.push.apply(this.sourceData, targetData); // 这种方式可以更新视图但watch不到
+
+## 2. 搭建vite+vue2.7+pnpm工程
+- `brew install pnpm`
+- `pnpm create vite`
+- 把工程中的`"vue": "^3.2.25"`换为`"vue": "2.7.8"`
+- 把工程中的`"@vitejs/plugin-vue": "^2.3.3"`换为`"@vitejs/plugin-vue2": "^1.1.2"`
+- 把工程中的`vite.config.js`的`@vitejs/plugin-vue`换为`@vitejs/plugin-vue2`
+- 注意vue3改为vue2后的template--->Component template should contain exactly one root element
+- 更改`man.js`
+```js title="main.js"
+// vue3
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')
+
+// vue2
+import Vue from 'vue'
+import App from './App.vue'
+
+new Vue({
+  render: h => h(App)
+}).$mount('#app')
+```
+- `pnpm add -D sass`（`Vite提供了对 .scss, .sass, .less, .styl 和 .stylus 文件的内置支持。`）
+> 如果使用的是单文件组件，可以通过 `<style lang="scss">`（或其他预处理器）自动开启。
