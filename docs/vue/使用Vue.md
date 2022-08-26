@@ -133,3 +133,37 @@ new Vue({
 > 如果使用的是单文件组件，可以通过 `<style lang="scss">`（或其他预处理器）自动开启。
 
 ## 6. keep-alive
+
+## 7. router.addRoute
+### 7.1 注意查看使用的vue-router版本中是否有addRoute方法
+- vue-router 3.1.6 使用addRoute时报错：router.addRoute is not a function；升级到3.5.4，问题解决
+- 可以把vue-router的实例log出来看`[[Prototype]]`中是否有addRoute方法
+![vue-router](img/vue_router.jpeg)
+
+### 7.2 Navigation cancelled
+> Error: Navigation cancelled from "/" to "/xxx" with a new navigation.
+    at createRouterError (vue-router.esm.js?8c4f:2065:1)
+
+- 通过addRoute等API动态改变router后，重新实例化vue-router即可解决上述问题
+```js
+router = new Router({
+  mode: 'history',
+  routes: routeList,
+})
+```
+
+### 7.3 Redirected
+> Error: Redirected when going from "/xxx" to "/yy/zzz" via a navigation guard.
+  at createRouterError (vue-router.esm.js?8c4f:2065:1)
+
+- 应该怎么捕获next()的异常？router.onError()也不生效
+
+## 8. vue.config.js
+### 8.1 pages
+
+### 8.2 configureWebpack
+- copy-webpack-plugin不需要install就能在vue.config.js中用，查看node_modules中有，说明copy-webpack-plugin不知道是哪个包的依赖，被附带安装了
+
+## 9. router.beforeEach
+### 9.1 next()
+- 注意：next函数在有参和无参的时候是不一样的，当传参时，会中断当前导航然后进行一个新的导航，此时beforeEach函数会被再次调用,而不传参时next()不会重新触发beforeEach函数。
