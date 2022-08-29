@@ -58,3 +58,8 @@ sudo lsof -i :<PortNumber>
 
 kill -9 <PID>
 ```
+
+## 鼠标方向调整
+:::tip
+系统偏好设置--->鼠标--->**勾掉** 滚动方向：自然
+:::tip

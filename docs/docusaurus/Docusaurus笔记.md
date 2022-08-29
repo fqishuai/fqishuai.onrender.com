@@ -8,6 +8,9 @@ tags: [Docusaurus学习笔记]
 ---
 
 # Docusaurus笔记
+:::tip
+[Docusaurus](https://docusaurus.io/) 使用 [Infima](https://infima.dev/) 作为底层样式框架，Infima 提供了灵活的布局，以及常见的 UI 组件样式，适用于以内容为中心的网站（博客、文档、首页）。
+:::
 
 ## 1. 路由
 - 在 /src/pages/ 目录下所创建的任何 JavaScript/TypeScript 文件都会自动生成相应的网站路径
