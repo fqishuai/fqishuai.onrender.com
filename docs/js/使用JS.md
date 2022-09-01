@@ -51,6 +51,21 @@ function AsyncDemo(props) {
 }
 ```
 
+### 3. 正则表达式
+```jsx live
+function demo(props) {
+  // 提取小括号中的内容
+  let sourceStr = 'aa(bb)cc';
+  let regex = /\((.+)\)/g; // 匹配小括号
+  let tempString = sourceStr.match(regex)[0];
+  let result = tempString.substring(1,tempString.length-1);
+
+  return (
+    <p>结果为：{result}</p>
+  )
+}
+```
+
 ## 二、API
 ### 1. Object.fromEntries
 :::note

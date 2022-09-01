@@ -63,3 +63,6 @@ kill -9 <PID>
 :::tip
 系统偏好设置--->鼠标--->**勾掉** 滚动方向：自然
 :::tip
+
+## vscode快捷键
+- Shift + Option + F 格式化代码
