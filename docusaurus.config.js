@@ -6,7 +6,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Blog - fqishuai',
+  title: 'fqishuai',
   tagline: '记录不仅仅是沉淀，也是个理解的过程，杜绝复制粘贴，更禁止只记录别人文章的跳转链接！',
   url: 'https://blog-fqishuai.vercel.app',
   baseUrl: '/',
@@ -16,8 +16,8 @@ const config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'fqishuai', // Usually your GitHub org/user name.
+  projectName: 'blog', // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -77,13 +77,12 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'Blog - fqishuai',
+        title: 'fqishuai',
         logo: {
           alt: 'My Site Logo',
           src: 'img/logo.svg',
         },
         items: [
-          {label: 'there is no royal road to learning', position: 'left', href: '/'},
           {
             type: 'doc',
             docId: 'js/learnJS',
@@ -93,12 +92,10 @@ const config = {
           {to: '/blog', label: 'Blog', position: 'right'},
           {to: '/todo-list', label: 'Pages', position: 'right'},
           {label: '图谱', position: 'right', href: 'https://f2e.tech/'},
-          {
-            href: 'https://github.com/fqishuai/blog',
-            label: 'GitHub',
-            position: 'right',
-          },
+          {label: 'coding', position: 'right', href: 'https://code.juejin.cn/'},
+          {label: 'flash-note', position: 'right', href: 'https://juejin.cn/flash-note/list'},
           {label: '脑图', position: 'right', href: 'https://naotu.baidu.com/home'},
+          {label: 'GitHub', position: 'right', href: 'https://github.com/fqishuai/blog'},
         ],
       },
       footer: {
