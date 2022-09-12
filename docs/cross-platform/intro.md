@@ -44,3 +44,8 @@ tags: [小程序开发,h5开发,跨端]
     </tr>
   </tbody>
 </table>
+
+## [微信小程序](https://developers.weixin.qq.com/miniprogram/dev/framework/)
+:::tip
+[微信公众平台](https://mp.weixin.qq.com/)
+:::

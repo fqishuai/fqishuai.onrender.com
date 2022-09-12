@@ -109,6 +109,10 @@ const config = {
                 to: '/todo-list',
               },
               {
+                label: 'markdown',
+                to: '/markdown',
+              },
+              {
                 label: 'Hello',
                 to: '/helloReact',
               },
