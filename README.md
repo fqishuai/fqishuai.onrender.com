@@ -6,4 +6,4 @@ This website is built using [Docusaurus 2](https://docusaurus.io/), a modern sta
 [@easyops-cn/docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) - Offline/local search for Docusaurus v2 (language of zh supported)
 
 ### deploy
-vercel
+vercel/netlify

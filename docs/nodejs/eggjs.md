@@ -109,3 +109,82 @@ app.config.env
 - 内置了 egg-cluster 来启动 Master 进程，Master 有足够的稳定性，不再需要使用 [pm2](https://github.com/Unitech/pm2) 等进程守护模块。
 
 ### 4.2 [egg-scripts](https://github.com/eggjs/egg-scripts) 用于支持线上环境的运行和停止
+
+## 5. 路由
+:::tip
+- Router 主要用来描述请求 URL 和具体承担执行动作的 Controller 的对应关系， 框架约定了 `app/router.js` 文件用于统一所有路由规则。
+- 在 Router 定义中， 可以支持多个 Middleware 串联执行
+:::
+
+## 6. 中间件
+
+### 6.1 编写中间件
+:::info
+约定一个中间件是一个放置在 app/middleware 目录下的单独文件，它需要 exports 一个普通的 function，接受两个参数：
+- options: 中间件的配置项，框架会将 `app.config[${middlewareName}]` 传递进来。
+- app: 当前应用 Application 的实例。
+```js
+module.exports = (options) => {
+  return async function fn(ctx, next) {
+    
+  }
+}
+```
+:::
+
+### 6.2 使用中间件
+> 中间件的加载是有顺序的
+
+需要手动挂载中间件，支持以下方式：
+- 在`config.default.js`中配置
+```js
+module.exports = {
+  // 配置需要的中间件，数组顺序即为中间件的加载顺序
+  middleware: ['gzip'],
+
+  // 配置 gzip 中间件的配置
+  gzip: {
+    threshold: 1024, // 小于 1k 的响应体不压缩
+  },
+};
+
+// 该配置最终将在启动时合并到 app.config.appMiddleware
+```
+
+- 框架和插件不支持在 `config.default.js` 中匹配 middleware，需要通过以下方式：
+```js
+// app.js
+module.exports = (app) => {
+  // 在中间件最前面统计请求时间
+  app.config.coreMiddleware.unshift('report');
+};
+
+// app/middleware/report.js
+module.exports = () => {
+  return async function (ctx, next) {
+    const startTime = Date.now();
+    await next();
+    // 上报请求时间
+    reportTime(Date.now() - startTime);
+  };
+};
+```
+:::tip
+  - 应用层定义的中间件（app.config.appMiddleware）和框架默认中间件（app.config.coreMiddleware）都会被加载器加载，并挂载到 app.middleware 上。
+  - 以上两种方式配置的中间件是全局的，会处理每一次请求。
+:::
+
+- router 中使用中间件。如果只想针对单个路由生效，可以直接在 `app/router.js` 中实例化和挂载，如下：
+```js
+module.exports = (app) => {
+  const gzip = app.middleware.gzip({ threshold: 1024 });
+  app.router.get('/needgzip', gzip, app.controller.handler);
+};
+```
+
+:::tip
+无论是应用层加载的中间件还是框架自带中间件，都支持几个通用的配置项：
+  - enable：控制中间件是否开启。
+  - match：设置只有符合某些规则的请求才会经过这个中间件。
+  - ignore：设置符合某些规则的请求不经过这个中间件。
+:::

@@ -91,6 +91,8 @@ const config = {
           },
           {to: '/blog', label: 'Blog', position: 'right'},
           {to: '/todo-list', label: 'Pages', position: 'right'},
+          {label: '极客课程', position: 'right', href: 'https://time.geekbang.org/dashboard/course'},
+          {label: '拉勾课程', position: 'right', href: 'https://kaiwu.lagou.com/learn'},
           {label: '图谱', position: 'right', href: 'https://f2e.tech/'},
           {label: 'coding', position: 'right', href: 'https://code.juejin.cn/'},
           {label: 'flash-note', position: 'right', href: 'https://juejin.cn/flash-note/list'},
