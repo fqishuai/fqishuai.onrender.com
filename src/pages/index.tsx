@@ -38,16 +38,40 @@ export default function Home(): JSX.Element {
       description="fqishuai's site"
     >
       <div className='tailwind'>
-        <div className='flex justify-center my-5'>
-          <img src='https://www.patterns.dev/img/patterns-dev/homepage-hero-group_1.5x.svg' />
+        <div className='flex justify-around my-5'>
+          {/* <img src='https://www.patterns.dev/img/patterns-dev/homepage-hero-group_1.5x.svg' /> */}
+          {/* <img src='https://www.patterns.dev/img/patterns-dev/production-patterns_1.5x.svg' /> */}
+          {/* <img src='https://www.patterns.dev/img/patterns-dev/progressive-rehydration-1280w.avif' /> */}
+          <img src='https://www.patterns.dev/img/patterns-dev/javascript-circle_1.5x.svg' />
+          <div>
+            <img src='https://www.patterns.dev/img/patterns-dev/production-patterns_1.5x.svg' />
+            <div className='flex'>
+              <img src='https://www.patterns.dev/img/patterns-dev/patterns-overview_1.5x.svg' />
+              <img src='https://www.patterns.dev/img/patterns-dev/developer-code-laptop_1.5x.svg' />
+            </div>
+          </div>
         </div>
-        <div className='mx-10 my-5'>
+        <div className='mx-10 my-5 flex justify-around flex-wrap'>
           <Card
-            linkUrl='https://www.patterns.dev/'
+            linkValue='https://www.patterns.dev/'
             title='Patterns.dev'
             bgColor='bg-green-500'
           >
             Patterns.dev is a free book on design patterns and component patterns for building powerful web apps with vanilla JavaScript and React.
+          </Card>
+          <Card
+            linkValue='https://github.com/getify/Functional-Light-JS'
+            title='Functional-Light-JS'
+            bgColor='bg-orange-300'
+          >
+            "Functional-Light JavaScript" explores the core principles of functional programming (FP) as they are applied to JavaScript.
+          </Card>
+          <Card
+            linkValue='https://ideazhao.com/2021/09/05/wechat_function/'
+            title='JavaScript世界的一等公民—函数'
+            bgColor='bg-indigo-500'
+          >
+            现今各种框架、工具‘横行’，到处在讲原理和源码，更有跨端技术需要我们去探索，但如果基本功不好，学什么都是事倍功半，效果很不好。
           </Card>
         </div>
       </div>

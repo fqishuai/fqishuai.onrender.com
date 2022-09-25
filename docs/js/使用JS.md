@@ -84,6 +84,16 @@ const obj = Object.fromEntries(arr);
 console.log(obj); // { 0: "a", 1: "b", 2: "c" }
 ```
 
+### 2. [Object.create](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
+:::note
+Object.create() 方法用于创建一个新对象，使用现有的对象来作为新创建对象的原型（prototype）。
+:::
+
+### 3. [Object.getPrototypeOf](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/GetPrototypeOf)
+:::note
+Object.getPrototypeOf() 方法返回指定对象的原型（内部[[Prototype]]属性的值）。
+:::
+
 ## 三、手写函数
 ### 1. 去重
 ```js
