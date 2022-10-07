@@ -73,6 +73,13 @@ export default function Home(): JSX.Element {
           >
             现今各种框架、工具‘横行’，到处在讲原理和源码，更有跨端技术需要我们去探索，但如果基本功不好，学什么都是事倍功半，效果很不好。
           </Card>
+          <Card
+            linkValue='https://js.okten.cn'
+            title='JavaScript: The Definitive Guide'
+            bgColor='bg-indigo-500'
+          >
+            犀牛书---《JavaScript 权威指南第七版》中英对照
+          </Card>
         </div>
       </div>
       {/* <HomepageHeader />

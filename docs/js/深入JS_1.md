@@ -203,4 +203,105 @@ console.log('结果7::', notice2.identify());
 ### 1. 闭包
 :::tip
 闭包最大的特点是**可以突破生命周期和作用域的限制**。
+- 突破生命周期的限制是指，当一个外部函数内嵌一个内部函数时，如果内嵌函数引用了外部函数的变量，则这个变量就会突破生命周期的限制，即在函数结束执行后，仍然存在。
+- 突破作用域的限制是指，可以把一个内部函数返回成一个方法在外部调用。
+```js
+function counter() {
+  let name = '计数';
+  let curVal = 0;
+  function counting() {
+    curVal++;
+  }
+  function getCount() {
+    console.log(`${name}是${curVal}`);
+  }
+  return {counting, getCount};
+}
+
+var counter1 = counter();
+
+counter1.counting();
+counter1.counting();
+counter1.counting();
+counter1.getCount();
+```
+[运行](https://code.juejin.cn/pen/7149796681096265743)
 :::
+
+### 2. 对象
+- 可以通过对象来封装一个状态，并创建一个方法来作用于这个状态值
+```js
+var counter = {
+  name: '计数',
+  curVal: 0,
+  counting() {
+    this.curVal++;
+    console.log(`${this.name}是${this.curVal}`);
+  }
+};
+
+counter.counting();
+counter.counting();
+counter.counting();
+```
+
+### 3. 闭包和对象的异同点
+- 单纯从值的状态管理和围绕它的一系列行为的角度来看，可以说闭包和对象是同形态的(isomorphic)，即可以起到异曲同工的作用。闭包中的状态，就是对象中的属性；闭包中创建的针对值的行为，可以在对象中通过方法来实现。
+- 闭包和对象在 隐私(privacy)、状态拷贝(state cloning)、性能(performance) 有一定的差别，而这些差别在结构性地处理值的问题上，具有不同的优劣势。
+
+![结构型不可变性](img/closure_object.webp)
+
+- 闭包是带数据的行为，对象是带行为的数据。
+
+### 3.1 属性的查改
+- 对于闭包，除非是通过接口，也就是在外部函数中返回内部函数的方法，不然内部的值是**对外不可见的**，所以通过闭包，可以细粒度地控制想要暴露或隐藏的属性及相关的操作。
+- 对于对象，可以直接获取对象中的属性及重新赋值。若想要遵循不可变的原则，则可以通过`Object.freeze()`设置对象所有的属性变得只读。
+
+### 3.2 状态的拷贝
+> 不对原始的对象和数组值做改变，而是拷贝之后，在拷贝的版本上做变更。
+
+```js
+// 数组浅拷贝
+var a = [ 1, 2 ];
+var b = [ ...a ];
+b.push( 3 );
+console.log('a的值::', a); // [1,2]
+console.log('b的值::', b); // [1,2,3]
+
+// 对象浅拷贝
+var o = {
+  x: 1,
+  y: 2
+};
+var p = { ...o };
+p.y = 3; 
+console.log('o.y::', o.y); // 2
+console.log('p.y::', p.y); // 3
+```
+
+- 如果系统中有值不停在改变，每次都拷贝的话，就会占据大量内存。可以通过链表等数据结构及相关算法来解决这类拷贝导致的性能问题，比如[immutable.js](https://immutable-js.com/)
+
+- 闭包相对更难拷贝；从性能的角度来讲，对象的内存和运算通常要优于闭包。
+
+```js
+function PrintMessageA() {
+  return `${this.name}，你好！`;
+}
+var greetings1 = PrintMessageA.bind( { name: '先生' } );
+greetings1();
+
+// 闭包
+function PrintMessageB(name) {
+  return function printName() {
+    return `${name}，你好！`;
+  };
+}
+var greetings2 = PrintMessageB('先生');
+greetings2();
+```
+
+### 3.3 React为什么选择使用对象(而不是闭包)作为 props 和 state 的值类型?
+- 选择使用对象作为 props 和 state 的值类型，能更容易保证props和state的值整体不可变，在需要state变化时，也更容易拷贝。
+- 闭包虽然在属性和方法的隐私方面更有优势，并且能更细粒度地获取或重新给属性赋值，可是在应用交互和状态管理这个场景下，它并没有什么实际的作用。
+
+## 三、柯里化（currying）
