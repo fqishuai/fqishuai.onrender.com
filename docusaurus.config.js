@@ -91,6 +91,32 @@ const config = {
           },
           {to: '/blog', label: 'Blog', position: 'right'},
           {to: '/todo-list', label: 'Pages', position: 'right'},
+          {
+            label: '技术周报',
+            position : 'right',
+            items: [
+              {
+                label: '字节前端技术周报',
+                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2ODQ1OTExOA==&action=getalbum&album_id=1706105889872527361&scene=173&from_msgid=2247500975&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
+              },
+              {
+                label: '转转前端周刊',
+                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzU0OTExNzYwNg==&action=getalbum&album_id=2368788922895220737&scene=173&from_msgid=2247495372&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
+              },
+              {
+                label: '奇舞周刊',
+                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg4MTYwMzY1Mw==&action=getalbum&album_id=1899297601078771727&scene=173&from_msgid=2247504287&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
+              },
+              {
+                label: 'MDH前端周刊',
+                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5NDgyODI4MQ==&action=getalbum&album_id=1862545371797749761&scene=173&from_msgid=2247485744&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
+              },
+              {
+                label: '技术雷达',
+                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MjY3OTgwMA==&action=getalbum&album_id=1564396246507847682&scene=173&from_msgid=2652483783&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
+              },
+            ]
+          },
           {label: '极客课程', position: 'right', href: 'https://time.geekbang.org/dashboard/course'},
           {label: '拉勾课程', position: 'right', href: 'https://kaiwu.lagou.com/learn'},
           {label: '图谱', position: 'right', href: 'https://f2e.tech/'},
@@ -157,8 +183,8 @@ const config = {
                 href: 'https://www.thisdot.co/blog',
               },
               {
-                label: '政采云前端',
-                to: 'https://zoo.team/',
+                label: '网易云音乐',
+                to: 'https://juejin.cn/user/4265760847567016',
               },
               {
                 label: '美团前端',
