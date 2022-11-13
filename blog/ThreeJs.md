@@ -3,6 +3,13 @@ slug: threejs
 tags: [3D]
 ---
 
-[threejs](https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene)
+[three.js](https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene)
+> ThreeJS: The most popular WebGL library, with a good support on both desktop and mobile.
 
-场景、相机和渲染器
+[three.js入门示例](https://code.juejin.cn/pen/7160872605510008868)
+
+[react-three-fiber](https://github.com/pmndrs/react-three-fiber)
+> A React renderer for Three.js
+
+[TroisJS](https://troisjs.github.io/)
+> ThreeJS + VueJS 3 + ViteJS

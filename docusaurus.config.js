@@ -49,8 +49,9 @@ const config = {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/fqishuai/blog/tree/main/',
+          editUrl: 'https://github.com/fqishuai/blog/tree/main/',
+          blogSidebarTitle: 'All posts',
+          blogSidebarCount: 'ALL',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -120,7 +121,28 @@ const config = {
           {label: '极客课程', position: 'right', href: 'https://time.geekbang.org/dashboard/course'},
           {label: '拉勾课程', position: 'right', href: 'https://kaiwu.lagou.com/learn'},
           {label: '图谱', position: 'right', href: 'https://f2e.tech/'},
-          {label: 'coding', position: 'right', href: 'https://code.juejin.cn/'},
+          {label: 'coding', position: 'right', items: [
+            {
+              label: 'replit',
+              href: 'https://replit.com/'
+            },
+            {
+              label: 'code.juejin',
+              href: 'https://code.juejin.cn/'
+            },
+            {
+              label: 'codesandbox.io',
+              href: 'https://codesandbox.io/'
+            },
+            {
+              label: 'glitch',
+              href: 'https://glitch.com/'
+            },
+            {
+              label: 'plnkr.co',
+              href: 'https://plnkr.co/'
+            },
+          ]},
           {label: 'flash-note', position: 'right', href: 'https://juejin.cn/flash-note/list'},
           {label: '脑图', position: 'right', href: 'https://naotu.baidu.com/home'},
           {label: 'GitHub', position: 'right', href: 'https://github.com/fqishuai/blog'},
@@ -168,6 +190,19 @@ const config = {
             ],
           },
           {
+            title: 'Tools',
+            items: [
+              {
+                label: '码力全开',
+                href: 'https://maliquankai.com/',
+              },
+              {
+                label: 'transform.tools',
+                href: 'https://transform.tools/html-to-jsx',
+              },
+            ],
+          },
+          {
             title: 'More',
             items: [
               {
@@ -194,6 +229,10 @@ const config = {
                 label: '转转前端',
                 href: 'https://www.zhihu.com/people/da-zhuan-zhuan-fe',
               },
+              {
+                label: 'bobbyhadz blog',
+                href: 'https://bobbyhadz.com/',
+              },
             ],
           },
         ],
@@ -202,6 +241,10 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+      },
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 5,
       },
     }),
 };

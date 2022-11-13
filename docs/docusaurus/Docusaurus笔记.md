@@ -4,7 +4,7 @@ sidebar_position: 1
 # pagination_prev: intro
 # pagination_next: tutorial-basics/create-a-document
 slug: /learn-notes
-tags: [Docusaurus学习笔记]
+tags: [以内容为中心的静态网站]
 ---
 
 # Docusaurus笔记
@@ -32,6 +32,8 @@ tags: [Docusaurus学习笔记]
 :::tip
 目录默认只包括 h2 和 h3 标题。
 :::
+如果你需要更改显示的标题范围，你可以自定义最小和最大的标题级别——既可以按页配置，也可以全局设置[目录标题级别](https://docusaurus.io/zh-CN/docs/markdown-features/toc#table-of-contents-heading-level)。
+> "tableOfContents.minHeadingLevel" must be greater than or equal to 2
 
 ### 2.3 页面片段
 在 docs 目录下所有带有下划线（_）前缀的文件都会被当作页面「片段」，并被默认忽略。

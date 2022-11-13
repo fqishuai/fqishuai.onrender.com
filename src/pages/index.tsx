@@ -52,33 +52,59 @@ export default function Home(): JSX.Element {
           </div>
         </div>
         <div className='mx-10 my-5 flex justify-around flex-wrap'>
-          <Card
-            linkValue='https://www.patterns.dev/'
-            title='Patterns.dev'
-            bgColor='bg-green-500'
+        <Card
+            linkValue='https://javascript.info/'
+            title='javascript.info'
+            bgColor='bg-[#FBE7C6]'
+            titleColor='text-[#15B5B0]'
+            contntColor='text-[#FA26A0]'
           >
-            Patterns.dev is a free book on design patterns and component patterns for building powerful web apps with vanilla JavaScript and React.
+            The Modern JavaScript Tutorial: 涵盖JavaScript和浏览器的讲解
           </Card>
           <Card
             linkValue='https://github.com/getify/Functional-Light-JS'
             title='Functional-Light-JS'
-            bgColor='bg-orange-300'
+            bgColor='bg-[#B4F8C8]'
+            titleColor='text-[#FA26A0]'
+            contntColor='text-[#FFA384]'
           >
             "Functional-Light JavaScript" explores the core principles of functional programming (FP) as they are applied to JavaScript.
           </Card>
           <Card
             linkValue='https://ideazhao.com/2021/09/05/wechat_function/'
             title='JavaScript世界的一等公民—函数'
-            bgColor='bg-indigo-500'
+            bgColor='bg-[#A0E7E5]'
+            titleColor='text-[#FA26A0]'
+            contntColor='text-[#FFA384]'
           >
             现今各种框架、工具‘横行’，到处在讲原理和源码，更有跨端技术需要我们去探索，但如果基本功不好，学什么都是事倍功半，效果很不好。
           </Card>
           <Card
             linkValue='https://js.okten.cn'
             title='JavaScript: The Definitive Guide'
-            bgColor='bg-indigo-500'
+            bgColor='bg-[#FFAEBC]'
+            titleColor='text-[#EFE7BC]'
+            contntColor='text-[#15B5B0]'
           >
             犀牛书---《JavaScript 权威指南第七版》中英对照
+          </Card>
+          <Card
+            linkValue='https://eloquentjavascript.net/'
+            title='Eloquent JavaScript'
+            bgColor='bg-[#FFAEBC]'
+            titleColor='text-[#EFE7BC]'
+            contntColor='text-[#15B5B0]'
+          >
+            Eloquent JavaScript 3rd edition (2018)
+          </Card>
+          <Card
+            linkValue='https://www.patterns.dev/'
+            title='Patterns.dev'
+            bgColor='bg-[#FBE7C6]'
+            titleColor='text-[#15B5B0]'
+            contntColor='text-[#FA26A0]'
+          >
+            Patterns.dev is a free book on design patterns and component patterns for building powerful web apps with vanilla JavaScript and React.
           </Card>
         </div>
       </div>

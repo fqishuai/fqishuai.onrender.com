@@ -61,9 +61,13 @@ location = /xx（xx为你的代理的项目名） {
 ### 1. pv和uv的区别是PV具体是指网站的是页面浏览量或者点击量，页面被刷新一次就计算一次，UV指访问网站的一台电脑客户端为一个访客。UV访客的统计是24小时内相同的客户端只被计算一次。一个UV可以用很多PV，一个PV也只能对应一个IP。PV是和IP的数量是成正比的，因为页面被刷新一次那么PV就会被记录一次，所以IP越多，说明网站的PV数据也就随之增多。但是需要注意的是PV并不是网站的页面的访问者数量，而是网站被访问的页面数量。因为一个访问者可以多次刷新页面，增加PV数量。
 
 ### 2. Axios的Post请求传参的两种方式
-> [Axios的Post请求传参的两种方式](https://www.jianshu.com/p/41d248172028)
+:::tip
+[Axios](https://axios-http.com/)是一个基于 promise 的网络请求库，可以用于浏览器和 node.js
+:::
 
-> [ajax post请求怎么传参_怎么让axios发送json格式的请求数据？](https://blog.csdn.net/weixin_31236935/article/details/112481242)
+- [Axios的Post请求传参的两种方式](https://www.jianshu.com/p/41d248172028)
+
+- [ajax post请求怎么传参_怎么让axios发送json格式的请求数据？](https://blog.csdn.net/weixin_31236935/article/details/112481242)
 
 - 表单 Form Data
 - json字符串 Request Payload
@@ -75,6 +79,12 @@ location = /xx（xx为你的代理的项目名） {
 // 改成如下就能正确接到参数
 `https://xxx/aaa/bbb?a=${encodeURIComponent({b:1})}`
 ```
+
+4. timeout of xxx
+当axios设置了[timeout](https://axios-http.com/zh/docs/req_config)，超时的情况有以下几种：
+- 后端在部署时前端有请求
+- 请求到了后端，后端有异常导致本次请求超时
+- 请求没到后端(拦截器日志都没打印出来说明没到后端)，比如后端服务只允许企业内网访问，当用户断开了内网自动连接了手机热点等非内部网络时，请求一直pending，超出设置的值后请求变为canceled，报错timeout of xxx
 
 ## 三、跨域
 - [用最简单的方式讲清楚常见的几种跨域解决方案](https://mp.weixin.qq.com/s/BUROGy6x-o37TPWHfLpwpQ)

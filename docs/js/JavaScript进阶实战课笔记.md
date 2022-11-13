@@ -1,11 +1,7 @@
 ---
-id: learnJS
 slug: insight
 tags: [原生js]
 ---
-
-# 深入JS_1
-> JavaScript进阶实战课 笔记
 
 ## 一、编程模式
 :::tip

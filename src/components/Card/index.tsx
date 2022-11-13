@@ -5,7 +5,8 @@ interface ICardProp {
   bgColor: string;
   children: JSX.Element | string;
   linkValue?: string;
-  titleBgColor?: string;
+  titleColor?: string;
+  contntColor?: string;
 }
 
 export default function Card(props: ICardProp): JSX.Element {
@@ -14,11 +15,11 @@ export default function Card(props: ICardProp): JSX.Element {
   }
   return <div className='card-container tailwind'>
     <div
-      className={`rounded-lg w-96 h-30 cursor-pointer p-2.5 box-border ${props.bgColor}`}
+      className={`rounded-lg w-96 h-32 cursor-pointer px-2.5 pt-2.5 mb-2.5 box-border ${props.bgColor}`}
       onClick={handleClick}
     >
-      <div className={`${props.titleBgColor} text-white text-2xl text-center pb-2`}>{props.title}</div>
-      <div>{props.children}</div>
+      <div className={`${props.titleColor} text-2xl text-center`}>{props.title}</div>
+      <div className={`text-center ${props.contntColor}`}>{props.children}</div>
     </div>
   </div>
 }
