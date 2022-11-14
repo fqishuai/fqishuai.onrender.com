@@ -4,7 +4,7 @@ tags: [react]
 ---
 
 :::tip
-[React]((https://beta.reactjs.org/)) is a library that lets you organize UI code by breaking it apart into pieces called components. React doesn’t take care of routing or data management.This means there are several ways to start a new React project:
+[React](https://beta.reactjs.org/) is a library that lets you organize UI code by breaking it apart into pieces called components. React doesn’t take care of routing or data management.This means there are several ways to start a new React project:
 - Start with a minimal toolchain, adding more features to your project as you go. (Great for learning!)
 - Start with an opinionated framework that has common features like data fetching and routing built-in.
 :::
@@ -783,6 +783,22 @@ const [count, setCount] = useState(0);
 console.log(count);  // 0
 setCount(count + 1); // Request a re-render with 1
 console.log(count);  // Still 0!
+```
+```jsx live
+function Gallery() {
+  const [count, setCount] = useState(0);
+
+  function handleClick() {
+    setCount(count + 1);
+  }
+
+  return (
+    <>
+      <button onClick={handleClick}> Count+1 </button>
+      <h3> {count} </h3>
+    </>
+  );
+}
 ```
 Here’s how that happens in action:
 1. 您的组件第一次呈现。因为您将 0 传递给 useState 作为 count 的初始值，所以它将返回 [0, setCount]。 React 记住 0 是最新的状态值。
