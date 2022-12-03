@@ -28,6 +28,12 @@ tags: [nodejs框架]
 - Agent
     > `app/extend/agent.js`  扩展 Agent 类
 
+:::info
+[例子：扩展Context，封装统一的response](https://code.juejin.cn/pen/7160667676237856798)
+> 参考：[如何规范接口输出协议——Eggjs最佳实践系列（一）](https://juejin.cn/post/6963458879032131621)
+:::
+
+
 ### 1.2 Application实例的访问方式
 - `ctx.app`
 
@@ -68,6 +74,17 @@ npm i
 npm run dev
 ```
 ![ts目录结构](img/eggjs-ts目录结构.jpg)
+
+问题：Property 'xxx' does not exist on type 'Application'，解决办法：在index.d.ts中进行声明：
+```typescript title="项目根目录/typings/index.d.ts"
+import 'egg';
+
+declare module 'egg' {
+  interface Application {
+    xxx: any;
+  }
+}
+```
 
 ## 2.自定义插件开发
 ```js
@@ -132,6 +149,25 @@ module.exports = (options) => {
 ```
 :::
 
+例子：封装中间件处理请求的路由未找到的情况
+```typescript title="项目根目录/app/middleware/notFoundHandler.ts"
+export default () => {
+  return async function notFoundHandler(ctx, next) {
+    await next(); // next()执行前用于处理请求，next()执行后用于处理响应
+    if (ctx.status === 404 && !ctx.body) {
+      ctx.body = ctx.acceptJSON ? {code: 0, message: 'Not Found'} : {code: 0, message: 'Page Not Found'};
+    }
+  }
+}
+```
+```typescript title="项目根目录/config/config.default.ts"
+config.middleware = [
+  'notFoundHandler',
+];
+
+// 注意：用于router的中间件，不需要在此配置，在router.ts中使用即可。
+```
+
 ### 6.2 使用中间件
 > 中间件的加载是有顺序的
 
@@ -188,3 +224,71 @@ module.exports = (app) => {
   - match：设置只有符合某些规则的请求才会经过这个中间件。
   - ignore：设置符合某些规则的请求不经过这个中间件。
 :::
+
+例子：在router中使用中间件gzip
+```typescript title="项目根目录/app/router.ts"
+import { Application } from 'egg';
+
+export default (app: Application) => {
+  const { controller, router, middleware } = app;
+  const gzipHandler = middleware.gzip({ threshold: 1024 });
+
+  router.post('/needgzip', gzipHandler, controller.handler);
+};
+```
+
+## 7. 日志
+eggjs产生的日志有三类:
+- 业务日志
+```plain
+common-error.log
+egg-agent.log
+egg-web.log
+${appInfo.name}-web.log
+```
+
+- 定时任务日志
+```plain
+egg-schedule.log
+```
+
+框架启动日志
+```plain
+master-stderr.log
+master-stdout.log
+```
+
+默认情况下，业务日志和定时任务日志都在${appInfo.root}/logs/${appInfo.name}目录下，例如 /home/admin/logs/example-app。
+而框架启动日志在${appInfo.root}/logs/目录下。
+
+当你要把日志文件转移到指定目录下，分三步:
+- 第一步对业务日志，需修改配置文件config.{env}.js
+```js
+config.logger = {
+  dir: '日志目录路径',
+};
+```
+
+- 第二步对定时任务日志，需修改配置文件config.{env}.js
+```js
+config.customLogger = {
+  scheduleLogger: {
+    consoleLevel: 'NONE',
+    file: 'aaa/bbb/egg-schedule.log',   // 新日志文件路径
+  },
+ };
+
+config.schedule = {
+  directory: [],
+};
+```
+
+- 第三步对框架启动日志，需要在启动命令上加参数
+```bash
+npm run start -- --stdout="/xx/master-stdout.log" --stderr="/xx/master-stderr.log"
+```
+
+> [基于Egg框架的日志链路追踪实践](https://www.nodejs.red/#/nodejs/logger?id=%e5%9f%ba%e4%ba%8eegg%e6%a1%86%e6%9e%b6%e7%9a%84%e6%97%a5%e5%bf%97%e9%93%be%e8%b7%af%e8%bf%bd%e8%b8%aa%e5%ae%9e%e8%b7%b5)
+
+## 8. egg-ts-helper
+ets clean 支持清除包含同名 tsx 文件的 js 文件

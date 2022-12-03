@@ -96,7 +96,7 @@ function demo(props) {
 
 #### 6.2 [Deep copy](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy)
 
-## 二、API
+## 二、API(应区分JS内置API和宿主环境API)
 ### 1. Object
 ### 1.1 Object.fromEntries
 :::note
@@ -249,6 +249,22 @@ Switch case 使用严格比较（===）。
 值必须与要匹配的类型相同。
 
 只有操作数属于同一类型时，严格比较才能为 true。
+
+### 9. Window
+#### 9.1 window.prompt
+> 显示一个对话框，对话框中包含一条文字信息，用来提示用户输入文字。
+```js
+result = window.prompt(text, value);
+
+// result 用来存储用户输入文字的字符串，或者是 null。
+// text 用来提示用户输入文字的字符串，如果没有任何提示内容，该参数可以省略不写。
+// value 文本输入框中的默认值，该参数也可以省略不写。不过在 Internet Explorer 7 和 8 中，省略该参数会导致输入框中显示默认值"undefined"。
+```
+
+### 10. Node
+> 各种类型的 DOM API 对象会从这个接口继承
+
+#### 10.1 Node.appendChild()
 
 ## 三、手写函数
 ### 1. 去重

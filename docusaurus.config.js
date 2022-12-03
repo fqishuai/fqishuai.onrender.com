@@ -93,9 +93,13 @@ const config = {
           {to: '/blog', label: 'Blog', position: 'right'},
           {to: '/todo-list', label: 'Pages', position: 'right'},
           {
-            label: '技术周报',
+            label: '技术报刊',
             position : 'right',
             items: [
+              {
+                label: '前沿技术解析',
+                href: 'https://www.thoughtworks.com/zh-cn/radar',
+              },
               {
                 label: '字节前端技术周报',
                 href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2ODQ1OTExOA==&action=getalbum&album_id=1706105889872527361&scene=173&from_msgid=2247500975&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
@@ -118,8 +122,16 @@ const config = {
               },
             ]
           },
-          {label: '极客课程', position: 'right', href: 'https://time.geekbang.org/dashboard/course'},
-          {label: '拉勾课程', position: 'right', href: 'https://kaiwu.lagou.com/learn'},
+          {label: 'course', position: 'right', items: [
+            {
+              label: '极客课程',
+              href: 'https://time.geekbang.org/dashboard/course'
+            },
+            {
+              label: '拉勾课程',
+              href: 'https://kaiwu.lagou.com/learn'
+            },
+          ]},
           {label: '图谱', position: 'right', href: 'https://f2e.tech/'},
           {label: 'coding', position: 'right', items: [
             {
@@ -171,6 +183,10 @@ const config = {
           {
             title: 'Community',
             items: [
+              {
+                label: 'CCF数字图书馆',
+                href: 'https://dl.ccf.org.cn/index.html?_ack=1',
+              },
               {
                 label: 'Segmentfault',
                 href: 'https://segmentfault.com/',

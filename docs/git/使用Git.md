@@ -56,6 +56,7 @@ tags: [git]
   - [(2) 操作步骤](#2-操作步骤)
   - [(3) 代码参考](#3-代码参考)
 - [41. github api](#41-github-api)
+- [42. 本地新建分支后push到远程](#42-本地新建分支后push到远程)
 
 
 ## 1. 使用git rebase合并分支(e.g.master合并dev)：git rebase dev
@@ -300,7 +301,7 @@ layout: default
 - 首先 git branch -m 旧分支名 新分支名
 - 其次 git push --delete origin 旧分支名
 - 将新分支名推上去 git push origin 新分支名
-- 将新本地分支和远程相连 git branch --set-upsteam-to origin/新分支名
+- 将新本地分支和远程相连 git branch --set-upstream-to origin/新分支名
 
 > 注意：如果修改远程master分支的名字，则：在Settings--->Branches中进行修改，然后：
 > - git branch -m master main
@@ -352,3 +353,6 @@ layout: default
 
 ## 41. github api
 - [github-api](https://www.npmjs.com/package/github-js)
+
+## 42. 本地新建分支后push到远程
+> git push --set-upstream origin 分支名
