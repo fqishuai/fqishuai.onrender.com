@@ -249,6 +249,14 @@ const config = {
                 label: 'bobbyhadz blog',
                 href: 'https://bobbyhadz.com/',
               },
+              {
+                label: 'maximeheckel blog',
+                href: 'https://blog.maximeheckel.com/',
+              },
+              {
+                label: 'JamesSinclair blog',
+                href: 'https://jrsinclair.com/',
+              },
             ],
           },
         ],
