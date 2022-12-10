@@ -2,7 +2,7 @@
 slug: mac-usage
 ---
 
-## Homebrew
+## 1. Homebrew
 :::tip
 mac安装软件使用[brew](https://brew.sh/)，安装完brew后注意终端的提示，需要操作两步设置brew的path
 node、git等尽量都别手动安装，不然卸载很痛苦～
@@ -13,17 +13,17 @@ node、git等尽量都别手动安装，不然卸载很痛苦～
 - brew update
 - brew uninstall
 
-## vscode的code命令
+## 2. vscode的code命令
 - 打开VSCode –> command+shift+p –> 输入shell command –> 点击提示Shell Command: Install ‘code’ command in PATH运行
 - 打开终端，cd到要用VSCode打开的文件夹，然后输入命令`code .`即可打开
 
-## 右键打开终端
+## 3. 右键打开终端
 在文件(夹)上右键--->服务--->新建位于文件夹位置的终端窗口
 
-## 显示（或者隐藏）隐藏的文件
+## 4. 显示（或者隐藏）隐藏的文件
 `Shift+Command+(.)`
 
-## 卸载手动安装的node
+## 5. 卸载手动安装的node
 - 运行如下命令：
 `sudo rm -rf /usr/local/{lib/node{,/.npm,_modules},bin,share/man}/{npm*,node*,man1/node*}`
 
@@ -31,7 +31,7 @@ node、git等尽量都别手动安装，不然卸载很痛苦～
 
 - 之后，您必须删除使用 NPM 安装的每个全局包。 为此，请在终端上运行以下命令`rm –rf ~/.npm`。 键入引号中的命令后，您将完成在 Mac 上卸载 Node 和卸载 NPM 的任务。
 
-## 远程连接
+## 6. 远程连接
 - ssh 连接远程服务器
   - 执行 `ssh 服务器用户名@服务器ip`，然后输入密码
 
@@ -53,17 +53,20 @@ node、git等尽量都别手动安装，不然卸载很痛苦～
 使用 put 命令，如果目录名称不存在于远程主机上的工作目录中，可能会报错。所以，首先在远程主机上创建一个具有相同名称的目录，然后从本地主机上传它。
 :::
 
-## kill端口号
+## 7. kill端口号
 ```bash
 sudo lsof -i :<PortNumber>
 
 kill -9 <PID>
 ```
 
-## 鼠标方向调整
+## 8. 鼠标方向调整
 :::tip
 系统偏好设置--->鼠标--->**勾掉** 滚动方向：自然
 :::tip
 
-## vscode快捷键
+## 9. vscode快捷键
 - Shift + Option + F 格式化代码
+
+## 10. 可视化查看/usr /tmp /var /etc等目录
+进入“访达”的偏好设置，选择“边栏”，勾中“硬盘”，再使用`Shift+Command+(.)`显示隐藏文件
