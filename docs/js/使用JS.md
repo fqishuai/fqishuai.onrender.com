@@ -5,7 +5,7 @@ tags: [原生js]
 ---
 
 # JavaScript
-
+> [Learn ES2015](https://babeljs.io/docs/en/learn)
 ## 一、基础
 ### 1. 循环
 
@@ -95,6 +95,11 @@ function demo(props) {
 #### 6.1 [Shallow copy](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy)
 
 #### 6.2 [Deep copy](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy)
+
+### 7. throw
+:::info
+throw 语句用来抛出一个用户自定义的异常，当前函数的执行将被停止（throw 之后的语句将不会执行），并且控制将被传递到调用堆栈中的第一个 catch 块。如果调用者函数中没有 catch 块，程序将会终止。
+:::
 
 ## 二、API(应区分JS内置API和宿主环境API)
 ### 1. Object

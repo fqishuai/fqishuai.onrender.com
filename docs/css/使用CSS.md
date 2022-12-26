@@ -52,6 +52,7 @@ tags: [css]
   - [37. css设置`position: absolute;`后点击事件时效](#37-css设置position-absolute后点击事件时效)
   - [38. 使用`@font-face`](#38-使用font-face)
   - [39. css选择器+、~](#39-css选择器)
+  - [40. flex布局实现一行n个，超出自动换行](#40-flex布局实现一行n个超出自动换行)
 
 ## 一、[CSS Modules](http://www.ruanyifeng.com/blog/2016/06/css_modules.html)
 
@@ -533,3 +534,27 @@ div.content {
 ### 39. css选择器+、~
 - `+` 相邻兄弟选择器: 可选择紧接在另一元素后的元素，且二者有相同父元素
 - `~` 兄弟选择器，又称匹配选择器: 作用是查找某一个指定元素的后面的所有兄弟结点
+
+### 40. flex布局实现一行n个，超出自动换行
+```jsx
+<div className='content'>
+  {
+    contentList.length>0 && contentList.map((contentItem,contentIndex) => <div className='content-item' key={contentIndex}>
+      {contentItem}
+    </div>)
+  }
+</div>
+```
+```scss
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  &>.content-item {
+    width: 14%;
+    margin: 0 calc(2% / 7 / 2) 11px calc(2% / 7 / 2);
+  }
+}
+```
+:::info
+参考[flex布局实现一行n个，超出自动换行](https://juejin.cn/post/7071919544394055710)
+:::
