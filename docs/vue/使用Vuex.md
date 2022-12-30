@@ -124,7 +124,7 @@ Vue.use(Vuex)
 
 ### 2. Vuex和单纯的全局对象的区别
 Vuex 和单纯的全局对象有以下两点不同：
-- Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
+- **Vuex 的状态存储是响应式的。** 当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
 - 你不能直接改变 store 中的状态。改变 store 中的状态的唯一途径就是显式地提交 (commit) mutation。这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。
 
 ### 3. `new Vuex.Store`
@@ -207,6 +207,8 @@ computed: mapState([
 ```
 
 ### 5. getters
+> 可以认为是 store 的计算属性。就像计算属性一样，getter 的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算。
+
 有时候我们需要从 store 中的 state 中派生出一些状态，例如对列表进行过滤并计数：
 ```js
 computed: {
@@ -216,3 +218,227 @@ computed: {
 }
 ```
 如果有多个组件需要用到此属性，我们要么复制这个函数，或者抽取到一个共享函数然后在多处导入它——无论哪种方式都不是很理想。
+
+#### 5.1 getter 接受 state 作为其第一个参数：
+```js
+const store = new Vuex.Store({
+  state: {
+    todos: [
+      { id: 1, text: '...', done: true },
+      { id: 2, text: '...', done: false }
+    ]
+  },
+  getters: {
+    doneTodos: state => {
+      return state.todos.filter(todo => todo.done)
+    }
+  }
+})
+```
+
+#### 5.2 getter 接受 getters 作为其第二个参数：
+```js
+getters: {
+  // ...
+  doneTodos: state => {
+    return state.todos.filter(todo => todo.done)
+  },
+  doneTodosCount: (state, getters) => {
+    return getters.doneTodos.length
+  }
+}
+```
+
+#### 5.3 也可以通过让 getter 返回一个函数，来实现给 getter 传参：
+> 注意，getter 在通过方法访问时，每次都会去进行调用，而不会缓存结果。
+
+```js
+getters: {
+  // ...
+  getTodoById: (state) => (id) => {
+    return state.todos.find(todo => todo.id === id)
+  }
+}
+
+this.$store.getters.getTodoById(2) // -> { id: 2, text: '...', done: false }
+```
+
+#### 5.4 在任何组件中使用getter：
+> 注意，getter 在通过属性访问时是作为 Vue 的响应式系统的一部分缓存其中的。
+
+```js
+computed: {
+  doneTodosCount () {
+    return this.$store.getters.doneTodosCount
+  }
+}
+```
+
+#### 5.5 辅助函数: mapGetters
+mapGetters 辅助函数仅仅是将 store 中的 getter 映射到局部计算属性：
+```js
+import { mapGetters } from 'vuex'
+
+export default {
+  // ...
+  computed: {
+  // 使用对象展开运算符将 getter 混入 computed 对象中
+    ...mapGetters([
+      'doneTodosCount',
+      'anotherGetter',
+      // ...
+    ])
+  }
+}
+
+// 如果你想将一个 getter 属性另取一个名字，使用对象形式：
+...mapGetters({
+  // 把 `this.doneCount` 映射为 `this.$store.getters.doneTodosCount`
+  doneCount: 'doneTodosCount'
+})
+```
+
+### 6. mutations
+> 更改 Vuex 的 store 中的状态的唯一方法是提交 mutation。不能直接调用一个 mutation handler，需要以相应的 type 调用 store.commit 方法。
+
+```js
+const store = new Vuex.Store({
+  state: {
+    count: 1,
+    obj: {},
+  },
+  mutations: {
+    increment (state) {
+      // 变更状态
+      state.count++
+    },
+    increment2 (state, payload) {
+      state.count += payload.amount
+    }
+  }
+})
+
+this.$store.commit('increment', 10);
+this.$store.commit('increment2', {
+  amount: 10
+});
+// 或者如下使用对象的方式commit
+this.$store.commit({
+  type: 'increment2',
+  amount: 10,
+});
+```
+
+- 当需要在对象上添加新属性时，使用`state.obj = { ...state.obj, newProp: 123 }`
+- **mutation 必须是同步函数**，这是因为 任何在回调函数中进行的状态的改变都是不可追踪的。
+
+#### 6.1 辅助函数：mapMutations
+```js
+import { mapMutations } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    // 数组的形式
+    ...mapMutations([
+      'increment', // 这样， this.increment() 就相当于 this.$store.commit('increment')
+      'incrementBy', // 也可以传参，this.incrementBy(amount) 就相当于 this.$store.commit('incrementBy', amount)
+    ]),
+
+    // 对象的形式
+    ...mapMutations({
+      add: 'increment' // 这样， this.add() 就相当于 this.$store.commit('increment')
+    })
+  }
+}
+```
+
+### 7. actions
+- action 提交的是 mutation，而不是直接变更状态
+- action 可以包含任意异步操作
+- context对象 与 store实例 具有相同的方法和属性，因此可以调用 context.commit 提交一个 mutation，或者通过 context.state 和 context.getters 来获取 state 和 getters
+- action 通过 store.dispatch 方法触发，store.dispatch 触发的action返回的是Promise时，store.dispatch 仍旧返回 Promise
+- 一个 store.dispatch 在不同模块中可以触发多个 action 函数。在这种情况下，只有当所有触发函数完成后，返回的 Promise 才会执行。
+
+```js
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    }
+  },
+  actions: {
+    increment (context) {
+      context.commit('increment')
+    },
+    incrementAsync ({ commit }) {
+      setTimeout(() => {
+        commit('increment')
+      }, 1000)
+    },
+    actionPromise ({ commit }) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          commit('someMutation')
+          resolve()
+        }, 1000)
+      })
+    },
+    actionPromise2 ({ dispatch, commit }) {
+      return dispatch('actionPromise').then(() => {
+        commit('someOtherMutation')
+      })
+    },
+    // 假设 getData() 和 getOtherData() 返回的是 Promise
+    async actionA ({ commit }) {
+      commit('gotData', await getData())
+    },
+    async actionB ({ dispatch, commit }) {
+      await dispatch('actionA') // 等待 actionA 完成
+      commit('gotOtherData', await getOtherData())
+    },
+  }
+})
+
+
+this.$store.dispatch('increment')
+
+// payload
+this.$store.dispatch('incrementAsync', {
+  amount: 10
+})
+
+// 对象形式
+this.$store.dispatch({
+  type: 'incrementAsync',
+  amount: 10
+})
+
+// store.dispatch 返回 Promise
+this.$store.dispatch('actionPromise').then(() => {
+  // ...
+})
+```
+
+#### 7.1 辅助函数：mapActions
+```js
+import { mapActions } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    // 数组形式
+    ...mapActions([
+      'increment', // 这样，this.increment() 就相当于 this.$store.dispatch('increment')
+      'incrementBy', // 也可以传参，this.incrementBy(amount) 就相当于 this.$store.dispatch('incrementBy', amount)
+    ]),
+    // 对象形式
+    ...mapActions({
+      add: 'increment', // 这样，this.add() 就相当于 this.$store.dispatch('increment')
+    })
+  }
+}
+```

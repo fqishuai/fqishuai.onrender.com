@@ -67,6 +67,7 @@ kill -9 <PID>
 
 ## 9. vscode快捷键
 - Shift + Option + F 格式化代码
+- Ctrl + - 返回上一步
 
 ## 10. 可视化查看/usr /tmp /var /etc等目录
 进入“访达”的偏好设置，选择“边栏”，勾中“硬盘”，再使用`Shift+Command+(.)`显示隐藏文件

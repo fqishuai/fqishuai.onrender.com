@@ -132,7 +132,15 @@ new Vue({
 - `pnpm add -D sass`（`Vite提供了对 .scss, .sass, .less, .styl 和 .stylus 文件的内置支持。`）
 > 如果使用的是单文件组件，可以通过 `<style lang="scss">`（或其他预处理器）自动开启。
 
-## 6. keep-alive
+## 6. [keep-alive](https://v2.cn.vuejs.org/v2/api/#keep-alive)
+> 主要用于保留组件状态或避免重新渲染。`<keep-alive>` 包裹动态组件时，会缓存不活动的组件实例，而不是销毁它们。
+> - `<keep-alive>` 是一个抽象组件：它自身不会渲染一个 DOM 元素，也不会出现在组件的父组件链中。
+> - 当组件在 `<keep-alive>` 内被切换，它的 activated 和 deactivated 这两个生命周期钩子函数将会被对应执行。
+
+- include 字符串或正则表达式或数组。只有名称匹配的组件会被缓存。
+- exclude 字符串或正则表达式或数组。任何名称匹配的组件都不会被缓存。
+- max 数字。最多可以缓存多少组件实例。
+
 
 ## 7. router.addRoute
 ### 7.1 注意查看使用的vue-router版本中是否有addRoute方法

@@ -101,6 +101,47 @@ function demo(props) {
 throw 语句用来抛出一个用户自定义的异常，当前函数的执行将被停止（throw 之后的语句将不会执行），并且控制将被传递到调用堆栈中的第一个 catch 块。如果调用者函数中没有 catch 块，程序将会终止。
 :::
 
+### 8. ES2015风格的计算属性命名功能
+> [计算属性名](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Object_initializer#%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7%E5%90%8D)
+
+ES2015中，使用字面量创建对象时也可以使用变量来创建属性名，具体方案是使用计算属性名（computed property name），使用形式是 `[property]` 或 `[表达式]`，如：
+```js
+var i = 1;
+var obj = {
+  [i]: 3
+};
+console.log(obj); // {'1': 3}
+
+var obj = {
+  a: 1
+};
+obj.b = 2;
+var k = 'c';
+obj[k] = 3;
+obj['a'] = 0;
+console.log(obj);
+
+// [表达式]
+var i = 0;
+var a = {
+  ["foo" + ++i]: i,
+  ["foo" + ++i]: i,
+  ["foo" + ++i]: i
+};
+
+console.log(a.foo1); // 1
+console.log(a.foo2); // 2
+console.log(a.foo3); // 3
+
+var param = 'size';
+var config = {
+  [param]: 12,
+  ["mobile" + param.charAt(0).toUpperCase() + param.slice(1)]: 4
+};
+
+console.log(config); // { size: 12, mobileSize: 4 }
+```
+
 ## 二、API(应区分JS内置API和宿主环境API)
 ### 1. Object
 ### 1.1 Object.fromEntries
