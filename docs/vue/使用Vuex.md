@@ -127,9 +127,10 @@ Vuex 和单纯的全局对象有以下两点不同：
 - **Vuex 的状态存储是响应式的。** 当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
 - 你不能直接改变 store 中的状态。改变 store 中的状态的唯一途径就是显式地提交 (commit) mutation。这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。
 
-### 3. `new Vuex.Store`
+### 3. 创建store实例
 > Vuex 使用单一状态树，用一个对象就包含了全部的应用层级状态。每个应用将仅仅包含一个 store 实例。存储在 Vuex 中的数据和 Vue 实例中的 data 遵循相同的规则，例如状态对象必须是纯粹 (plain) 的。
 
+#### 3.1 `new Vuex.Store`
 ```js
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -174,6 +175,25 @@ methods: {
   increment() {
     this.$store.commit('increment')
     console.log(this.$store.state.count)
+  }
+}
+```
+
+#### 3.2 createStore
+```js
+import { createStore } from 'vuex'
+
+const store = createStore({ ...options })
+```
+
+#### 3.3 useStore
+在 setup 钩子函数中调用该方法可以获取注入的 store。当使用组合式 API 时，可以通过调用该方法检索 store。
+```js
+import { useStore } from 'vuex'
+
+export default {
+  setup () {
+    const store = useStore()
   }
 }
 ```
@@ -442,3 +462,45 @@ export default {
   }
 }
 ```
+
+### 8. modules
+> Vuex 允许我们将 store 分割成模块（module）。每个模块拥有自己的 state、mutation、action、getter、甚至是嵌套子模块。这样可以避免当应用变得非常复杂时，所有的state、mutation、action、getter都写在一个对象中，导致store 对象变得相当臃肿。
+
+```js
+import { createStore } from 'vuex'
+
+const moduleA = {
+  state: () => ({
+    stateA: '',
+  }),
+  mutations: { ... },
+  actions: { ... },
+  getters: { ... }
+}
+
+const moduleB = {
+  state: () => ({
+    count: 0,
+  }),
+  mutations: {
+    increment (state, payload) { // 这里的 `state` 对象是模块moduleB的局部状态state
+      state.count += payload;
+    },
+  },
+  actions: { ... }
+}
+
+const store = createStore({ // 使用createStore，或者使用new Vuex.Store，创建store实例
+  modules: {
+    a: moduleA,
+    b: moduleB
+  }
+})
+
+// 组件中使用
+console.log(this.$store.state.a.stateA)
+
+this.$store.commit('b/increment', 1)
+```
+
+- `context.rootState` 获取根节点状态

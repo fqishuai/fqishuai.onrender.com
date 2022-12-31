@@ -356,3 +356,9 @@ layout: default
 
 ## 42. 本地新建分支后push到远程
 > git push --set-upstream origin 分支名
+
+## 43. 报错：HTTP/2 stream 1 was not closed cleanly before end of the underlying stream
+是git默认使用的通信协议出现了问题，可以通过将默认通信协议修改为 http/1.1 来解决该问题：
+```bash
+git config --global http.version HTTP/1.1
+```

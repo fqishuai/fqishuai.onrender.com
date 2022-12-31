@@ -10,7 +10,7 @@ tags: [nginx]
 ```
 
 ## 2. A服务器访问B服务器的文件
-> 参考[https://blog.csdn.net/sinat_15733233/article/details/123255654](https://blog.csdn.net/sinat_15733233/article/details/123255654)
+> 参考[nginx访问另一台服务器上的文件](https://blog.csdn.net/sinat_15733233/article/details/123255654)
 
 - A服务器的配置
 ```bash
