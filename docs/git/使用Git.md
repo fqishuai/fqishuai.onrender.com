@@ -4,7 +4,7 @@ tags: [git]
 ---
 
 - [1. 使用git rebase合并分支(e.g.master合并dev)：git rebase dev](#1-使用git-rebase合并分支egmaster合并devgit-rebase-dev)
-- [2. 使用git rebase合并commits：git rebase -i [start-commitid]  [end-commitid]](#2-使用git-rebase合并commitsgit-rebase--i-start-commitid--end-commitid)
+- [2. 使用git rebase合并commits：git rebase -i \[start-commitid\]  \[end-commitid\]](#2-使用git-rebase合并commitsgit-rebase--i-start-commitid--end-commitid)
 - [3. git pull 报错：fatal: Exiting because of unfinished merge.](#3-git-pull-报错fatal-exiting-because-of-unfinished-merge)
 - [4. 不要使用git rebase修改已经push到远端的commit](#4-不要使用git-rebase修改已经push到远端的commit)
 - [5. 强制推送到远端分支(e.g. feature分支)](#5-强制推送到远端分支eg-feature分支)
@@ -15,7 +15,7 @@ tags: [git]
 - [10. 推送现有空的存储库](#10-推送现有空的存储库)
 - [11. 推送已有存储库](#11-推送已有存储库)
 - [12. git大文件push](#12-git大文件push)
-- [13. git branch --set-upstream-to=origin/remote_branch local_branch](#13-git-branch---set-upstream-tooriginremote_branch-local_branch)
+- [13. git branch --set-upstream-to=origin/remote\_branch local\_branch](#13-git-branch---set-upstream-tooriginremote_branch-local_branch)
 - [14. 查看某个stash改动的文件](#14-查看某个stash改动的文件)
 - [15. 查看某个stash具体内容](#15-查看某个stash具体内容)
 - [16. git subtree](#16-git-subtree)
@@ -57,6 +57,7 @@ tags: [git]
   - [(3) 代码参考](#3-代码参考)
 - [41. github api](#41-github-api)
 - [42. 本地新建分支后push到远程](#42-本地新建分支后push到远程)
+- [43. 报错：HTTP/2 stream 1 was not closed cleanly before end of the underlying stream](#43-报错http2-stream-1-was-not-closed-cleanly-before-end-of-the-underlying-stream)
 
 
 ## 1. 使用git rebase合并分支(e.g.master合并dev)：git rebase dev

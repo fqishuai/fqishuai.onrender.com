@@ -198,7 +198,17 @@ export default {
 }
 ```
 
-### 4. 辅助函数：mapState
+#### 4. state
+注意：如果使用一个 **纯对象** 来声明模块的state，那么这个state对象会通过引用被共享，导致state对象被修改时 store 或模块间数据互相污染的问题。所以，更严谨地，应该使用一个 **函数** 来声明模块state（仅 2.3.0+ 支持）
+```js
+const reusableModule = {
+  state: () => ({
+    foo: 'bar'
+  }),
+}
+```
+
+#### 4.1 辅助函数：mapState
 > mapState 函数返回的是一个对象。用于简化写法
 
 ```js
@@ -221,8 +231,7 @@ computed: {
 当映射的计算属性的名称与 state 的子节点名称相同时，也可以给 mapState 传一个字符串数组：
 ```js
 computed: mapState([
-  // 映射 this.count 为 store.state.count
-  'count'
+  'count', // 这样，this.count 就相当于 store.state.count
 ])
 ```
 
@@ -482,12 +491,23 @@ const moduleB = {
   state: () => ({
     count: 0,
   }),
+  getters: {
+    sumWithRootCount (state, getters, rootState) {
+      return state.count + rootState.count
+    }
+  },
   mutations: {
     increment (state, payload) { // 这里的 `state` 对象是模块moduleB的局部状态state
       state.count += payload;
     },
   },
-  actions: { ... }
+  actions: {
+    incrementIfOddOnRootSum ({ state, commit, rootState }) {
+      if ((state.count + rootState.count) % 2 === 1) {
+        commit('increment')
+      }
+    }
+  },
 }
 
 const store = createStore({ // 使用createStore，或者使用new Vuex.Store，创建store实例
@@ -504,3 +524,172 @@ this.$store.commit('b/increment', 1)
 ```
 
 - `context.rootState` 获取根节点状态
+
+#### 8.1 带命名空间的module
+- 可以通过添加 `namespaced: true` 的方式使module成为带命名空间的module
+```js
+const moduleA = {
+  namespaced: true,
+  state: () => ({
+    stateA: '',
+  }),
+  mutations: { ... },
+  actions: { ... },
+  getters: { ... }
+}
+```
+
+- 不添加 `namespaced: true` 的情况下，module内部的 action、mutation、getter 仍然是注册在**全局命名空间**的，不要在不同的、无命名空间的module中定义两个相同的 getter，这样会导致错误。
+
+- 当module设置`namespaced: true`后，getter、action 及 mutation 会带上module的路径
+```js
+const store = createStore({
+  modules: {
+    account: {
+      namespaced: true,
+
+      // 模块内容（module assets）
+      state: () => ({
+        name: '',
+      }), // 模块内的状态已经是嵌套的了，使用 `namespaced` 属性不会对其产生影响 -> this.$store.state.account.name
+      getters: {
+        isAdmin () { ... } // -> this.$store.getters['account/isAdmin']
+      },
+      actions: {
+        login () { ... } // -> this.$store.dispatch('account/login')
+      },
+      mutations: {
+        login () { ... } // -> this.$store.commit('account/login')
+      },
+    },
+  },
+});
+```
+
+- 在带命名空间的module内访问全局命名空间的内容
+```js
+modules: {
+  foo: {
+    namespaced: true,
+
+    getters: {
+      // 在这个模块的 getter 中，`getters` 被局部化了
+      // 你可以使用 getter 的第四个参数来调用 `rootGetters`
+      someGetter (state, getters, rootState, rootGetters) {
+        getters.someOtherGetter // -> 'foo/someOtherGetter'
+        rootGetters.someOtherGetter // -> 'someOtherGetter'
+        rootGetters['bar/someOtherGetter'] // -> 'bar/someOtherGetter'
+      },
+      someOtherGetter: state => { ... }
+    },
+
+    actions: {
+      // 在这个模块中， dispatch 和 commit 也被局部化了
+      // 他们可以接受 `root` 属性以访问根 dispatch 或 commit
+      someAction ({ dispatch, commit, getters, rootGetters }) {
+        getters.someGetter // -> 'foo/someGetter'
+        rootGetters.someGetter // -> 'someGetter'
+        rootGetters['bar/someGetter'] // -> 'bar/someGetter'
+
+        dispatch('someOtherAction') // -> 'foo/someOtherAction'
+        dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+
+        commit('someMutation') // -> 'foo/someMutation'
+        commit('someMutation', null, { root: true }) // -> 'someMutation'
+      },
+      someOtherAction (ctx, payload) { ... }
+    }
+  }
+}
+```
+
+- 在带命名空间的module内注册全局 action
+```js
+{
+  actions: {
+    someOtherAction ({dispatch}) {
+      dispatch('someAction')
+    }
+  },
+  modules: {
+    foo: {
+      namespaced: true,
+
+      actions: {
+        someAction: { // 添加 root: true，并将这个 action 的定义放在函数 handler 中, 这样该action就会被注册到全局命名空间
+          root: true,
+          handler (namespacedContext, payload) { ... } // -> 'someAction'
+        }
+      }
+    }
+  }
+}
+```
+
+- 带命名空间的 state、getters、mutatioins、actions 使用辅助函数 mapState、mapGetters、mapMutations、mapActions 时，可以将module的空间名称字符串作为第一个参数传递给上述辅助函数
+```js
+computed: {
+  ...mapState('some/nested/module', {
+    a: state => state.a,
+    b: state => state.b
+  }),
+  ...mapGetters('some/nested/module', [
+    'someGetter', // -> this.someGetter
+    'someOtherGetter', // -> this.someOtherGetter
+  ])
+},
+methods: {
+  ...mapActions('some/nested/module', [
+    'foo', // -> this.foo()
+    'bar' // -> this.bar()
+  ])
+}
+```
+
+- 可以通过使用 `createNamespacedHelpers` 创建基于某个命名空间辅助函数
+```js
+import { createNamespacedHelpers } from 'vuex'
+
+const { mapState, mapActions } = createNamespacedHelpers('some/nested/module')
+
+export default {
+  computed: {
+    // 在 `some/nested/module` 中查找
+    ...mapState({
+      a: state => state.a,
+      b: state => state.b
+    })
+  },
+  methods: {
+    // 在 `some/nested/module` 中查找
+    ...mapActions([
+      'foo',
+      'bar'
+    ])
+  }
+}
+```
+
+#### 8.2 动态注册module
+在 store 创建之后，你可以使用 `store.registerModule` 方法注册模块：
+```js
+import { createStore } from 'vuex'
+
+const store = createStore({ /* 选项 */ })
+
+// 注册模块 `myModule`
+store.registerModule('myModule', {
+  // ...
+})
+
+// 注册嵌套模块 `nested/myModule`
+store.registerModule(['nested', 'myModule'], { // 注意，嵌套模块是以数组的形式传参给registerModule
+  // ...
+})
+```
+
+- 然后就可以通过 `store.state.myModule` 和 `store.state.nested.myModule` 访问对应module的state
+
+- 可以使用 `store.unregisterModule(moduleName)` 来动态卸载模块。注意，不能使用此方法卸载静态模块（即创建 store 时声明的模块）。
+
+- 可以通过 `store.hasModule(moduleName)` 方法检查该模块是否已经被注册到 store。注意，嵌套模块应该以数组的形式传参给hasModule
