@@ -5,8 +5,40 @@ tags: [原生js]
 ---
 
 # JavaScript
-> [Learn ES2015](https://babeljs.io/docs/en/learn)
+:::info
+JavaScript 没有输入或输出的概念，它是一个在宿主环境（host environment）下运行的脚本语言，任何与外界沟通的机制都是由宿主环境提供的。浏览器是最常见的宿主环境，但在非常多的其他程序中也包含 JavaScript 解释器，如 Adobe Acrobat、Adobe Photoshop、SVG 图像、Yahoo！的 Widget 引擎，Node.js 之类的服务器端环境，NoSQL 数据库（如开源的 [Apache CouchDB](https://couchdb.apache.org/))、嵌入式计算机，以及包括 [GNOME](https://www.gnome.org/)（注：GNU/Linux 上最流行的 GUI 之一）在内的桌面环境等等。
+
+JavaScript 是一种多范式的动态语言，它包含类型、运算符、标准内置（built-in）对象和方法。
+
+JavaScript 支持面向对象编程。JavaScript是通过**[原型链（prototype chain）](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)**而不是 [类](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Classes) 来支持面向对象编程。
+
+JavaScript 也支持函数式编程。在JavaScript中，函数也是对象，函数也可以被保存在变量中，并且像其他对象一样被传递。
+
+学习资料：
+- [重新介绍 JavaScript](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Language_Overview)
+- [Learn ES2015](https://babeljs.io/docs/en/learn)
+- [ecma](https://www.ecma-international.org/)
+- [tc39](https://tc39.es/) 所属 Ecma International 的 TC39 是一个由 JavaScript 开发者、实现者、学者等组成的团体，与 JavaScript 社区合作维护和发展 JavaScript 的标准。
+:::
+
 ## 一、基础
+### 1. 类型
+- Number（数字）
+- String（字符串）
+- Boolean（布尔）
+- Symbol（符号）（ES2015 新增）
+- Object（对象）
+  - Function（函数）
+  - Array（数组）
+  - Date（日期）
+  - RegExp（正则表达式）
+- null（空）
+- undefined（未定义）
+
+JavaScript 还有一种内置的 [Error（错误）](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Error)类型。
+
+JavaScript 还有一种内置的 [BigInt](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt) 类型。
+
 ### 1. 循环
 
 ### 2. 异步
