@@ -1,5 +1,5 @@
 ---
-tags: [构建工具]
+tags: [Building tool, Module-bundler]
 ---
 
 ## 一、使用

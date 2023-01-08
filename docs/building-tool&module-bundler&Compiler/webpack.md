@@ -1,5 +1,5 @@
 ---
-tags: [编译/构建 工具]
+tags: [Building tool, Module-bundler]
 ---
 
 :::tip

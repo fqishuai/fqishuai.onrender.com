@@ -86,7 +86,7 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'js/learnJS',
+            docId: 'index/docsIndex',
             position: 'right',
             label: 'Docs',
           },
@@ -164,6 +164,49 @@ const config = {
         style: 'dark',
         links: [
           {
+            title: 'Trending',
+            items: [
+              {
+                label: 'JS Risings Stars',
+                href: 'https://risingstars.js.org/',
+              },
+            ],
+          },
+          {
+            title: 'Blog Site',
+            items: [
+              {
+                label: 'builder.io blog',
+                href: 'https://www.builder.io/blog',
+              },
+              {
+                label: 'JamesSinclair blog',
+                href: 'https://jrsinclair.com/',
+              },
+              {
+                label: 'bobbyhadz blog',
+                href: 'https://bobbyhadz.com/',
+              },
+              {
+                label: 'maximeheckel blog',
+                href: 'https://blog.maximeheckel.com/',
+              },
+            ],
+          },
+          {
+            title: 'Tools',
+            items: [
+              {
+                label: '码力全开',
+                href: 'https://maliquankai.com/',
+              },
+              {
+                label: 'transform.tools',
+                href: 'https://transform.tools/html-to-jsx',
+              },
+            ],
+          },
+          {
             title: 'Pages',
             items: [
               {
@@ -206,19 +249,6 @@ const config = {
             ],
           },
           {
-            title: 'Tools',
-            items: [
-              {
-                label: '码力全开',
-                href: 'https://maliquankai.com/',
-              },
-              {
-                label: 'transform.tools',
-                href: 'https://transform.tools/html-to-jsx',
-              },
-            ],
-          },
-          {
             title: 'More',
             items: [
               {
@@ -244,18 +274,6 @@ const config = {
               {
                 label: '转转前端',
                 href: 'https://www.zhihu.com/people/da-zhuan-zhuan-fe',
-              },
-              {
-                label: 'bobbyhadz blog',
-                href: 'https://bobbyhadz.com/',
-              },
-              {
-                label: 'maximeheckel blog',
-                href: 'https://blog.maximeheckel.com/',
-              },
-              {
-                label: 'JamesSinclair blog',
-                href: 'https://jrsinclair.com/',
               },
             ],
           },
