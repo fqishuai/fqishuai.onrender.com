@@ -39,6 +39,12 @@ JavaScript 还有一种内置的 [Error（错误）](https://developer.mozilla.o
 
 JavaScript 还有一种内置的 [BigInt](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/BigInt) 类型。
 
+```jsx live
+alert(undefined == null)
+alert(undefined == 0)
+alert(null == 0)
+```
+
 ### 1. 循环
 
 ### 2. 异步
