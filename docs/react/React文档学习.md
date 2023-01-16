@@ -9,6 +9,10 @@ tags: [react]
 - Start with an opinionated framework that has common features like data fetching and routing built-in.
 :::
 
+:::info
+[React JS Best Practices From The New Docs](https://sebastiancarlos.medium.com/react-js-best-practices-from-the-new-docs-1c65570e785d)
+:::
+
 - [一、创建React工程](#一创建react工程)
   - [1. minimal toolchain---Create React App](#1-minimal-toolchain---create-react-app)
   - [2. full-featured framework---Next.js](#2-full-featured-framework---nextjs)
@@ -26,7 +30,7 @@ tags: [react]
       - [2.1.2. JSX的花括号中可以写任何JS表达式](#212-jsx的花括号中可以写任何js表达式)
       - [2.1.3. JSX 元素不是“实例”(instances)，因为它们不保存任何内部状态，也不是真正的 DOM 节点。](#213-jsx-元素不是实例instances因为它们不保存任何内部状态也不是真正的-dom-节点)
       - [2.1.4. React的JSX中表达式为false时不会渲染任何内容。React将 false 视为 JSX 树中的“漏洞”，就像 null 或 undefined 一样，并不会在其位置渲染任何内容。](#214-react的jsx中表达式为false时不会渲染任何内容react将-false-视为-jsx-树中的漏洞就像-null-或-undefined-一样并不会在其位置渲染任何内容)
-      - [2.1.5. JSX表达式中使用逻辑与操作符时，&&的左边不要放数字。JavaScript 自动将 && 左侧转换为布尔值。如果左边是 0，那么整个表达式都会得到那个值 (0)，React 会渲染 0 而不是什么都没有。](#215-jsx表达式中使用逻辑与操作符时的左边不要放数字javascript-自动将--左侧转换为布尔值如果左边是-0那么整个表达式都会得到那个值-0react-会渲染-0-而不是什么都没有)
+      - [2.1.5. JSX表达式中使用逻辑与操作符时，\&\&的左边不要放数字。JavaScript 自动将 \&\& 左侧转换为布尔值。如果左边是 0，那么整个表达式都会得到那个值 (0)，React 会渲染 0 而不是什么都没有。](#215-jsx表达式中使用逻辑与操作符时的左边不要放数字javascript-自动将--左侧转换为布尔值如果左边是-0那么整个表达式都会得到那个值-0react-会渲染-0-而不是什么都没有)
     - [2.2 Keeping components pure](#22-keeping-components-pure)
       - [2.2.1. 纯函数](#221-纯函数)
       - [2.2.2. Strict Mode](#222-strict-mode)
@@ -63,6 +67,8 @@ tags: [react]
     - [5.3 Sharing state between components](#53-sharing-state-between-components)
     - [5.4 Preserving and resetting state 保留/重置状态](#54-preserving-and-resetting-state-保留重置状态)
     - [5.5 Extracting state logic into a reducer](#55-extracting-state-logic-into-a-reducer)
+    - [5.6 Passing data deeply with context](#56-passing-data-deeply-with-context)
+    - [5.7 Scaling up with reducer and context 使用 reducer 和 context 进行扩展](#57-scaling-up-with-reducer-and-context-使用-reducer-和-context-进行扩展)
 - [三、Hooks](#三hooks)
   - [1. useState](#1-usestate)
     - [1.1 useState怎么区分不同的state？](#11-usestate怎么区分不同的state)
@@ -1508,11 +1514,62 @@ Sometimes, you want the state of two components to always change together. To do
 
 #### 5.4 Preserving and resetting state 保留/重置状态
 :::tip
-- 当你重新渲染一个组件时，React 需要决定树的哪些部分要保留（和更新），哪些部分要丢弃或从头开始重新创建。在大多数情况下，React 的自动行为工作得很好。默认情况下，React 保留树中与先前渲染的组件树“匹配”的部分。
+- When you re-render a component, React needs to decide which parts of the tree to keep (and update), and which parts to discard or re-create from scratch. In most cases, React’s automatic behavior works well enough. By default, React preserves the parts of the tree that “match up” with the previously rendered component tree. 当你重新渲染一个组件时，React 需要决定树的哪些部分要保留（和更新），哪些部分要丢弃或从头开始重新创建。在大多数情况下，React 的自动行为工作得很好。默认情况下，React 保留树中与先前渲染的组件树“匹配”的部分。
 - React 允许您覆盖默认行为，通过向组件传递不同的 `key` 来强制组件重置其状态，即从头开始重新创建该组件。
 :::
 
 #### 5.5 Extracting state logic into a reducer
+- useReducer 是useState的替代方案，当有多个event handlers更新一个state时，使用useReducer更合适
+```jsx
+// 使用useState
+function Counter({initialCount}) {
+  const [count, setCount] = useState(initialCount);
+  return (
+    <>
+      Count: {count}
+      <button onClick={() => setCount(initialCount)}>Reset</button>
+      <button onClick={() => setCount(prevCount => prevCount - 1)}>-</button>
+      <button onClick={() => setCount(prevCount => prevCount + 1)}>+</button>
+    </>
+  );
+}
+
+// 使用useReducer
+const initialState = {count: 0};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return {count: state.count + 1};
+    case 'decrement':
+      return {count: state.count - 1};
+    default:
+      throw new Error();
+  }
+}
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({type: 'decrement'})}>-</button>
+      <button onClick={() => dispatch({type: 'increment'})}>+</button>
+    </>
+  );
+}
+```
+
+- 使用 useReducer 还能给那些会触发深更新的组件做性能优化，因为你可以向子组件传递 dispatch 而不是回调函数，比如[这个例子](https://codesandbox.io/s/39bmj9?file=/App.js&utm_medium=sandpack)
+
+#### 5.6 Passing data deeply with context
+- createContext
+- useContext
+
+[查看示例](https://codesandbox.io/s/sbhymf?file=/Section.js&utm_medium=sandpack)
+
+#### 5.7 Scaling up with reducer and context 使用 reducer 和 context 进行扩展
+[reducer和context结合使用](https://codesandbox.io/s/rxg0dv?file=/TasksContext.js&utm_medium=sandpack)
 
 ## 三、Hooks
 ### 1. useState

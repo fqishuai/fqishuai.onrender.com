@@ -45,8 +45,6 @@ alert(undefined == 0)
 alert(null == 0)
 ```
 
-### 1. 循环
-
 ### 2. 异步
 ```jsx live
 function AsyncDemo(props) {
@@ -93,7 +91,7 @@ function AsyncDemo(props) {
 ```
 
 ### 3. 正则表达式
-### 3.1 提取小括号中的内容
+#### 3.1 提取小括号中的内容
 ```jsx live
 function demo(props) {
   // 提取小括号中的内容
@@ -108,7 +106,7 @@ function demo(props) {
 }
 ```
 
-### 3.2 手机号码中间 4 位用星号（*）替换显示
+#### 3.2 手机号码中间 4 位用星号（*）替换显示
 ```jsx live
 function demo(props) {
   // 提取小括号中的内容
@@ -130,6 +128,16 @@ function demo(props) {
 [如何将js回调函数中的数据返回给最外层函数？](https://segmentfault.com/q/1010000013400193/a-1020000013407882)
 
 ### 6. 拷贝
+:::tip
+In JavaScript, all standard built-in object-copy operations (
+  - spread syntax
+  - Array.prototype.concat()
+  - Array.prototype.slice()
+  - Array.from()
+  - Object.assign()
+  - Object.create()
+) create shallow copies rather than deep copies.
+:::
 #### 6.1 [Shallow copy](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy)
 
 #### 6.2 [Deep copy](https://developer.mozilla.org/en-US/docs/Glossary/Deep_copy)
@@ -182,7 +190,7 @@ console.log(config); // { size: 12, mobileSize: 4 }
 
 ## 二、API(应区分JS内置API和宿主环境API)
 ### 1. Object
-### 1.1 Object.fromEntries
+#### 1.1 Object.fromEntries
 :::note
 Object.fromEntries() 方法接收一个键值对的列表参数，并返回一个带有这些键值对的新对象。这个迭代参数应该是一个能够实现@@iterator方法的的对象，返回一个迭代器对象。它生成一个具有两个元素的类数组的对象，第一个元素是将用作属性键的值，第二个元素是与该属性键关联的值。
 Object.fromEntries() 执行与 Object.entries 互逆的操作。
@@ -199,36 +207,64 @@ const obj = Object.fromEntries(arr);
 console.log(obj); // { 0: "a", 1: "b", 2: "c" }
 ```
 
-### 1.2 [Object.create](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
+#### 1.2 [Object.create](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
 :::note
 Object.create() 方法用于创建一个新对象，使用现有的对象来作为新创建对象的原型（prototype）。
 :::
 
-### 1.3 [Object.getPrototypeOf](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/GetPrototypeOf)
+#### 1.3 [Object.getPrototypeOf](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/GetPrototypeOf)
 :::note
 Object.getPrototypeOf() 方法返回指定对象的原型（内部[[Prototype]]属性的值）。
 :::
 
+#### 1.4 Object.is
+用于判断两个值是否相同。
+```js
+// Case 1: Evaluation result is the same as using ===
+Object.is(25, 25); // true
+Object.is("foo", "foo"); // true
+Object.is("foo", "bar"); // false
+Object.is(null, null); // true
+Object.is(undefined, undefined); // true
+Object.is(window, window); // true
+Object.is([], []); // false
+const foo = { a: 1 };
+const bar = { a: 1 };
+const sameFoo = foo;
+Object.is(foo, foo); // true
+Object.is(foo, bar); // false
+Object.is(foo, sameFoo); // true
+
+// Case 2: Signed zero
+Object.is(0, -0); // false
+Object.is(+0, -0); // false
+Object.is(-0, -0); // true
+
+// Case 3: NaN
+Object.is(NaN, 0 / 0); // true
+Object.is(NaN, Number.NaN); // true
+```
+
 ### 2. HTMLElement
-### 2.1 dragstart
+#### 2.1 dragstart
 > 当用户开始拖动一个元素或者一个选择文本的时候 dragstart 事件就会触发。
 
-### 2.2 dragend
+#### 2.2 dragend
 > dragend 事件在拖放操作结束时触发（通过释放鼠标按钮或单击 escape 键）。该事件无法取消。
 
-### 2.3 dragenter
+#### 2.3 dragenter
 > 当拖动的元素或被选择的文本进入有效的放置目标时， dragenter 事件被触发。
 
-### 2.4 dragleave
+#### 2.4 dragleave
 > dragleave 事件在拖动的元素或选中的文本离开一个有效的放置目标时被触发。此事件不可取消。
 
-### 2.5 dragover
+#### 2.5 dragover
 > 当元素或者选择的文本被拖拽到一个有效的放置目标上时，触发 dragover 事件（每几百毫秒触发一次）。这个事件在可被放置元素的节点上触发。
 
-### 2.6 drag
+#### 2.6 drag
 > drag 事件在用户拖动元素或选择的文本时，每隔几百毫秒就会被触发一次。
 
-### 2.7 drop
+#### 2.7 drop
 > drop 事件在元素或选中的文本被放置在有效的放置目标上时被触发。
 
 
@@ -237,7 +273,7 @@ Object.getPrototypeOf() 方法返回指定对象的原型（内部[[Prototype]]�
 - 在放置区域的 drop 事件处理器中，将可拖动元素从原先的容器移动到该放置区域。
 
 ### 3. 循环
-### 3.1 Array.prototype.forEach()
+#### 3.1 Array.prototype.forEach()
 :::info
 除了抛出异常以外，没有办法中止或跳出 forEach() 循环。若你需要提前终止循环，你可以使用：
 - 一个简单的 for 循环
@@ -250,7 +286,7 @@ Object.getPrototypeOf() 方法返回指定对象的原型（内部[[Prototype]]�
 
 forEach中的return：退出当前函数，但迭代继续。
 
-### 3.2 for...of
+#### 3.2 for...of
 - 对于for...of的循环，可以由 break, throw 或 return 终止。
 - for...of 语句遍历可迭代对象定义要迭代的数据。
 > 若一个对象拥有迭代行为，那么这个对象便是一个可迭代对象。为了实现可迭代，一个对象必须实现 @@iterator 方法，这意味着这个对象（或其原型链中的任意一个对象）必须具有一个带 Symbol.iterator 键（key）的属性。
@@ -272,14 +308,14 @@ console.log([...myIterable])
 ```
 [查看执行结果](https://code.juejin.cn/pen/7163182011257978884)
 
-### 3.3 for...in
+#### 3.3 for...in
 - for...in 语句以任意顺序迭代一个对象的除Symbol以外的可枚举属性，包括继承的可枚举属性。
 > 可枚举属性是指那些内部“可枚举”标志设置为 true 的属性，对于通过直接的赋值和属性初始化的属性，该标识值默认为 true，对于通过 `Object.defineProperty` 等定义的属性，该标识值默认为 false。
 
 - for...in不应该用于迭代一个关注索引顺序的 Array。
 - for...in是为遍历对象属性而构建的，不建议与数组一起使用，数组可以用Array.prototype.forEach()和for...of
 
-### 3.4 for...of 和 for...in的区别
+#### 3.4 for...of 和 for...in的区别
 ```js
 Object.prototype.objCustom = function() {};
 Array.prototype.arrCustom = function() {};
@@ -326,6 +362,26 @@ console.log(JSON.stringify(array));
 
 ### 7. base64
 [url、base64、blob相互转换方法](https://juejin.cn/post/6959003541457502222)
+
+#### 7.1 base64解密
+> 参考：[原来浏览器原生支持JS Base64编码解码](https://www.zhangxinxu.com/wordpress/2018/08/js-base64-atob-btoa-encode-decode/)
+- 浏览器中
+```js
+const decodedData = window.atob(encodedData);
+```
+- Service Workers和Web Workers中
+```js
+const decodedData = self.atob(encodedData);
+```
+#### 7.2 base64加密
+- 浏览器中
+```js
+const encodedData = window.btoa(stringToEncode);
+```
+- Service Workers和Web Workers中
+```js
+const encodedData = self.btoa(stringToEncode);
+```
 
 ### 8. switch
 Switch case 使用严格比较（===）。
