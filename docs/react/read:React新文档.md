@@ -1504,6 +1504,7 @@ function Form() {
 [以状态驱动的思维方式处理交互(approach interactions with a state-driven mindset)](https://codesandbox.io/s/xenodochial-golick-0645w2?file=/App.js)
 
 #### 5.1 Reacting to Input with State
+Remove non-essential state to avoid bugs and paradoxes. 删除非必要状态以避免错误和悖论。
 
 #### 5.2 Choosing the state structure
 
@@ -1561,6 +1562,8 @@ function Counter() {
 ```
 
 - 使用 useReducer 还能给那些会触发深更新的组件做性能优化，因为你可以向子组件传递 dispatch 而不是回调函数，比如[这个例子](https://codesandbox.io/s/39bmj9?file=/App.js&utm_medium=sandpack)
+
+- To model the state more precisely, you can extract it into a reducer. Reducers let you unify multiple state variables into a single object and consolidate all the related logic! 为了更精确地对状态建模，您可以将其提取到reducer中。 Reducers 让您可以将多个状态变量统一到一个对象中，并整合所有相关逻辑！
 
 #### 5.6 Passing data deeply with context
 - createContext
