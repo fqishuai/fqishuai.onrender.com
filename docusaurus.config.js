@@ -170,6 +170,10 @@ const config = {
                 label: 'JS Risings Stars',
                 href: 'https://risingstars.js.org/',
               },
+              {
+                label: 'daily.dev',
+                href: 'https://app.daily.dev/',
+              },
             ],
           },
           {
@@ -178,6 +182,10 @@ const config = {
               {
                 label: 'builder.io blog',
                 href: 'https://www.builder.io/blog',
+              },
+              {
+                label: 'daily.dev blog',
+                href: 'https://daily.dev/blog',
               },
               {
                 label: 'JamesSinclair blog',

@@ -1506,6 +1506,87 @@ function Form() {
 #### 5.1 Reacting to Input with State
 Remove non-essential state to avoid bugs and paradoxes. 删除非必要状态以避免错误和悖论。
 
+请记住，如果两个不同的 JSX 块描述同一棵树，则它们的嵌套（第一个 `<div>` → 第一个 `<img>`）必须对齐。否则，切换 isActive 将重新创建下面的整棵树并重置其状态。这就是为什么，**如果在两种情况下都返回了相似的 JSX 树，那么最好将它们写成一个单独的 JSX 片段**。
+```jsx live
+function Picture() {
+  const [isActive, setIsActive] = useState(false);
+  if (isActive) {
+    return (
+      <div
+        className="background"
+        onClick={() => setIsActive(false)}
+      >
+        <img
+          className="picture picture--active"
+          alt="Rainbow houses in Kampung Pelangi, Indonesia"
+          src="https://images.pexels.com/photos/14932984/pexels-photo-14932984.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
+          onClick={e => e.stopPropagation()}
+        />
+      </div>
+    );
+  }
+  return (
+    <div className="background background--active">
+      <img
+        className="picture"
+        alt="Rainbow houses in Kampung Pelangi, Indonesia"
+        src="https://images.pexels.com/photos/14932984/pexels-photo-14932984.jpeg?auto=compress&cs=tinysrgb&w=800&lazy=load"
+        onClick={() => setIsActive(true)}
+      />
+    </div>
+  );
+}
+```
+
+```jsx live
+function EditProfile() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState('Jane');
+  const [lastName, setLastName] = useState('Jacobs');
+
+  return (
+    <form onSubmit={e => {
+      e.preventDefault();
+      setIsEditing(!isEditing);
+    }}>
+      <label>
+        First name:{' '}
+        {isEditing ? (
+          <input
+            value={firstName}
+            onChange={e => {
+              setFirstName(e.target.value)
+            }}
+          />
+        ) : (
+          <b>{firstName}</b>
+        )}
+      </label>
+      <label>
+        Last name:{' '}
+        {isEditing ? (
+          <input
+            value={lastName}
+            onChange={e => {
+              setLastName(e.target.value)
+            }}
+          />
+        ) : (
+          <b>{lastName}</b>
+        )}
+      </label>
+      <button type="submit">
+        {isEditing ? 'Save' : 'Edit'} Profile
+      </button>
+      <p><i>Hello, {firstName} {lastName}!</i></p>
+    </form>
+  );
+}
+```
+
+
+However, React also avoids touching the DOM for properties that have not changed since the last time they were set.
+
 #### 5.2 Choosing the state structure
 
 #### 5.3 Sharing state between components
