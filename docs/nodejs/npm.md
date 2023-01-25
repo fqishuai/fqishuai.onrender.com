@@ -1,3 +1,7 @@
+---
+tags: [包管理工具]
+---
+
 :::tip
 [npm docs](https://docs.npmjs.com)
 :::
