@@ -38,3 +38,102 @@ import { default as dayjs } from 'dayjs';
 
 import dayjs = require('dayjs');
 ```
+
+### 6. Binding element 'X' implicitly has an 'any' type
+> 参考：[Binding element 'X' implicitly has an 'any' type](https://bobbyhadz.com/blog/typescript-binding-element-implicitly-has-an-any-type)
+
+The error "Binding element implicitly has an 'any' type" occurs when we don't set the type of an object parameter in a function. The issue is that the functions take an object as a parameter, we destructure the object's properties, but don't type the object. To solve the error, make sure to explicitly type the object parameter of the function. 当我们没有在函数中设置对象参数的类型时，会出现“绑定元素隐式具有‘任何’类型”的错误。问题是函数将对象作为参数，我们解构对象的属性，但不键入对象。要解决该错误，请确保明确键入函数的对象参数。
+
+```ts
+// 👇️ With Functions 👇️
+// ⛔️ Error: Binding element 'id' implicitly has an 'any' type.ts(7031)
+function getEmployee({ id, name }) {
+  return { id, name };
+}
+
+// 👇️ With Class methods 👇️
+class Employee {
+  id: number;
+  name: string;
+
+  // ⛔️ Error: Binding element 'name' implicitly has an 'any' type.ts(7031)
+  constructor({ id, name }) {
+    this.id = id;
+    this.name = name;
+  }
+}
+
+// To solve the error, type the object by separating the object parameter and its type by a colon.
+// 要解决该错误，请通过用冒号分隔对象参数及其类型来键入对象。
+// 👇️ With Functions 👇️
+function getEmployee({ id, name }: { id: number; name: string }) {
+  return { id, name };
+}
+
+// 👇️ With class methods 👇️
+class Employee {
+  id: number;
+  name: string;
+
+  constructor({ id, name }: { id: number; name: string }) {
+    this.id = id;
+    this.name = name;
+  }
+}
+
+```
+
+### 7. Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
+> 参考：[Element implicitly has an 'any' type because expression of type 'string' can't be used to index type](https://bobbyhadz.com/blog/typescript-element-implicitly-has-any-type-expression)
+
+- keyof
+- typeof
+```ts
+const str = 'name' as string;
+
+const obj = {
+  name: 'Bobby Hadz',
+  country: 'Chile',
+};
+
+// ⛔️ Error: Element implicitly has an 'any' type
+// because expression of type 'string' can't be used
+// to index type '{ name: string; }'.
+// No index signature with a parameter of type 'string'
+// was found on type '{ name: string; }'.ts(7053)
+obj[str];
+
+// 使用keyof typeof解决
+const str = 'name' as string;
+
+const obj = {
+  name: 'Bobby Hadz',
+  country: 'Chile',
+};
+
+// 👇️ "Bobby Hadz"
+console.log(obj[str as keyof typeof obj]);
+
+// 👇️ type T = "name" | "country"
+type T = keyof typeof obj;
+
+// 使用keyof解决
+const str = 'name' as string;
+
+interface Person {
+  name: string;
+  country: string;
+}
+
+const obj: Person = {
+  name: 'Bobby Hadz',
+  country: 'Chile',
+};
+
+console.log(obj[str as keyof Person]); // 👉️ "Bobby Hadz"
+
+// 👇️ type T = "name" | "country"
+type T = keyof Person;
+
+```
+
