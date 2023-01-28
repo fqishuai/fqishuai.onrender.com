@@ -85,6 +85,18 @@ NODE_ENV=production taro build --type alipay --watch # Bash
 - 需要关闭上传代码时样式自动补全，开启可能报错
 - 需要关闭代码压缩上传，开启可能报错
 
+:::tip
+1. 预览模式生成的文件较大，设置 NODE_ENV 为 production 可以开启压缩。
+Example:`NODE_ENV=production taro build --type alipay --watch`
+```json title="package.json"
+"scripts": {
+  "dev:alipay": "NODE_ENV=production taro build --type alipay --watch"
+}
+```
+
+1. 建议开启持久化缓存功能，能有效提升二次编译速度，详情请参考: https://docs.taro.zone/docs/config-detail#cache。
+:::
+
 ## 全局配置
 根目录下的 `app.config.js` 文件用来对小程序进行全局配置，配置项遵循微信小程序规范，并且对所有平台进行统一。
 
@@ -99,6 +111,14 @@ NODE_ENV=production taro build --type alipay --watch # Bash
   - 支付宝小程序  project.alipay.json
   - 字节跳动小程序	project.tt.json
   - 百度小程序	project.swan.json
+
+## 页面配置
+每一个小程序页面都可以使用 .config.js 文件来对本页面的窗口表现进行配置。页面中配置项在当前页面会覆盖全局配置 app.config.json 的 window 中相同的配置项。比如index页面:
+```js title="src/pages/index/index.config.ts"
+export default definePageConfig({
+  navigationBarTitleText: '首页'
+})
+```
 
 ## 生命周期
 - Taro 3 在小程序逻辑层上实现了一份遵循 Web 标准 BOM 和 DOM API。因此 React 使用的 `document.appendChild`、`document.removeChild` 等 API 其实是 Taro 模拟实现的，最终的效果是把 React 的虚拟 DOM 树渲染为 Taro 模拟的 Web 标准 DOM 树。
