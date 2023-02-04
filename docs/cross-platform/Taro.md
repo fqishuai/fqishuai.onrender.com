@@ -104,6 +104,38 @@ Example:`NODE_ENV=production taro build --type alipay --watch`
 - 多端差异化逻辑可以使用 `process.env.TARO_ENV` 变量作条件判断来实现。
 - `app.config.js` 不支持多端文件的形式，如 `app.weapp.js` 这样是不起作用的。
 
+```jsx
+export default defineAppConfig({
+  pages: [
+    'pages/index/index',
+    'pages/about/index',
+  ],
+  tabBar: {
+    list: [
+      {
+        pagePath: '',
+        text: '',
+      },
+      {
+        pagePath: '',
+        text: '',
+      }
+    ],
+  },
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#fff',
+    navigationBarTitleText: 'WeChat',
+    navigationBarTextStyle: 'black'
+  }
+})
+```
+
+### 1. pages
+### 2. window
+### 3. tabBar
+### 4. subPackages
+
 ## 项目配置
 - 各类小程序平台均有自己的项目配置文件，为了能够适配不同小程序平台的配置文件不同的情况，Taro 支持为各个小程序平台添加各自的项目配置文件。
 - 通过 Taro 模板创建的项目都会默认拥有 `project.config.json` 这一项目配置文件，这个文件 只能用于微信小程序，若要兼容到其他小程序平台，请按如下对应规则来增加相应平台的配置文件，其配置与各自小程序平台要求的一致：

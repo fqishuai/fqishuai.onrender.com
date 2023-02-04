@@ -64,6 +64,7 @@ tags: [react]
   - [5. Managing State](#5-managing-state)
     - [5.1 Reacting to Input with State](#51-reacting-to-input-with-state)
     - [5.2 Choosing the state structure](#52-choosing-the-state-structure)
+      - [5.2.1 Principles for structuring state](#521-principles-for-structuring-state)
     - [5.3 Sharing state between components](#53-sharing-state-between-components)
     - [5.4 Preserving and resetting state 保留/重置状态](#54-preserving-and-resetting-state-保留重置状态)
     - [5.5 Extracting state logic into a reducer](#55-extracting-state-logic-into-a-reducer)
@@ -1506,8 +1507,41 @@ function Form() {
 #### 5.1 Reacting to Input with State
 Remove non-essential state to avoid bugs and paradoxes. 删除非必要状态以避免错误和悖论。
 
-请记住，如果两个不同的 JSX 块描述同一棵树，则它们的嵌套（第一个 `<div>` → 第一个 `<img>`）必须对齐。否则，切换 isActive 将重新创建下面的整棵树并重置其状态。这就是为什么，**如果在两种情况下都返回了相似的 JSX 树，那么最好将它们写成一个单独的 JSX 片段**。
-```jsx live
+如果在两种情况下都返回了相似的 JSX 树，那么最好将它们写成一个 JSX 片段；如果两个不同的 JSX 块描述同一棵树，则它们的嵌套必须对齐，否则切换不同的JSX将重新创建整棵树并重置其状态。
+```jsx
+import { useState } from 'react';
+
+// 不同的情况下返回一个JSX
+function Picture() {
+  const [isActive, setIsActive] = useState(false);
+
+  let backgroundClassName = 'background';
+  let pictureClassName = 'picture';
+  if (isActive) {
+    pictureClassName += ' picture--active';
+  } else {
+    backgroundClassName += ' background--active';
+  }
+
+  return (
+    <div
+      className={backgroundClassName}
+      onClick={() => setIsActive(false)}
+    >
+      <img
+        onClick={e => {
+          e.stopPropagation();
+          setIsActive(true);
+        }}
+        className={pictureClassName}
+        alt="Rainbow houses in Kampung Pelangi, Indonesia"
+        src="https://i.imgur.com/5qwVYb1.jpeg"
+      />
+    </div>
+  );
+}
+
+// 返回两个JSX，此时JSX的嵌套必须对齐(如下，第一个 `<div>` → 第一个 `<img>`都对齐)，否则，切换 isActive 将重新创建整棵树并重置其状态。
 function Picture() {
   const [isActive, setIsActive] = useState(false);
   if (isActive) {
@@ -1584,10 +1618,463 @@ function EditProfile() {
 }
 ```
 
-
-However, React also avoids touching the DOM for properties that have not changed since the last time they were set.
+React avoids touching the DOM for properties that have not changed since the last time they were set. React 避免触及 属性自上次设置后未更改的 DOM。
 
 #### 5.2 Choosing the state structure
+##### 5.2.1 Principles for structuring state
+1. Group related state. 如果你总是同时更新两个或多个状态变量，请考虑将它们合并为一个状态变量。
+
+```jsx
+const [x, setX] = useState(0);
+const [y, setY] = useState(0);
+
+// 合并
+const [position, setPosition] = useState({ x: 0, y: 0 });
+```
+
+注意：if you wanted to set x alone, you would either do `setPosition({ ...position, x: 100 })`, you can’t do `setPosition({ x: 100 })`.
+
+```jsx live
+function MovingDot() {
+  const [position, setPosition] = useState({
+    x: 0,
+    y: 0
+  });
+  return (
+    <div
+      onPointerMove={e => {
+        setPosition({
+          x: e.clientX,
+          y: e.clientY
+        });
+      }}
+      style={{
+        position: 'relative',
+        width: '100vw',
+        height: '100vh',
+      }}>
+      <div style={{
+        position: 'absolute',
+        backgroundColor: 'red',
+        borderRadius: '50%',
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        left: -10,
+        top: -10,
+        width: 20,
+        height: 20,
+      }} />
+    </div>
+  )
+}
+```
+
+2. Avoid contradictions in state. 避免定义的多个state变量使某个状态相互矛盾。
+
+3. Avoid redundant state. 避免定义冗余的state变量。如果你可以在渲染期间从组件的 props 或其现有状态变量中计算出一些信息，则不应将该信息放入该组件的状态中。
+
+```jsx live
+function Form() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  const fullName = firstName + ' ' + lastName; // When you call setFirstName or setLastName, you trigger a re-render, and then the next fullName will be calculated from the fresh data.
+
+  function handleFirstNameChange(e) {
+    setFirstName(e.target.value);
+  }
+
+  function handleLastNameChange(e) {
+    setLastName(e.target.value);
+  }
+
+  return (
+    <>
+      <h2>Let’s check you in</h2>
+      <label>
+        First name:{' '}
+        <input
+          value={firstName}
+          onChange={handleFirstNameChange}
+        />
+      </label>
+      <label>
+        Last name:{' '}
+        <input
+          value={lastName}
+          onChange={handleLastNameChange}
+        />
+      </label>
+      <p>
+        Your ticket will be issued to: <b>{fullName}</b>
+      </p>
+    </>
+  );
+}
+```
+
+Here, a color state variable is initialized to the messageColor prop. **The problem is that if the parent component passes a different value of `messageColor` later (for example, 'red' instead of 'blue'), the `color` state variable would not be updated! The state is only initialized during the first render. When the prop changes, this does not affect the state variable!**
+```jsx
+function Message({ messageColor }) {
+  const [color, setColor] = useState(messageColor);
+}
+```
+
+Instead, use the messageColor prop directly in your code. If you want to give it a shorter name, use a constant. This way it won’t get out of sync with the prop passed from the parent component. 这样它就不会与从父组件传递的 prop 不同步。
+```jsx
+function Message({ messageColor }) {
+  const color = messageColor;
+}
+```
+
+4. Avoid duplication in state.
+
+对比下面两个selectedItem的初始化，第一个是更改items后还需要手动更改selectedItem后`{selectedItem.title}`才是最新的；第二个是更改items后`{selectedItem.title}`就是最新的。
+```jsx
+import { useState } from 'react';
+
+const initialItems = [
+  { title: 'pretzels', id: 0 },
+  { title: 'crispy seaweed', id: 1 },
+  { title: 'granola bar', id: 2 },
+];
+
+export default function Menu() {
+  const [items, setItems] = useState(initialItems);
+  const [selectedItem, setSelectedItem] = useState(
+    items[0]
+  );
+
+  function handleItemChange(id, e) {
+    setItems(items.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          title: e.target.value,
+        };
+      } else {
+        return item;
+      }
+    }));
+  }
+
+  return (
+    <>
+      <h2>What's your travel snack?</h2> 
+      <ul>
+        {items.map((item, index) => (
+          <li key={item.id}>
+            <input
+              value={item.title}
+              onChange={e => {
+                handleItemChange(item.id, e)
+              }}
+            />
+            {' '}
+            <button onClick={() => {
+              setSelectedItem(item);
+            }}>Choose</button>
+          </li>
+        ))}
+      </ul>
+      <p>You picked {selectedItem.title}.</p>
+    </>
+  );
+}
+
+// Now if you edit the selected item, the message below will update immediately. 
+// This is because setItems triggers a re-render, and items.find(...) would find the item with the updated title. 
+// You didn’t need to hold the selected item in state, because only the selected ID is essential. The rest could be calculated during render.
+export default function Menu() {
+  const [items, setItems] = useState(initialItems);
+  const [selectedId, setSelectedId] = useState(0);
+
+  const selectedItem = items.find(item =>
+    item.id === selectedId
+  );
+
+  function handleItemChange(id, e) {
+    setItems(items.map(item => {
+      if (item.id === id) {
+        return {
+          ...item,
+          title: e.target.value,
+        };
+      } else {
+        return item;
+      }
+    }));
+  }
+
+  return (
+    <>
+      <h2>What's your travel snack?</h2>
+      <ul>
+        {items.map((item, index) => (
+          <li key={item.id}>
+            <input
+              value={item.title}
+              onChange={e => {
+                handleItemChange(item.id, e)
+              }}
+            />
+            {' '}
+            <button onClick={() => {
+              setSelectedId(item.id);
+            }}>Choose</button>
+          </li>
+        ))}
+      </ul>
+      <p>You picked {selectedItem.title}.</p>
+    </>
+  );
+}
+```
+
+5. Avoid deeply nested state. 避免定义深度嵌套的state
+
+If the state is too nested to update easily, consider making it “flat”(also known as “normalized”). 如果状态嵌套太多而不易更新，请考虑使其“扁平化”。
+
+嵌套的数据结构（a tree-like structure）：
+```js
+export const initialTravelPlan = {
+  id: 0,
+  title: "(Root)",
+  childPlaces: [
+    {
+      id: 1,
+      title: "Earth",
+      childPlaces: [
+        {
+          id: 2,
+          title: "Africa",
+          childPlaces: [
+            {
+              id: 3,
+              title: "Botswana",
+              childPlaces: []
+            },
+            {
+              id: 4,
+              title: "Egypt",
+              childPlaces: []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 43,
+      title: "Moon",
+      childPlaces: [
+        {
+          id: 44,
+          title: "Rheita",
+          childPlaces: []
+        },
+        {
+          id: 45,
+          title: "Piccolomini",
+          childPlaces: []
+        },
+        {
+          id: 46,
+          title: "Tycho",
+          childPlaces: []
+        }
+      ]
+    },
+    {
+      id: 47,
+      title: "Mars",
+      childPlaces: [
+        {
+          id: 48,
+          title: "Corn Town",
+          childPlaces: []
+        },
+        {
+          id: 49,
+          title: "Green Hill",
+          childPlaces: []
+        }
+      ]
+    }
+  ]
+};
+```
+
+扁平的数据结构：
+```js
+export const initialTravelPlan = {
+  0: {
+    id: 0,
+    title: "(Root)",
+    childIds: [1, 43, 47]
+  },
+  1: {
+    id: 1,
+    title: "Earth",
+    childIds: [2]
+  },
+  2: {
+    id: 2,
+    title: "Africa",
+    childIds: [3, 4]
+  },
+  3: {
+    id: 3,
+    title: "Botswana",
+    childIds: []
+  },
+  4: {
+    id: 4,
+    title: "Egypt",
+    childIds: []
+  },
+  43: {
+    id: 43,
+    title: "Moon",
+    childIds: [44, 45, 46]
+  },
+  44: {
+    id: 44,
+    title: "Rheita",
+    childIds: []
+  },
+  45: {
+    id: 45,
+    title: "Piccolomini",
+    childIds: []
+  },
+  46: {
+    id: 46,
+    title: "Tycho",
+    childIds: []
+  },
+  47: {
+    id: 47,
+    title: "Mars",
+    childIds: [48, 49]
+  },
+  48: {
+    id: 48,
+    title: "Corn Town",
+    childIds: []
+  },
+  49: {
+    id: 49,
+    title: "Green Hill",
+    childIds: []
+  }
+};
+```
+
+[使用useImmer删除扁平化后的嵌套数据](https://codesandbox.io/s/zim79i?file=/App.js&utm_medium=sandpack)
+
+:::tip
+一个优化点：使用 `Set.prototype.has()` 替代 `Array.prototype.includes()`，array search with `includes()` takes linear time, `Set` provides a fast `has()` operation.
+- `new Set()`
+- `has()`
+- `add()`
+- `delete()`
+
+```jsx
+import { useState } from 'react';
+import { letters } from './data.js';
+import Letter from './Letter.js';
+
+// 使用Array
+export default function MailClient() {
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const selectedCount = selectedIds.length;
+
+  function handleToggle(toggledId) {
+    // Was it previously selected?
+    if (selectedIds.includes(toggledId)) {
+      // Then remove this ID from the array.
+      setSelectedIds(selectedIds.filter(id =>
+        id !== toggledId
+      ));
+    } else {
+      // Otherwise, add this ID to the array.
+      setSelectedIds([
+        ...selectedIds,
+        toggledId
+      ]);
+    }
+  }
+
+  return (
+    <>
+      <h2>Inbox</h2>
+      <ul>
+        {letters.map(letter => (
+          <Letter
+            key={letter.id}
+            letter={letter}
+            isSelected={
+              selectedIds.includes(letter.id)
+            }
+            onToggle={handleToggle}
+          />
+        ))}
+        <hr />
+        <p>
+          <b>
+            You selected {selectedCount} letters
+          </b>
+        </p>
+      </ul>
+    </>
+  );
+}
+
+// 使用Set
+export default function MailClient() {
+  const [selectedIds, setSelectedIds] = useState(
+    new Set()
+  );
+
+  const selectedCount = selectedIds.size;
+
+  function handleToggle(toggledId) {
+    // Create a copy (to avoid mutation).
+    const nextIds = new Set(selectedIds);
+    if (nextIds.has(toggledId)) {
+      nextIds.delete(toggledId);
+    } else {
+      nextIds.add(toggledId);
+    }
+    setSelectedIds(nextIds);
+  }
+
+  return (
+    <>
+      <h2>Inbox</h2>
+      <ul>
+        {letters.map(letter => (
+          <Letter
+            key={letter.id}
+            letter={letter}
+            isSelected={
+              selectedIds.has(letter.id)
+            }
+            onToggle={handleToggle}
+          />
+        ))}
+        <hr />
+        <p>
+          <b>
+            You selected {selectedCount} letters
+          </b>
+        </p>
+      </ul>
+    </>
+  );
+}
+```
+:::
 
 #### 5.3 Sharing state between components
 :::tip

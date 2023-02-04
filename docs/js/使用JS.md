@@ -417,9 +417,32 @@ result = window.prompt(text, value);
 XMLHttpRequest (XHR) 对象用于与服务器交互，这使网页可以只更新页面的一部分，而不会中断用户正在做的事情。
 
 ### 12. Fetch API
+#### 12.1 `fetch()`
 
 ### 13. FormData
 FormData 接口提供了一种表示表单数据的键值对 key/value 的构造方式，可以使用 fetch() 或 XMLHttpRequest.send() 方法发送这些值。如果编码类型设置为“multipart/form-data”，它使用的格式与表单使用的格式相同。
+
+### 14. URL API
+#### 14.1 URLSearchParams
+```js
+const paramsString1 = 'http://example.com/search?query=%40';
+const searchParams1 = new URLSearchParams(paramsString1);
+
+console.log(searchParams1.has('query')); // false
+console.log(searchParams1.has('http://example.com/search?query')); // true
+
+console.log(searchParams1.get('query')); // null
+console.log(searchParams1.get('http://example.com/search?query')); // "@" (equivalent to decodeURIComponent('%40'))
+
+const paramsString2 = '?query=value';
+const searchParams2 = new URLSearchParams(paramsString2);
+console.log(searchParams2.has('query')); // true
+
+const url = new URL('http://example.com/search?query=%40');
+const searchParams3 = new URLSearchParams(url.search);
+console.log(searchParams3.has('query')); // true
+
+```
 
 ## 三、手写函数
 ### 1. 去重

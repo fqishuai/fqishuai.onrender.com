@@ -137,3 +137,25 @@ type T = keyof Person;
 
 ```
 
+### 8. Property 'value' does not exist on type 'HTMLElement'.
+> 参考：[Property 'value' does not exist on type 'HTMLElement' in TS](https://bobbyhadz.com/blog/typescript-property-value-not-exist-type-htmlelement)
+
+The error "Property 'value' does not exist on type 'HTMLElement'" occurs when we try to access the value property on an element that has a type of HTMLElement. The reason we got the error is that the return type of the document.getElementById method is `HTMLElement | null` and the `value` property doesn't exist in the HTMLElement type. To solve the error, use a type assertion to type the element as HTMLInputElement (or HTMLTextAreaElement if you're typing a textarea element) before accessing the property. 当我们尝试访问具有 HTMLElement 类型的元素的 value 属性时，会出现错误“属性‘value’在类型‘HTMLElement’上不存在”。我们得到错误的原因是 document.getElementById 方法的返回类型是 `HTMLElement | null` 并且 value 属性在 HTMLElement 类型中不存在。要解决该错误，请在访问该属性之前使用类型断言将元素断言为 HTMLInputElement（或者 对于textarea元素 断言为 HTMLTextAreaElement）。
+
+```ts
+// 👇️ const input: HTMLElement | null
+const input = document.getElementById('first_name');
+
+if (input != null) {
+  // ⛔️ Error: Property 'value' does not exist on type 'HTMLElement'.ts(2339)
+  const value = input.value;
+}
+
+// 断言为HTMLInputElement
+const input = document.getElementById('first_name') as HTMLInputElement | null;
+
+// 👇️ using optional chaining (?.)
+const value = input?.value;
+
+console.log(value); // 👉️ Initial value
+```
