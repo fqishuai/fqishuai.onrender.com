@@ -29,7 +29,7 @@ tags: [小程序开发,h5开发,跨端]
 - 不能在页面组件的 DOM 树之外插入元素，因此不支持 `<Portal>`。
 :::
 
-## 安装cli及创建项目
+## 1. 安装cli及创建项目
 :::tip
 如果安装过程出现sass相关的安装错误，请在安装 [mirror-config-china](https://www.npmjs.com/package/mirror-config-china) 后重试。
 ```bash
@@ -55,7 +55,7 @@ taro init myApp
 npx @tarojs/cli init myApp
 ```
 
-### 编译支付宝小程序
+### 1.1 编译支付宝小程序
 ```bash
 # pnpm
 pnpm build:alipay
@@ -94,10 +94,10 @@ Example:`NODE_ENV=production taro build --type alipay --watch`
 }
 ```
 
-1. 建议开启持久化缓存功能，能有效提升二次编译速度，详情请参考: https://docs.taro.zone/docs/config-detail#cache。
+2. 建议开启持久化缓存功能，能有效提升二次编译速度，详情请参考: https://docs.taro.zone/docs/config-detail#cache。
 :::
 
-## 全局配置
+## 2. 全局配置
 根目录下的 `app.config.js` 文件用来对小程序进行全局配置，配置项遵循微信小程序规范，并且对所有平台进行统一。
 
 - Taro v3.4 之前，`app.config.js` 里引用的 JS 文件没有经过 Babel 编译。(Taro v3.4 开始支持）
@@ -131,12 +131,12 @@ export default defineAppConfig({
 })
 ```
 
-### 1. pages
-### 2. window
-### 3. tabBar
-### 4. subPackages
+### 2.1. pages
+### 2.2. window
+### 2.3. tabBar
+### 2.4. subPackages
 
-## 项目配置
+## 3. 项目配置
 - 各类小程序平台均有自己的项目配置文件，为了能够适配不同小程序平台的配置文件不同的情况，Taro 支持为各个小程序平台添加各自的项目配置文件。
 - 通过 Taro 模板创建的项目都会默认拥有 `project.config.json` 这一项目配置文件，这个文件 只能用于微信小程序，若要兼容到其他小程序平台，请按如下对应规则来增加相应平台的配置文件，其配置与各自小程序平台要求的一致：
   - 微信小程序  project.config.json
@@ -144,22 +144,82 @@ export default defineAppConfig({
   - 字节跳动小程序	project.tt.json
   - 百度小程序	project.swan.json
 
-## 页面配置
-每一个小程序页面都可以使用 .config.js 文件来对本页面的窗口表现进行配置。页面中配置项在当前页面会覆盖全局配置 app.config.json 的 window 中相同的配置项。比如index页面:
+## 4. 编译配置
+> 项目的`config`目录下存放的是不同环境的编译配置文件
+
+### 4.1 alias
+> 用于配置目录别名，从而方便书写代码引用路径。比如：
+
+```js
+module.exports = {
+  // ...
+  alias: {
+    '@/components': path.resolve(__dirname, '..', 'src/components'),
+    '@/utils': path.resolve(__dirname, '..', 'src/utils'),
+    '@/package': path.resolve(__dirname, '..', 'package.json'),
+    '@/project': path.resolve(__dirname, '..', 'project.config.json'),
+  },
+}
+```
+
+为了让编辑器（VS Code）不报错，并继续使用自动路径补全的功能，需要在项目根目录下的 `jsconfig.json` 或者 `tsconfig.json` 中配置 `paths` 让编辑器认得我们的别名，形式如下：
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["./src/components/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/package": ["./package.json"],
+      "@/project": ["./project.config.json"]
+    }
+  }
+}
+```
+
+
+
+## 5. 页面配置
+每一个小程序页面都可以使用 `xx.config.js` 文件来对本页面的窗口表现进行配置。页面中配置项在当前页面会覆盖全局配置 `app.config.js` 的 window 中相同的配置项。比如index页面:
 ```js title="src/pages/index/index.config.ts"
 export default definePageConfig({
   navigationBarTitleText: '首页'
 })
 ```
 
-## 生命周期
+也可以不配置`xx.config.js`，直接在页面文件(指的是在app.config.js的pages中声明的路径)中定义，比如index页面:
+```jsx title="src/pages/index/index.tsx"
+definePageConfig({
+  navigationBarTitleText: '首页',
+});
+
+export default function Index() {
+  return <>首页</>
+}
+```
+
+### 5.1 动态设置页面标题
+使用[`Taro.setNavigationBarTitle(option)`](https://taro-docs.jd.com/docs/apis/ui/navigation-bar/setNavigationBarTitle)可以动态设置页面标题。
+```jsx
+export default function Detail() {
+  useEffect(() => {
+    Taro.setNavigationBarTitle({
+      title: '详情',
+    });
+  });
+  
+  return <>详情</>
+}
+```
+
+## 6. 生命周期
 - Taro 3 在小程序逻辑层上实现了一份遵循 Web 标准 BOM 和 DOM API。因此 React 使用的 `document.appendChild`、`document.removeChild` 等 API 其实是 Taro 模拟实现的，最终的效果是把 React 的虚拟 DOM 树渲染为 Taro 模拟的 Web 标准 DOM 树。
 - React 组件的生命周期方法在 Taro 中都支持使用。
 - 生命周期触发时机和在 Web 开发中有一些偏差。触发时机：
   - `componentWillMount ()`：`onLoad`之后，页面组件渲染到 Taro 的虚拟 DOM 之前触发。
   - `componentDidMount ()`：页面组件渲染到 Taro 的虚拟 DOM 之后触发。此时能访问到 Taro 的虚拟 DOM（使用 `React ref`、`document.getElementById` 等手段），并支持对其进行操作（设置 DOM 的 style 等）。但此时不代表 Taro 的虚拟 DOM 数据已经完成从逻辑层 `setData` 到视图层。因此这时无法通过 `createSelectorQuery` 等方法获取小程序渲染层 DOM 节点。 只能在 `onReady` 生命周期中获取。
 
-## Ref
+## 7. Ref
 - 在 Taro 中 ref 的用法和 React 完全一致，但是获取到的 “DOM” 和浏览器环境还有小程序环境都有不同。
 - 使用 React Ref 获取到的是 Taro 的虚拟 DOM，和浏览器的 DOM 相似，可以操作它的 style，调用它的 API 等。但是 **Taro 的虚拟 DOM 运行在小程序的逻辑层，并不是真实的小程序渲染层节点**，它没有尺寸宽高等信息。
 - 获取真实的小程序渲染层节点，需要在 `onReady` 生命周期中，调用小程序中用于获取 DOM 的 API。
@@ -184,13 +244,13 @@ export default class Test extends React.Component {
 }
 ```
 
-## Hooks
+## 8. Hooks
 
-## Minified React error
+## 9. Minified React error
 - 因为 development 版本的 React 体积较大，为了减少小程序体积，方便开发时真机预览。Taro 在构建小程序时默认使用 production 版本的 React 相关依赖。
 - 但是 production 版本的 React 出错时不会展示报错堆栈的信息。因此当你遇到类似这种报错时：【Error: Minified React error #152】，可以修改编译配置中的 `mini.debugReact` 选项，然后重新开启编译。这样 Taro 会使用 development 版本的 React，从而输出报错堆栈。
 
-## 入口组件
+## 10. 入口组件
 ```jsx title="src/app.js"
 import React, { useEffect } from 'react'
 
@@ -228,7 +288,7 @@ function App (props) {
 export default App
 ```
 
-## 路由
+## 11. 路由
 - 默认，Taro 遵循微信小程序的路由规范。只需要修改全局配置`src/app.config.ts`的 pages 属性，配置为 Taro 应用中每个页面的路径即可。
 - Taro v3.6(canary 版本) 开始支持前端路由库，包括 [react-router](https://reactrouter.com/en/main) 和 vue-router。
 - 已有项目升级到 canary 版本：
@@ -237,3 +297,7 @@ export default App
 - 在路由库中，诸如`<Link>` 组件内部会动态生成 `<a>` 标签，因此需要引入 `@tarojs/plugin-html` 插件以支持在 Taro 中使用 html 标签开发组件。
 - 前端路由库的基本原理是监听 `popstate` 或 `hashchange` 事件触发后，读取 location 对象对视图进行操控更新。 Taro 为了支持前端路由库的使用，在运行时中引入了 `histroy` `location` 对象的实现，且尽可能与 Web 端规范对齐，你可以在 window 对象上访问到 history 和 location 对象。
 - 小程序天然支持多页面(pages数组)，Taro 并非以整个应用为一个路由系统，而是顺应小程序规范以页面维度进行路由管理。每当切换页面时，会将当前页面的页面路由状态缓存。跳转至新页面后会重新创建页面路由状态，并挂载在 window 对象上。当返回上一级页面时，会重新将当前页面的页面路由状态挂载到 window 对象中。（这里的"页面路由状态"指的是history 和 location 对象，将 history 和 location 对象统称为页面路由状态。）
+
+## 12. 网路
+### 12.1 发起请求
+[Taro.request](https://taro-docs.jd.com/docs/apis/network/request/) 发起 HTTPS 网络请求
