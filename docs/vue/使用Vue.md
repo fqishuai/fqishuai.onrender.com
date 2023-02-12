@@ -3,6 +3,19 @@ slug: usage
 tags: [vue]
 ---
 
+- [1. 渲染函数 \& JSX](#1-渲染函数--jsx)
+  - [1.1 记录一次webpack5搭建的vue工程使用elementui的Tree组件遇到的问题](#11-记录一次webpack5搭建的vue工程使用elementui的tree组件遇到的问题)
+  - [1.2 由一次监听`el-switch`的click事件(想在switch切换状态前处理一些逻辑)引发的思考](#12-由一次监听el-switch的click事件想在switch切换状态前处理一些逻辑引发的思考)
+- [2. filters](#2-filters)
+- [3. v-if对computed无效；key对computed无效](#3-v-if对computed无效key对computed无效)
+- [4. Array触发视图更新的API](#4-array触发视图更新的api)
+- [5. 搭建vite+vue2.7+pnpm工程](#5-搭建vitevue27pnpm工程)
+- [6. keep-alive](#6-keep-alive)
+- [7. vue.config.js](#7-vueconfigjs)
+  - [7.1 pages](#71-pages)
+  - [7.2 configureWebpack](#72-configurewebpack)
+
+
 ## 1. 渲染函数 & JSX
 ### 1.1 记录一次webpack5搭建的vue工程使用elementui的Tree组件遇到的问题
 - Tree组件可以通过两种方法进行树节点内容的自定义：`render-content`和 `scoped slot`

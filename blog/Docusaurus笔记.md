@@ -1,9 +1,5 @@
 ---
-id: docNotes
-sidebar_position: 1
-# pagination_prev: intro
-# pagination_next: tutorial-basics/create-a-document
-slug: /learn-notes
+slug: learn-notes
 tags: [以内容为中心的静态网站]
 ---
 
