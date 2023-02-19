@@ -6,6 +6,7 @@ tags: [vue]
 - [1. 渲染函数 \& JSX](#1-渲染函数--jsx)
   - [1.1 记录一次webpack5搭建的vue工程使用elementui的Tree组件遇到的问题](#11-记录一次webpack5搭建的vue工程使用elementui的tree组件遇到的问题)
   - [1.2 由一次监听`el-switch`的click事件(想在switch切换状态前处理一些逻辑)引发的思考](#12-由一次监听el-switch的click事件想在switch切换状态前处理一些逻辑引发的思考)
+  - [1.3 vue中使用jsx](#13-vue中使用jsx)
 - [2. filters](#2-filters)
 - [3. v-if对computed无效；key对computed无效](#3-v-if对computed无效key对computed无效)
 - [4. Array触发视图更新的API](#4-array触发视图更新的api)
@@ -47,7 +48,7 @@ renderContent(h, { node, data, store }) {
 - 解决步骤如下：
   - 新增2个依赖`@vue/babel-preset-jsx`和`@vue/babel-helper-vue-jsx-merge-props`
   - 使用`@vue/babel-preset-jsx`（在`webpack.config.js`的babel-loader的options中配置或者在babel的配置文件(`babel.config.js`或`.babelrc`)中配置）
-```markdown
+```bash
 npm install -D @vue/babel-preset-jsx @vue/babel-helper-vue-jsx-merge-props
 ```
 ```js title="webpack.config.js"
@@ -85,6 +86,8 @@ npm install -D @vue/babel-preset-jsx @vue/babel-helper-vue-jsx-merge-props
 
 - 这就引出3个值得深究的点：1）`v-model`是如何实现的？ 2）事件的向上/向下传递过程 3）vue的事件修饰符及如何实现的
 > [Vue事件修饰符](https://vuetechworld.com/blog/detail/9570e28eab4b3dcf074a8f2bacdc29c9)
+
+### 1.3 vue中使用jsx
 
 ## 2. filters
 - filters里面this为undefined，为啥这样设计？

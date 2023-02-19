@@ -3,6 +3,35 @@ slug: vuex
 tags: [vue]
 ---
 
+- [一、简单的状态共享](#一简单的状态共享)
+  - [1. `vm.$emit( eventName, […args] )`](#1-vmemit-eventname-args-)
+  - [2. `vm.$on( event, callback )`](#2-vmon-event-callback-)
+  - [3. `vm.$off( [event, callback] )`](#3-vmoff-event-callback-)
+- [二、简单的store模式](#二简单的store模式)
+- [三、Vuex](#三vuex)
+  - [1. 安装](#1-安装)
+  - [2. Vuex和单纯的全局对象的区别](#2-vuex和单纯的全局对象的区别)
+  - [3. 创建store实例](#3-创建store实例)
+    - [3.1 `new Vuex.Store`](#31-new-vuexstore)
+    - [3.2 createStore](#32-createstore)
+    - [3.3 useStore](#33-usestore)
+    - [4. state](#4-state)
+    - [4.1 辅助函数：mapState](#41-辅助函数mapstate)
+  - [5. getters](#5-getters)
+    - [5.1 getter 接受 state 作为其第一个参数：](#51-getter-接受-state-作为其第一个参数)
+    - [5.2 getter 接受 getters 作为其第二个参数：](#52-getter-接受-getters-作为其第二个参数)
+    - [5.3 也可以通过让 getter 返回一个函数，来实现给 getter 传参：](#53-也可以通过让-getter-返回一个函数来实现给-getter-传参)
+    - [5.4 在任何组件中使用getter：](#54-在任何组件中使用getter)
+    - [5.5 辅助函数: mapGetters](#55-辅助函数-mapgetters)
+  - [6. mutations](#6-mutations)
+    - [6.1 辅助函数：mapMutations](#61-辅助函数mapmutations)
+  - [7. actions](#7-actions)
+    - [7.1 辅助函数：mapActions](#71-辅助函数mapactions)
+  - [8. modules](#8-modules)
+    - [8.1 带命名空间的module](#81-带命名空间的module)
+    - [8.2 动态注册module](#82-动态注册module)
+
+
 ![vuex](img/vuex.png)
 
 ## 一、简单的状态共享
