@@ -53,6 +53,7 @@ tags: [css]
   - [38. 使用`@font-face`](#38-使用font-face)
   - [39. css选择器+、~](#39-css选择器)
   - [40. flex布局实现一行n个，超出自动换行](#40-flex布局实现一行n个超出自动换行)
+  - [41. 子元素在父元素的最右侧](#41-子元素在父元素的最右侧)
 
 ## 一、[CSS Modules](http://www.ruanyifeng.com/blog/2016/06/css_modules.html)
 
@@ -558,3 +559,27 @@ div.content {
 :::info
 参考[flex布局实现一行n个，超出自动换行](https://juejin.cn/post/7071919544394055710)
 :::
+
+### 41. 子元素在父元素的最右侧
+3种方案：
+- 子元素设置float：right
+- 父元素设置flex布局方式
+```css
+{
+  display:flex;
+  justify-content:flex-end;
+}
+```
+- 使用position
+```css
+/* 父元素 */
+{
+  position:relative;
+}
+
+/* 子元素 */
+{
+  position:absolute;
+  right:0
+}
+```

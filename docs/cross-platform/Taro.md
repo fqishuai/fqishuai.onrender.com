@@ -3,6 +3,38 @@ slug: taro
 tags: [小程序开发,h5开发,跨端]
 ---
 
+- [1. 安装cli及创建项目](#1-安装cli及创建项目)
+  - [1.1 编译支付宝小程序](#11-编译支付宝小程序)
+- [2. 全局配置](#2-全局配置)
+  - [2.1. pages](#21-pages)
+  - [2.2. window](#22-window)
+  - [2.3. tabBar](#23-tabbar)
+  - [2.4. subPackages](#24-subpackages)
+- [3. 项目配置](#3-项目配置)
+- [4. 编译配置](#4-编译配置)
+  - [4.1 alias](#41-alias)
+- [5. 页面配置](#5-页面配置)
+  - [5.1 动态设置页面标题](#51-动态设置页面标题)
+  - [5.2 动态设置页面导航条颜色](#52-动态设置页面导航条颜色)
+- [6. 生命周期](#6-生命周期)
+- [7. Ref](#7-ref)
+- [8. Hooks](#8-hooks)
+- [9. Minified React error](#9-minified-react-error)
+- [10. 入口组件](#10-入口组件)
+- [11. 路由](#11-路由)
+- [12. 网路](#12-网路)
+  - [12.1 发起请求](#121-发起请求)
+- [13. 文件\&下载](#13-文件下载)
+  - [13.1 下载文件资源到本地 `Taro.downloadFile`](#131-下载文件资源到本地-tarodownloadfile)
+  - [13.2 新开页面打开文档 `Taro.openDocument(option)`](#132-新开页面打开文档-taroopendocumentoption)
+- [14. 样式问题](#14-样式问题)
+- [15. 交互](#15-交互)
+  - [15.1 loading](#151-loading)
+  - [15.2 toast](#152-toast)
+  - [15.3 modal](#153-modal)
+  - [15.4 actionSheet](#154-actionsheet)
+
+
 :::info
 - 相较于 Taro 1/2 编译时架构，Taro 3 采用了重运行时的架构，让开发者可以获得完整的 React / Vue 等框架的开发体验。具体原理请参考 [《小程序跨框架开发的探索与实践》](https://mp.weixin.qq.com/s?__biz=MzU3NDkzMTI3MA==&mid=2247483770&idx=1&sn=ba2cdea5256e1c4e7bb513aa4c837834)。
 
@@ -211,6 +243,26 @@ export default function Detail() {
   return <>详情</>
 }
 ```
+### 5.2 动态设置页面导航条颜色
+`Taro.setNavigationBarColor(option)`
+- backgroundColor 必填 背景颜色值，有效值为十六进制颜色
+- frontColor 必填 前景颜色值，包括按钮、标题、状态栏的颜色，仅支持 #ffffff 和 #000000
+```jsx
+export default function Detail() {
+  useEffect(() => {
+    Taro.setNavigationBarColor({
+      frontColor: '#ffffff',
+      backgroundColor: '#ff0000',
+      animation: {
+        duration: 400,
+        timingFunc: 'easeIn'
+      }
+    });
+  });
+  
+  return <>详情</>
+}
+```
 
 ## 6. 生命周期
 - Taro 3 在小程序逻辑层上实现了一份遵循 Web 标准 BOM 和 DOM API。因此 React 使用的 `document.appendChild`、`document.removeChild` 等 API 其实是 Taro 模拟实现的，最终的效果是把 React 的虚拟 DOM 树渲染为 Taro 模拟的 Web 标准 DOM 树。
@@ -301,3 +353,96 @@ export default App
 ## 12. 网路
 ### 12.1 发起请求
 [Taro.request](https://taro-docs.jd.com/docs/apis/network/request/) 发起 HTTPS 网络请求
+```jsx
+Taro.request({
+  url: 'test.php', //仅为示例，并非真实的接口地址
+  data: {
+    x: '',
+    y: ''
+  },
+  header: {
+    'content-type': 'application/json' // 默认值
+  },
+  success: function (res) {
+    console.log(res.data)
+  }
+})
+
+// async/await 用法：
+const res = await Taro.request(params)
+```
+
+## 13. 文件&下载
+### 13.1 下载文件资源到本地 `Taro.downloadFile`
+客户端直接发起一个 HTTPS GET 请求，返回文件的本地临时路径，单次下载允许的最大文件为 50MB。
+```js
+Taro.downloadFile({
+  url: 'https://example.com/audio/123', //仅为示例，并非真实的资源
+  success: function (res) {
+    // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
+    if (res.statusCode === 200) {
+      Taro.playVoice({
+        filePath: res.tempFilePath
+      })
+    }
+  }
+})
+```
+
+### 13.2 新开页面打开文档 `Taro.openDocument(option)`
+注意： 小程序开发者工具： 不支持。 my.openDocument 只支持在真机上测试，无法在 IDE 上调试
+```js
+Taro.downloadFile({
+  url: 'https://example.com/somefile.pdf',
+  success: function (res) {
+    var filePath = res.tempFilePath
+    Taro.openDocument({
+      filePath: filePath,
+      success: function (res) {
+        console.log('打开文档成功')
+      }
+    })
+  }
+})
+```
+
+## 14. 样式问题
+- Taro 默认会使用 postcss 把 px 按比例解析为 rpx(小程序中) 和 rem(H5中)
+> 在 Taro 中尺寸单位建议使用 px、 百分比 %，Taro 默认会对所有单位进行转换。在 Taro 中书写尺寸按照 1:1 的关系来进行书写，即从设计稿上量的长度 100px，那么尺寸书写就是 100px，当转成微信小程序的时候，尺寸将默认转换为 100rpx，当转成 H5 时将默认转换为以 rem 为单位的值。如果你希望部分 px 单位不被转换成 rpx 或者 rem ，最简单的做法就是在 px 单位中增加一个大写字母，例如 Px 或者 PX 这样，则会被转换插件忽略。
+
+- Taro 默认以 750px 作为换算尺寸标准，如果设计稿不是以 750px 为标准，则需要在项目配置 config/index.js 中进行设置，例如设计稿尺寸是 640px，则需要修改项目配置 config/index.js 中的 designWidth 配置为 640：
+```js title="/config/index.js"
+const config = {
+  projectName: 'myProject',
+  date: '2018-4-18',
+  designWidth: 640,
+  ....
+}
+```
+
+- 在编译时，Taro 会帮你对样式做尺寸转换操作，但是如果是在 JS 中书写了行内样式，那么编译时就无法做替换了，针对这种情况，Taro 提供了 API `Taro.pxTransform` 来做运行时的尺寸转换。
+```js
+Taro.pxTransform(10) // 小程序：rpx，H5：rem
+```
+
+- 在小程序中部分 CSS 选择器不会生效，如：
+  - 通配符 `*`
+  - 媒体查询
+  - 属性选择器，当属性不是对应小程序组件的内置属性时
+
+- 暂不支持使用 rem
+
+## 15. 交互
+### 15.1 loading
+### 15.2 toast
+`Taro.showToast(option)`
+```jsx
+Taro.showToast({
+  title: '成功',
+  icon: 'success',
+  duration: 2000
+})
+```
+
+### 15.3 modal
+### 15.4 actionSheet
