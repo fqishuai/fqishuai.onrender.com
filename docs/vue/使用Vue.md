@@ -15,6 +15,7 @@ tags: [vue]
 - [7. vue.config.js](#7-vueconfigjs)
   - [7.1 pages](#71-pages)
   - [7.2 configureWebpack](#72-configurewebpack)
+- [8. 动态组件`<component>/component>`](#8-动态组件componentcomponent)
 
 
 ## 1. 渲染函数 & JSX
@@ -162,3 +163,86 @@ new Vue({
 
 ### 7.2 configureWebpack
 - copy-webpack-plugin不需要install就能在vue.config.js中用，查看node_modules中有，说明copy-webpack-plugin不知道是哪个包的依赖，被附带安装了
+
+
+## 8. 动态组件`<component>/component>`
+背景：多个tab切换，切换时显示的内容都是相同的form表单，不过某些form表单项的默认值不同，切换后保留更改的表单项的值。
+
+设计：将form表单封装为单文件组件，并使用动态组件，`is`属性传入单文件组件，使用`v-bind`传入props，以及回调`@search`接收form表单的值，使用keep-alive包裹：
+```js
+// A.vue
+<template>
+  <div>
+    <keep-alive>
+      <component :is="'my-component'" v-bind="myComponentProps" @search="handleSearch"></component>
+    </keep-alive>
+  </div>
+</template>
+<script>
+  import MyComponent from './component/MyComponent';
+  export default {
+    components: {
+      MyComponent,
+    },
+    data: function() {
+      return {
+        tabList: [
+          {
+            label: 'first',
+            value: '1',
+          },
+          {
+            label: 'second',
+            value: '2',
+          },
+        ],
+        currentTabName: '1',
+        searchDisabled: false,
+      }
+    },
+    computed: {
+      computedDisabled({currentTabName, tabList}) {
+        return tabList.find(tab => tab.value === currentTabName)?.disabled;
+      },
+      myComponentProps({computedDisabled, searchDisabled, currentTabName}) {
+        return {
+          isDisabled: computedDisabled,
+          searchDisabled: searchDisabled,
+          tabName: currentTabName,
+          key: currentTabName, // 通过设置key，变相地将my-component当作不同的组件来使用
+        };
+      },
+    },
+    methods: {
+      handleSearch() {
+
+      },
+    },
+  }
+</script>
+
+// MyComponent.vue
+<script>
+  export default {
+    props:{
+      isDisabled: {
+        type: Boolean,
+        default: false,
+      },
+      searchDisabled: {
+        type: Boolean,
+        default: false,
+      },
+      tabName: {
+        type: String,
+        default: '',
+      },
+    },
+    methods: {
+      emitSearch() {
+        this.$emit('search', this.queryParam);
+      },
+    },
+  }
+</script>
+```

@@ -127,6 +127,8 @@ Example:`NODE_ENV=production taro build --type alipay --watch`
 ```
 
 2. 建议开启持久化缓存功能，能有效提升二次编译速度，详情请参考: https://docs.taro.zone/docs/config-detail#cache。
+3. `my.getAuthCode` 获取用户信息授权，取得授权码（authCode）。`my.getAuthCode` 引导用户授权其信息给当前小程序，会弹出授权引导浮窗。请勿在小程序首屏调用 `my.getAuthCode`，否则将面临违规处罚风险。通过 `my.getAuthCode` 所取得的代表用户授权的授权码（authCode），后续需由小程序服务端使用，向支付宝换取实际信息（如 user_id、头像、昵称、手机号、地区、性别、出生日期等）。
+4. 对于简单需求，建议优先选择其他方式：获取用户昵称和头像，请使用 `my.getOpenUserInfo`；获取用户手机号，请使用 `my.getPhoneNumber`。
 :::
 
 ## 2. 全局配置
