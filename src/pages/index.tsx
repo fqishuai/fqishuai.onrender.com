@@ -7,6 +7,8 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures/custom';
 
 import styles from './index.module.css';
 import Card from '../components/Card';
+import titleImg from './imgs/title.jpg';
+import title1Img from './imgs/title1.jpg';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
@@ -38,21 +40,12 @@ export default function Home(): JSX.Element {
       description="fqishuai's site"
     >
       <div className='tailwind'>
-        <div className='flex justify-around my-5'>
-          {/* <img src='https://www.patterns.dev/img/patterns-dev/homepage-hero-group_1.5x.svg' /> */}
-          {/* <img src='https://www.patterns.dev/img/patterns-dev/production-patterns_1.5x.svg' /> */}
-          {/* <img src='https://www.patterns.dev/img/patterns-dev/progressive-rehydration-1280w.avif' /> */}
-          <img src='https://www.patterns.dev/img/patterns-dev/javascript-circle_1.5x.svg' />
-          <div>
-            <img src='https://www.patterns.dev/img/patterns-dev/production-patterns_1.5x.svg' />
-            <div className='flex'>
-              <img src='https://www.patterns.dev/img/patterns-dev/patterns-overview_1.5x.svg' />
-              <img src='https://www.patterns.dev/img/patterns-dev/developer-code-laptop_1.5x.svg' />
-            </div>
-          </div>
+        <div className='flex justify-center my-5'>
+          <img src={titleImg} />
+          <img src={title1Img} />
         </div>
         <div className='mx-10 my-5 flex justify-around flex-wrap'>
-        <Card
+          <Card
             linkValue='https://javascript.info/'
             title='javascript.info'
             bgColor='bg-[#FBE7C6]'
@@ -105,6 +98,24 @@ export default function Home(): JSX.Element {
             contntColor='text-[#FA26A0]'
           >
             Patterns.dev is a free book on design patterns and component patterns for building powerful web apps with vanilla JavaScript and React.
+          </Card>
+          <Card
+            linkValue='https://www.javascripttutorial.net/'
+            title='JavaScript Tutorial'
+            bgColor='bg-[#B4F8C8]'
+            titleColor='text-[#FA26A0]'
+            contntColor='text-[#FFA384]'
+          >
+            This JavaScript Tutorial helps you learn the JavaScript programming language from scratch quickly and effectively.
+          </Card>
+          <Card
+            linkValue='https://www.typescripttutorial.net/'
+            title='TypeScript Tutorial'
+            bgColor='bg-[#A0E7E5]'
+            titleColor='text-[#FA26A0]'
+            contntColor='text-[#FFA384]'
+          >
+            TypeScript adds types to JavaScript to help you speed up the development by catching errors before you even run the JavaScript code.
           </Card>
         </div>
       </div>

@@ -97,6 +97,10 @@ const config = {
             position : 'right',
             items: [
               {
+                label: 'Frontend Weekly Digest',
+                href: 'https://frontender-ua.medium.com/',
+              },
+              {
                 label: '前沿技术解析',
                 href: 'https://www.thoughtworks.com/zh-cn/radar',
               },
@@ -198,6 +202,14 @@ const config = {
               {
                 label: 'maximeheckel blog',
                 href: 'https://blog.maximeheckel.com/',
+              },
+              {
+                label: 'robinwieruch blog',
+                href: 'https://www.robinwieruch.de/blog/',
+              },
+              {
+                label: 'Joshua Comeau',
+                href: 'https://www.joshwcomeau.com',
               },
             ],
           },
