@@ -10,4 +10,5 @@ tags: [react]
 :::tip
 参考资料：
 - [图解React原理系列](https://7kms.github.io/react-illustration-series/)
+- [React技术揭秘](https://react.iamkasong.com/)
 :::

@@ -195,6 +195,12 @@ Asynchronous JavaScript and XML, or Ajax, is not a technology in itself, but rat
 
 虽然 Ajax 中的 X 代表 XML，但首选 JSON，因为它的大小更轻，而且是用 JavaScript 编写的。 JSON 和 XML 都用于 Ajax 模型中的信息打包。
 
+### 10. 解构
+```js
+const { data } = undefined
+// TypeError: Cannot destructure property 'data' of 'undefined' as it is undefined.
+```
+
 ## 二、API(应区分JS内置API和宿主环境API)
 ### 1. Object
 #### 1.1 Object.fromEntries
@@ -250,6 +256,18 @@ Object.is(-0, -0); // true
 // Case 3: NaN
 Object.is(NaN, 0 / 0); // true
 Object.is(NaN, Number.NaN); // true
+```
+
+#### 1.5 Object.entries
+```js
+let a = {1: 'a'};
+Object.entries(a) // [["1","a"]]
+```
+
+#### 1.6 Object.values
+```js
+let a = {1: 'a'};
+Object.values(a) // ["a"]
 ```
 
 ### 2. HTMLElement
@@ -406,6 +424,16 @@ result = window.prompt(text, value);
 // result 用来存储用户输入文字的字符串，或者是 null。
 // text 用来提示用户输入文字的字符串，如果没有任何提示内容，该参数可以省略不写。
 // value 文本输入框中的默认值，该参数也可以省略不写。不过在 Internet Explorer 7 和 8 中，省略该参数会导致输入框中显示默认值"undefined"。
+```
+
+#### 9.2 window.getComputedStyle
+> 获取指定元素的的所有 CSS 属性的值
+```js
+const currentCell = document.getElementById(refValue);
+const parentWidth = currentCell.parentNode.offsetWidth;
+const contentWidth = currentCell.offsetWidth;
+const parentStyle = document.defaultView.getComputedStyle(currentCell.parentNode, '');
+const paddingValue = parseInt(parentStyle.paddingLeft.replace('px', '')) + parseInt(parentStyle.paddingRight.replace('px', ''));
 ```
 
 ### 10. Node

@@ -16,12 +16,21 @@ tags: [小程序开发,h5开发,跨端]
 - [5. 页面配置](#5-页面配置)
   - [5.1 动态设置页面标题](#51-动态设置页面标题)
   - [5.2 动态设置页面导航条颜色](#52-动态设置页面导航条颜色)
+  - [5.3 usingComponents 页面自定义组件配置](#53-usingcomponents-页面自定义组件配置)
 - [6. 生命周期](#6-生命周期)
 - [7. Ref](#7-ref)
 - [8. Hooks](#8-hooks)
+  - [8.1 useLoad](#81-useload)
+  - [8.2 useReady](#82-useready)
+  - [8.3 useDidShow](#83-usedidshow)
 - [9. Minified React error](#9-minified-react-error)
 - [10. 入口组件](#10-入口组件)
 - [11. 路由](#11-路由)
+  - [11.1 navigateTo](#111-navigateto)
+  - [11.2 switchTab](#112-switchtab)
+  - [11.3 navigateBack](#113-navigateback)
+  - [11.4 navigateToMiniProgram](#114-navigatetominiprogram)
+  - [11.5 useRouter](#115-userouter)
 - [12. 网路](#12-网路)
   - [12.1 发起请求](#121-发起请求)
 - [13. 文件\&下载](#13-文件下载)
@@ -33,6 +42,11 @@ tags: [小程序开发,h5开发,跨端]
   - [15.2 toast](#152-toast)
   - [15.3 modal](#153-modal)
   - [15.4 actionSheet](#154-actionsheet)
+- [16. 视图容器](#16-视图容器)
+  - [16.1 ScrollView 可滚动视图区域](#161-scrollview-可滚动视图区域)
+  - [16.2 PageContainer](#162-pagecontainer)
+- [17. 表单组件](#17-表单组件)
+  - [17.1 Picker](#171-picker)
 
 
 :::info
@@ -168,6 +182,41 @@ export default defineAppConfig({
 ### 2.1. pages
 ### 2.2. window
 ### 2.3. tabBar
+如果小程序是一个多 tab 应用（客户端窗口的底部或顶部有 tab 栏可以切换页面），可以通过 tabBar 配置项指定 tab 栏的表现，以及 tab 切换时显示的对应页面。
+```js title="app.config.ts"
+tabBar: {
+  color: '#999999',
+  selectedColor: '#E53C1C',
+  list: [
+    {
+      pagePath: 'pages/home/index',
+      text: '首页',
+      iconPath: 'assets/imgs/tabbar_icon1@2x.png',
+      selectedIconPath: 'assets/imgs/tabbar_selected_icon1@2x.png',
+    },
+    {
+      pagePath: 'pages/meal/index',
+      text: '我的餐点',
+      iconPath: 'assets/imgs/tabbar_icon2@2x.png',
+      selectedIconPath: 'assets/imgs/tabbar_selected_icon2@2x.png',
+    },
+    {
+      pagePath: 'pages/bill/index',
+      text: '账单',
+      iconPath: 'assets/imgs/tabbar_icon3@2x.png',
+      selectedIconPath: 'assets/imgs/tabbar_selected_icon3@2x.png',
+    },
+    {
+      pagePath: 'pages/mine/index',
+      text: '我的',
+      iconPath: 'assets/imgs/tabbar_icon1@2x.png',
+      selectedIconPath: 'assets/imgs/tabbar_selected_icon1@2x.png',
+    },
+  ],
+},
+```
+其中 list 接受一个数组，只能配置最少 2 个、最多 5 个 tab。tab 按数组的顺序排序，每个项都是一个对象
+
 ### 2.4. subPackages
 
 ## 3. 项目配置
@@ -266,6 +315,18 @@ export default function Detail() {
 }
 ```
 
+### 5.3 usingComponents 页面自定义组件配置
+usingComponents 一般不需要配置，只有在需要与引用原生小程序组件的时候才需要配置。比如使用支付宝小程序组件库[mini-ali-ui](https://github.com/Alibaba-mp/mini-ali-ui):
+- `pnpm add mini-ali-ui`
+- 在页面config文件中进行注册，比如about页面
+```js title="src/about/index.config.ts"
+export default definePageConfig({
+  usingComponents: {
+    "calendar": "mini-ali-ui/es/calendar/index", // calendar组件的注册
+  }
+})
+```
+
 ## 6. 生命周期
 - Taro 3 在小程序逻辑层上实现了一份遵循 Web 标准 BOM 和 DOM API。因此 React 使用的 `document.appendChild`、`document.removeChild` 等 API 其实是 Taro 模拟实现的，最终的效果是把 React 的虚拟 DOM 树渲染为 Taro 模拟的 Web 标准 DOM 树。
 - React 组件的生命周期方法在 Taro 中都支持使用。
@@ -299,6 +360,29 @@ export default class Test extends React.Component {
 ```
 
 ## 8. Hooks
+### 8.1 useLoad
+> 等同于页面的 `onLoad` 生命周期钩子。
+```jsx
+useLoad(() => {
+  console.log('onLoad')
+})
+```
+
+### 8.2 useReady
+> 等同于页面的 `onReady` 生命周期钩子。从此生命周期开始可以使用 `createCanvasContext` 或 `createSelectorQuery` 等 API 访问小程序渲染层的 DOM 节点。
+```jsx
+useReady(() => {
+  const query = wx.createSelectorQuery()
+})
+```
+
+### 8.3 useDidShow
+> 页面显示/切入前台时触发。等同于 `componentDidShow` 页面生命周期钩子。
+```jsx
+useDidShow(() => {
+  console.log('componentDidShow')
+})
+```
 
 ## 9. Minified React error
 - 因为 development 版本的 React 体积较大，为了减少小程序体积，方便开发时真机预览。Taro 在构建小程序时默认使用 production 版本的 React 相关依赖。
@@ -352,6 +436,61 @@ export default App
 - 前端路由库的基本原理是监听 `popstate` 或 `hashchange` 事件触发后，读取 location 对象对视图进行操控更新。 Taro 为了支持前端路由库的使用，在运行时中引入了 `histroy` `location` 对象的实现，且尽可能与 Web 端规范对齐，你可以在 window 对象上访问到 history 和 location 对象。
 - 小程序天然支持多页面(pages数组)，Taro 并非以整个应用为一个路由系统，而是顺应小程序规范以页面维度进行路由管理。每当切换页面时，会将当前页面的页面路由状态缓存。跳转至新页面后会重新创建页面路由状态，并挂载在 window 对象上。当返回上一级页面时，会重新将当前页面的页面路由状态挂载到 window 对象中。（这里的"页面路由状态"指的是history 和 location 对象，将 history 和 location 对象统称为页面路由状态。）
 
+### 11.1 navigateTo
+`Taro.navigateTo(option)` 保留当前页面，跳转到应用内的某个页面。
+- **如果跳的是tabbar页面，则tabbar不显示。**
+- 使用 Taro.navigateBack 可以返回到原页面。
+- 小程序中页面栈最多十层。
+- 调用 navigateTo 跳转时，调用该方法的页面会被加入堆栈，而 redirectTo 方法则不会。
+```js
+Taro.navigateTo({
+  url: 'test?id=1',
+  events: {
+    // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
+    acceptDataFromOpenedPage: function(data) {
+      console.log(data)
+    },
+    someEvent: function(data) {
+      console.log(data)
+    }
+    ...
+  },
+  success: function (res) {
+    // 通过eventChannel向被打开页面传送数据
+    res.eventChannel.emit('acceptDataFromOpenerPage', { data: 'test' })
+  }
+})
+```
+
+- 带的参数可以在目标页面中使用`Taro. getCurrentInstance().router.params`接参
+
+### 11.2 switchTab
+`Taro.switchTab(option)` 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面。
+```js
+Taro.switchTab({
+  url: '/index'
+})
+```
+
+### 11.3 navigateBack
+- 关闭当前页面，返回上一页面或多级页面。可通过 `getCurrentPages` 获取当前的页面栈，决定需要返回几层。
+```js
+Taro.navigateBack({
+  delta: 2
+})
+```
+
+### 11.4 navigateToMiniProgram
+> 打开另一个小程序
+
+### 11.5 useRouter
+```jsx
+import Taro, { useRouter } from "@tarojs/taro";
+
+// { path: '', params: { ... } }
+const router = useRouter(); // 等同于 Taro.getCurrentInstance().router
+```
+
 ## 12. 网路
 ### 12.1 发起请求
 [Taro.request](https://taro-docs.jd.com/docs/apis/network/request/) 发起 HTTPS 网络请求
@@ -373,6 +512,14 @@ Taro.request({
 // async/await 用法：
 const res = await Taro.request(params)
 ```
+
+- data 参数说明：最终发送给服务器的数据是 String 类型，如果传入的 data 不是 String 类型，会被转换成 String 。转换规则如下：
+  - 对于 GET 方法的数据，会将数据转换成 query string
+  - 对于 POST 方法且 `header['content-type']` 为 `application/json` 的数据，会对数据进行 JSON 序列化
+  - 对于 POST 方法且 `header['content-type']` 为 `application/x-www-form-urlencoded` 的数据，会将数据转换成 query string
+
+- header 参数说明：header 中不能设置 Referer
+- method 参数说明：默认 GET
 
 ## 13. 文件&下载
 ### 13.1 下载文件资源到本地 `Taro.downloadFile`
@@ -436,6 +583,19 @@ Taro.pxTransform(10) // 小程序：rpx，H5：rem
 
 ## 15. 交互
 ### 15.1 loading
+`Taro.showLoading(option)` ，注意：
+- Taro.showLoading 和 Taro.showToast 同时只能显示一个
+- Taro.showLoading 应与 Taro.hideLoading 配对使用
+
+```jsx
+Taro.showLoading({
+  title: '加载中',
+})
+setTimeout(function () {
+  Taro.hideLoading()
+}, 2000)
+```
+
 ### 15.2 toast
 `Taro.showToast(option)`
 ```jsx
@@ -448,3 +608,65 @@ Taro.showToast({
 
 ### 15.3 modal
 ### 15.4 actionSheet
+
+## 16. 视图容器
+### 16.1 ScrollView 可滚动视图区域
+> 使用竖向滚动时，需要给scroll-view一个固定高度
+
+- scrollTop  设置竖向滚动条位置
+- scrollX  允许横向滚动，默认值false
+- scrollY  允许纵向滚动，默认值false
+- lowerThreshold  距底部/右边多远时（单位px），触发 scrolltolower 事件，默认值50
+- upperThreshold  距顶部/左边多远时（单位px），触发 scrolltoupper 事件，默认值50
+- onScrollToUpper  滚动到顶部/左边，会触发 scrolltoupper 事件
+- onScrollToLower  滚动到底部/右边，会触发 scrolltolower 事件
+- onScroll  滚动时触发
+- onRefresherRefresh  自定义下拉刷新被触发
+
+### 16.2 PageContainer
+> 效果类似于 popup 弹出层。页面内存在该容器时，当用户进行返回操作，关闭该容器不关闭页面。返回操作包括三种情形，右滑手势、安卓物理返回键和调用 navigateBack 接口。
+
+- onClickOverlay 点击遮罩层时触发
+
+```jsx
+export default function PageContainerDemo() {
+  const [showPopup, setShowPopup] = useState(false);
+
+  function onPopupClose() {
+    setShowPopup(false);
+  }
+
+  <PageContainer className="page-popup" show={showPopup} round={true} onClickOverlay={onPopupClose}>
+    <View className="popup-content">
+      <View className="tip">订单金额(元)</View>
+      <View className="need-to-pay">26.01</View>
+      <View className="tip">当前余额</View>
+      <View className="account">509</View>
+      <View>
+        <View className="confirm-btn">确认付款</View>
+      </View>
+      <View className="cancel" onClick={onPopupClose}>取  消</View>
+    </View>
+  </PageContainer>
+}
+```
+
+## 17. 表单组件
+### 17.1 Picker
+:::tip
+支付宝小程序中，选择器通常会从屏幕底部弹起（iOS）或中间弹出（Android）。
+:::
+- mode  选择器类型  'selector'普通选择器; 'multiSelector'多列选择器; 'time'时间选择器; 'date'日期选择器; 'region'省市区选择器
+- 日期选择器的prop有：
+  - value  必填  表示选中的日期，格式为"YYYY-MM-DD"
+  - onChange  必填  value 改变时触发 change 事件
+  - fields  非必填  有效值 year, month, day，表示选择器的粒度；默认值"day"
+  - start  非必填  表示有效时间范围的开始，字符串格式为"hh:mm"
+  - end  非必填  表示有效时间范围的结束，字符串格式为"hh:mm"
+```jsx
+<Picker mode='date' value={dateValue} fields='month' onChange={handleDateChange}>
+  <View className="picker-wrapper">
+    
+  </View>
+</Picker>
+```

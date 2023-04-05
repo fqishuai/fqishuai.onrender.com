@@ -54,6 +54,8 @@ tags: [css]
   - [39. css选择器+、~](#39-css选择器)
   - [40. flex布局实现一行n个，超出自动换行](#40-flex布局实现一行n个超出自动换行)
   - [41. 子元素在父元素的最右侧](#41-子元素在父元素的最右侧)
+  - [42. 渐变](#42-渐变)
+  - [43. 阴影](#43-阴影)
 
 ## 一、[CSS Modules](http://www.ruanyifeng.com/blog/2016/06/css_modules.html)
 
@@ -582,4 +584,56 @@ div.content {
   position:absolute;
   right:0
 }
+```
+
+### 42. 渐变
+- 线性渐变创建了一条沿直线前进的颜色带。要创建最基本的渐变类型，您只需指定两种颜色即可。这些被称为色标。至少指定两个色标，也可以指定任意数量。
+```css
+.a {
+  background: linear-gradient(blue, pink);
+}
+```
+- 默认情况下，线性渐变的方向是从上到下，你可以指定一个值来改变渐变的方向。
+```css
+.horizontal-gradient {
+  background: linear-gradient(to right, blue, pink);
+}
+```
+- 可以设置渐变方向为从一个对角到另一个对角。
+```css
+.diagonal-gradient {
+  background: linear-gradient(to bottom right, blue, pink);
+}
+```
+- 如果你想要更精确地控制渐变的方向，你可以给渐变设置一个具体的角度。在使用角度的时候，0deg 代表渐变方向为从下到上，90deg 代表渐变方向为从左到右，诸如此类正角度都属于顺时针方向。而负角度意味着逆时针方向。
+```css
+.angled-gradient {
+  background: linear-gradient(70deg, blue, pink);
+}
+```
+- 颜色终止位置。你可以通过给每个颜色设置 0，1% 或者 2% 或者其他的绝对数值来调整它们的位置。
+> - 如果你将位置设置为百分数， 0% 表示起始点，而 100% 表示终点，但是如果需要的话你也可以设置这个范围之外的其他值来达到你想要的效果。
+> - 如果有些位置你没有明确设置，那么它将会被自动计算，第一种颜色会在 0% 处停止，而最后一种颜色是 100%，至于其他颜色则是在它邻近的两种颜色的中间停止。
+```css
+.multicolor-linear {
+  background: linear-gradient(to left, blue 28px, red 77%, #abcdef);
+}
+```
+
+### 43. 阴影
+```css
+/* x 偏移量 | y 偏移量 | 阴影颜色 */
+box-shadow: 60px -16px teal;
+
+/* x 偏移量 | y 偏移量 | 阴影模糊半径 | 阴影颜色 */
+box-shadow: 10px 5px 5px black;
+
+/* x 偏移量 | y 偏移量 | 阴影模糊半径 | 阴影扩散半径 | 阴影颜色 */
+box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+
+/* 插页 (阴影向内) | x 偏移量 | y 偏移量 | 阴影颜色 */
+box-shadow: inset 5em 1em gold;
+
+/* 任意数量的阴影，以逗号分隔 */
+box-shadow: 3px 3px red, -1em 0 0.4em olive;
 ```

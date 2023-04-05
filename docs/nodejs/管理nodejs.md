@@ -31,7 +31,7 @@ fnm alias 14.14.0 a2
 ```
 - fnm unalias
 
-## nvm
+## [nvm](https://github.com/nvm-sh/nvm)
 ### 1. 安装及配置
 - `brew install nvm`
 - mkdir ~/.nvm

@@ -3,8 +3,8 @@ slug: usage
 tags: [git]
 ---
 
-- [1. 使用git rebase合并分支(e.g.master合并dev)：git rebase dev](#1-使用git-rebase合并分支egmaster合并devgit-rebase-dev)
-- [2. 使用git rebase合并commits：git rebase -i \[start-commitid\]  \[end-commitid\]](#2-使用git-rebase合并commitsgit-rebase--i-start-commitid--end-commitid)
+- [1. 使用git rebase合并分支](#1-使用git-rebase合并分支)
+- [2. 使用git rebase合并commits](#2-使用git-rebase合并commits)
 - [3. git pull 报错：fatal: Exiting because of unfinished merge.](#3-git-pull-报错fatal-exiting-because-of-unfinished-merge)
 - [4. 不要使用git rebase修改已经push到远端的commit](#4-不要使用git-rebase修改已经push到远端的commit)
 - [5. 强制推送到远端分支(e.g. feature分支)](#5-强制推送到远端分支eg-feature分支)
@@ -60,8 +60,12 @@ tags: [git]
 - [43. 报错：HTTP/2 stream 1 was not closed cleanly before end of the underlying stream](#43-报错http2-stream-1-was-not-closed-cleanly-before-end-of-the-underlying-stream)
 
 
-## 1. 使用git rebase合并分支(e.g.master合并dev)：git rebase dev
-## 2. 使用git rebase合并commits：git rebase -i [start-commitid]  [end-commitid]
+## 1. 使用git rebase合并分支
+(e.g.master合并dev)：`git rebase dev`
+
+## 2. 使用git rebase合并commits
+命令语法：`git rebase -i [start-commitid]  [end-commitid]`
+
 > 注意：不包含start-commitid，包含end-commitid
 >- pick：保留该commit（缩写:p）
 >- reword：保留该commit，但我需要修改该commit的注释（缩写:r）
@@ -71,13 +75,13 @@ tags: [git]
 >- exec：执行shell命令（缩写:x）
 >- drop：我要丢弃该commit（缩写:d）
 ## 3. git pull 报错：fatal: Exiting because of unfinished merge.
-> 解决方法（放弃本地修改）：git reset --hard origin/master
+> 解决方法（放弃本地修改）：`git reset --hard origin/master`
 ## 4. 不要使用git rebase修改已经push到远端的commit
 > 否则rebase后push的时候会报错（因为git的push操作默认是假设远端的分支和你本地的分支可以进行fast-forward操作，换句话说就是这个push命令假设你的本地分支和远端分支的唯一区别是你本地有几个新的commit，而远端没有）让先pull，而pull后会有一堆冲突。
 ## 5. 强制推送到远端分支(e.g. feature分支)
-> 使用  git push --force-with-lease origin feature  来保证分支安全
+> 使用  `git push --force-with-lease origin feature`  来保证分支安全
 ## 6. 查看git graph
-> git log --graph --decorate --oneline --simplify-by-decoration --all
+> `git log --graph --decorate --oneline --simplify-by-decoration --all`
 >- --decorate 标记会让git log显示每个commit的引用(如:分支、tag等)
 >- --oneline 一行显示
 >- --simplify-by-decoration 只显示被branch或tag引用的commit

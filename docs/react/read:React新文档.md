@@ -4,7 +4,7 @@ tags: [react]
 ---
 
 :::tip
-[React](https://beta.reactjs.org/) is a library that lets you organize UI code by breaking it apart into pieces called components. React doesn’t take care of routing or data management.This means there are several ways to start a new React project:
+[React](https://react.dev/) is a library that lets you organize UI code by breaking it apart into pieces called components. React doesn’t take care of routing or data management.This means there are several ways to start a new React project:
 - Start with a minimal toolchain, adding more features to your project as you go. (Great for learning!)
 - Start with an opinionated framework that has common features like data fetching and routing built-in.
 :::
