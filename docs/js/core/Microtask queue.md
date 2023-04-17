@@ -1,5 +1,5 @@
 ---
-slug: microtask queue
+slug: microtask-queue
 tags: [js-core]
 ---
 

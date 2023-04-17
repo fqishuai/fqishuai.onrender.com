@@ -41,7 +41,7 @@ export default function Home(): JSX.Element {
     >
       <div className='tailwind'>
         <div className='flex justify-center my-5'>
-          <img src={titleImg} />
+          {/* <img src={titleImg} /> */}
           <img src={title1Img} />
         </div>
         <div className='mx-10 my-5 flex justify-around flex-wrap'>

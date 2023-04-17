@@ -1,5 +1,5 @@
 ---
-slug: event loop
+slug: event-loop
 tags: [js-core]
 ---
 

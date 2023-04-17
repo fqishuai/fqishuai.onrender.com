@@ -1,6 +1,6 @@
 ---
-slug: insight
-tags: [原生js]
+slug: jikeshijian
+tags: [课程笔记]
 ---
 
 ## 一、编程模式
