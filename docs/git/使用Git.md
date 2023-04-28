@@ -58,6 +58,8 @@ tags: [git]
 - [41. github api](#41-github-api)
 - [42. 本地新建分支后push到远程](#42-本地新建分支后push到远程)
 - [43. 报错：HTTP/2 stream 1 was not closed cleanly before end of the underlying stream](#43-报错http2-stream-1-was-not-closed-cleanly-before-end-of-the-underlying-stream)
+- [44. 撤销中间某次commit](#44-撤销中间某次commit)
+- [45. 查询本地所有操作记录](#45-查询本地所有操作记录)
 
 
 ## 1. 使用git rebase合并分支
@@ -231,6 +233,14 @@ git pull origin master    //拉取远程哪个分支的文件目录，这里是m
 - push本地所有标签：git push origin --tags
 - tag内容：git tag -a v1.4 -m "my version 1.4"
 - 给某次commit追加tag：git tag -a tag名 commit的hash，例如：git tag -a v1.2 9fceb02
+- 将tag提交到远程仓库：git push origin tag名
+- 回滚切换到某个tag：
+  - git checkout tag名
+  - git reset –hard xxxxxxx
+- 删除某个tag：
+  - 本地删除：git tag -d tag名
+  - 远程删除（一般不删除远程）：git push origin :refs/tags/tag名
+- 查看具体某一个 tag 的详情：git show tag名
 
 ## 34. 当用自己的网访问不了github时，可以使用[dev-sidecar](https://gitee.com/docmirror/dev-sidecar)，亲测可用。
 
@@ -367,3 +377,13 @@ layout: default
 ```bash
 git config --global http.version HTTP/1.1
 ```
+
+## 44. 撤销中间某次commit
+> [git revert 撤销中间某次commit](https://www.jianshu.com/p/bca969bfda7d)
+
+- 想要撤回中间某次commit，可以使用命令: `git revert commit_id`
+- 如果想撤销的不是一次commit，而是连着的几次，那么: `git revert --no-commit commit1..commit2`
+- 如果这次提交是别的分支合并过来的，按照提示可知需要加参数`-m`: `git revert -m commit_id`
+
+## 45. 查询本地所有操作记录
+> git reflog

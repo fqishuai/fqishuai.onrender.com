@@ -5,6 +5,8 @@ tags: [js]
 
 ## [How JavaScript Works? – Behind the Scenes](https://www.atatus.com/blog/how-does-javascript-works/)
 
+## [wtfjs](https://github.com/denysdovhan/wtfjs/blob/master/README-zh-cn.md)
+
 ## [this](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
 > [Understanding Javascript ‘this’ keyword (Context)](https://towardsdatascience.com/javascript-context-this-keyword-9a78a19d5786)
 :::tip

@@ -84,6 +84,7 @@ const config = {
           src: 'https://s0.lgstatic.com/i/image/M00/41/92/CgpEMllU3hWAFygCAAZ9z9H7nhk224.jpg',
         },
         items: [
+          {label: 'developer-roadmap', position: 'right', href: 'https://roadmap.sh/'},
           {
             type: 'doc',
             docId: 'index/docsIndex',
@@ -91,9 +92,9 @@ const config = {
             label: 'Docs',
           },
           {to: '/blog', label: 'Blog', position: 'right'},
-          {to: '/todo-list', label: 'Pages', position: 'right'},
+          // {to: '/todo-list', label: 'Pages', position: 'right'},
           {
-            label: '技术报刊',
+            label: 'weekly-digest',
             position : 'right',
             items: [
               {
@@ -126,18 +127,7 @@ const config = {
               },
             ]
           },
-          {label: 'course', position: 'right', items: [
-            {
-              label: '极客课程',
-              href: 'https://time.geekbang.org/dashboard/course'
-            },
-            {
-              label: '拉勾课程',
-              href: 'https://kaiwu.lagou.com/learn'
-            },
-          ]},
-          {label: '图谱', position: 'right', href: 'https://f2e.tech/'},
-          {label: 'coding', position: 'right', items: [
+          {label: 'coding-online', position: 'right', items: [
             {
               label: 'replit',
               href: 'https://replit.com/'
@@ -159,8 +149,16 @@ const config = {
               href: 'https://plnkr.co/'
             },
           ]},
-          {label: 'flash-note', position: 'right', href: 'https://juejin.cn/flash-note/list'},
-          {label: '脑图', position: 'right', href: 'https://naotu.baidu.com/home'},
+          {label: 'course', position: 'right', items: [
+            {
+              label: '极客课程',
+              href: 'https://time.geekbang.org/dashboard/course'
+            },
+            {
+              label: '拉勾课程',
+              href: 'https://kaiwu.lagou.com/learn'
+            },
+          ]},
           {label: 'GitHub', position: 'right', href: 'https://github.com/fqishuai/blog'},
         ],
       },
@@ -216,14 +214,11 @@ const config = {
           {
             title: 'Tools',
             items: [
-              {
-                label: '码力全开',
-                href: 'https://maliquankai.com/',
-              },
-              {
-                label: 'transform.tools',
-                href: 'https://transform.tools/html-to-jsx',
-              },
+              { label: 'flash-note', href: 'https://juejin.cn/flash-note/list' },
+              { label: '阿里前端图谱', href: 'https://f2e.tech/' },
+              { label: '码力全开', href: 'https://maliquankai.com/' },
+              { label: 'transform.tools', href: 'https://transform.tools/html-to-jsx' },
+              { label: '脑图', href: 'https://naotu.baidu.com/home' },
             ],
           },
           {

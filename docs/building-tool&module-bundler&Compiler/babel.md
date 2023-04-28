@@ -18,3 +18,22 @@ yo babel-plugin
 - 使用[generator-babel-plugin-x](https://github.com/OSpoon/generator-babel-plugin)生成目录，参照该目录创建[babel-plugin-starter](https://github.com/fqishuai/babel-plugin-starter)作为开发babel插件的通用工程
 
 ### [yeoman](https://yeoman.io/)
+
+## babel使用
+### 1. 转译 可选链操作符 及 空值合并运算符
+```js title='babel.config.js'
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      // Config for @babel/preset-env
+      {
+        // Example: Always transpile optional chaining/nullish coalescing
+        include: [
+          /(optional-chaining|nullish-coalescing)/
+        ],
+      },
+    ],
+  ]
+}
+```
