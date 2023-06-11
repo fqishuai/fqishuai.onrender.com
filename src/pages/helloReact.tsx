@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import CodeBlock from '@theme/CodeBlock';
+import RunKit from 'react-runkit-embed/RunKit'
 
 export default function HelloReact() {
   return (
@@ -24,6 +25,9 @@ export default function HelloReact() {
             }
           </CodeBlock>
         </div>
+        <RunKit>
+          console.log('hello')
+        </RunKit>
       </div>
     </Layout>
   )
