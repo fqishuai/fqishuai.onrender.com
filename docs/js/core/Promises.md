@@ -421,6 +421,36 @@ promise1
   .catch(err => console.log(err));
 ```
 In this example, if any error in the promise1, promise2, or promise4, the `catch()` method will handle it.
+
+```jsx live
+function liveRender() {
+  // begin
+  function queryInitInfo() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve({name: 'LBJ'});
+      }, 500);
+    });
+  }
+  // end
+
+  function showResult() {
+    try {
+      queryInitInfo().then(res => {
+        b.c = 1;
+      }).catch(reason => {
+        console.log('reason::', reason) // reason:: ReferenceError: b is not defined
+      })
+    } catch (error) {
+      console.log('error::', error)
+    }
+  }
+
+  return <div>
+    <button onClick={showResult}>控制台查看哪个catch有效</button>
+  </div>
+}
+```
 :::
 
 #### Calling reject() function

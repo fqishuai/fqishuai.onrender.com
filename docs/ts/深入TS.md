@@ -1,4 +1,0 @@
----
-slug: insight
-tags: [ts]
----

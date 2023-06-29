@@ -470,6 +470,13 @@ console.log(searchParams3.has('query')); // true
 
 ```
 
+### 15. Document
+#### 15.1 querySelectorAll
+获取整个页面中class前缀都为"operation"的元素：
+```js
+document.querySelectorAll('[class^="operation"]')
+```
+
 ## 三、手写函数
 ### 1. 去重
 ```js

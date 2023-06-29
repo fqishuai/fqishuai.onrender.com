@@ -292,3 +292,116 @@ npm run start -- --stdout="/xx/master-stdout.log" --stderr="/xx/master-stderr.lo
 
 ## 8. egg-ts-helper
 ets clean 支持清除包含同名 tsx 文件的 js 文件
+
+## 9. [eggjs处理jsonp请求](https://www.jianshu.com/p/afc0acc6206a)
+jsonp作为前端跨域的一种解决方案，优缺点如下：
+- 优点
+  - 它不像`XMLHttpRequest`对象实现的`Ajax`请求那样受到同源策略的限制
+  - 它的兼容性更好，在更加古老的浏览器中都可以运行，不需要`XMLHttpRequest`或`ActiveX`的支持
+  - 并且在请求完毕后可以通过调用`callback`的方式回传结果
+
+- 缺点
+  - 它只支持`GET`请求而不支持`POST`等其它类型的HTTP请求
+  - 它只支持跨域HTTP请求这种情况，不能解决不同域的两个页面之间如何进行JavaScript调用的问题
+
+1. 安装 egg-jsonp 插件 `npm i -S egg-jsonp`
+2. 配置`config/plugin.js`
+```js
+// {app_root}/config/plugin.js
+exports.jsonp = {
+  enable: true,
+  package: 'egg-jsonp',
+};
+```
+
+3. 配置`config/config.default.js`
+```js
+module.exports = appInfo => {
+  /**
+   * built-in config
+   * @type {Egg.EggAppConfig}
+   **/
+  const config = exports = {};
+
+  config.jsonp = {
+    limit: 100,                               // 回调方法名的最大长度，默认为 50。
+    // callback: [ '_callback', 'callback' ], // jsonp回调方法key值，默认为 [ '_callback', 'callback' ]
+    // csrf: true,                            // 是否启用 csrf 防御检查。默认为 false。
+    // whiteList: [                           // 请求referrer的白名单。类型可以是String、Array、RegExp。
+    // 'localhost:4000/',
+    // '127.0.0.1:4000/',
+    // ],
+  };
+  /**
+   * whiteList 为 字符串，如：{whiteList : '.test.com'}
+   * whiteList 为 正则，如：{whiteList : / ^ https?: / / test.com / /}，如果 whiteList 的类型是正则，referrer 必须 匹配 whiteList，注意 first^和 last /。
+   * whiteList 为 数组，如：{whiteList : [ '.foo.com' , '.bar.com' ]}
+   */
+  return {
+    ...config,
+  }
+}
+```
+
+4. controller
+```js
+// app/controller/jsonp/index.js
+'use strict';
+
+const Controller = require('egg').Controller;
+
+class JsonpController extends Controller {
+
+  async list() {
+    const { ctx } = this;
+    ctx.body = [
+      {
+        id: 1,
+        name: '天問', 
+      },
+      {
+        id: 2,
+        name: '天问', 
+      },
+      {
+        id: 3,
+        name: 'Tiven', 
+      },
+    ];
+  }
+
+}
+
+module.exports = JsonpController;
+```
+
+5. router
+```js
+// app/router.js
+
+module.exports = app => {
+  const { router, controller } = app;
+  const jsonp = app.jsonp();
+  
+  router.get('/api/v1/jsonp/list', jsonp, controller.jsonp.index.list);
+};
+```
+
+6. 前端页面调用
+```js
+function getList(res) {
+  if (!res) return
+  // jsonp接口返回的数据
+  // do ...
+  console.log(res)
+}
+let script = document.createElement('script')
+script.src = `http://127.0.0.1:7001/api/v1/jsonp/list?callback=getList&v=${Date.now()}`
+document.body.appendChild(script)
+```
+
+7. jsonp返回的数据结构
+打开控制台的network可以查看jsonp返回的数据结构：
+```js
+/**/ typeof getList === 'function' && getList([{ "id": 1, "name": '天問'}, { "id": 2,"name": '天问'},{"id": 3, "name": 'Tiven'}]);
+```
