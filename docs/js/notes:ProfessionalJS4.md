@@ -3,7 +3,7 @@ slug: professional-js-4
 tags: [读书笔记]
 ---
 
-> [源码](https://github.com/msfrisbie/professional-javascript-for-web-developers)
+> [书内代码](https://github.com/msfrisbie/professional-javascript-for-web-developers)
 
 :::tip
 完整的JavaScript实现包含以下几个部分：
@@ -14,10 +14,13 @@ tags: [读书笔记]
 ![js实现](img/js实现.png)
 
 各种浏览器均以ECMAScript作为自己JavaScript实现的依据，具体实现各有不同：
-- Chrome的Blink/V8
-- Firefox的Gecko/SpiderMonkey
-- Safari的WebKit/JavaScriptCore
-- 微软的Trident/EdgeHTML/Chakra
+- Chrome的Blink/[V8](https://v8.dev/)
+  - JavaScript 由 V8 内部编译，采用即时 (JIT, just-in-time) 编译来加快执行速度。
+- Firefox的Gecko/[SpiderMonkey](https://spidermonkey.dev/)
+- Safari的WebKit/[JavaScriptCore](https://developer.apple.com/documentation/javascriptcore)(also called Nitro)
+- 微软的Trident/EdgeHTML/Chakra（Edge 最初基于 [Chakra](https://github.com/chakra-core/ChakraCore)，但最近使用 Chromium 和 V8 引擎进行了重建）
+
+JavaScript is generally considered an interpreted language, but modern JavaScript engines no longer just interpret JavaScript, they compile it. Compiling JavaScript makes perfect sense because while it might take a little bit more to have the JavaScript ready, once done it's going to be much more performant than purely interpreted code. **JavaScript 通常被认为是一种解释型语言，但现代 JavaScript 引擎不再只是解释 JavaScript，而是编译它。** 编译 JavaScript 非常有意义，因为虽然准备好 JavaScript 可能需要多一点时间，但一旦完成，它的性能将比纯解释代码高得多。
 
 JavaScript 实现了ECMAScript，而Adobe ActionScript 同样也实现了ECMAScript。
 
@@ -601,6 +604,63 @@ console.log(Reflect.ownKeys(o)); // ['baz', 'qux', Symbol(foo), Symbol(bar)]
 ```
 
 ##### 3.6.4 `Symbol.iterator`
+- 表示实现迭代器API 的函数，`for...of` 循环这样的语言结构会利用这个函数执行迭代操作
+
+- 创建自定义的迭代器：
+```js
+const myIterable = {};
+myIterable[Symbol.iterator] = function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+};
+[...myIterable]; // [1, 2, 3]
+```
+
+- 一些内置类型拥有默认的迭代器行为，其他类型（如 Object）则没有。拥有默认的 `@@iterator` 方法的内置类型是：
+```js
+Array.prototype[@@iterator]()
+TypedArray.prototype[@@iterator]()
+String.prototype[@@iterator]()
+Map.prototype[@@iterator]()
+Set.prototype[@@iterator]()
+```
+
+- 在提到ECMAScript 规范时，经常会引用符号在规范中的名称，前缀为`@@`。比如，`@@iterator` 指的就是`Symbol.iterator`。
+
+##### 3.6.5 `Symbol.asyncIterator`
+- 表示实现异步迭代器API 的函数，`for await...of` 循环会利用这个函数执行异步迭代操作。
+```js
+var asyncIterable = {
+  [Symbol.asyncIterator]() {
+    return {
+      i: 0,
+      next() {
+        if (this.i < 3) {
+          return Promise.resolve({ value: this.i++, done: false });
+        }
+
+        return Promise.resolve({ done: true });
+      }
+    };
+  }
+};
+
+(async function() {
+  for await (num of asyncIterable) {
+    console.log(num);
+  }
+})();
+
+// 0
+// 1
+// 2
+```
+
+- `Symbol.asyncIterator` 是 ES2018 规范定义的，因此只有版本非常新的浏览器支持它。
+
+##### 3.6.6 `Symbol.hasInstance`
+- 用于判断某对象是否为某构造器的实例
 
 
 ## DOM
