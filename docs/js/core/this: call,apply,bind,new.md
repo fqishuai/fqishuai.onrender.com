@@ -60,16 +60,20 @@ There are four general rules：Default Binding、Implicit Binding、Explicit Bin
 
 #### Default Binding 默认绑定
 独立函数调用:
-```js
-function getPokémon(){
-  console.log("Pokémon in Ultra Ball is : ", this.ultraBall);
+<CodeRun>
+{
+  `
+  function getPokémon(){
+    console.log("Pokémon in Ultra Ball is : ", this.ultraBall);
+  }
+  var ultraBall = "Articuno";
+  getPokémon();
+  // Output
+  // Pokémon in Ultra Ball is : Articuno
+  `
 }
+</CodeRun>
 
-var ultraBall = "Articuno";
-getPokémon();
-// Output
-// Pokémon in Ultra Ball is : Articuno
-```
 - 使用`var`在全局作用域中声明的变量(如上的`ultraBall`) 等同于 在全局对象中声明一个同名的属性。
 - 在 `getPokemon()` 内部，对 `this` 的引用默认为全局对象。`this.ultraBall`的值 即 全局对象的属性`ultraBall`的值，也即使用`var`在全局作用域中声明的变量`ultraBall`的值。
 - 如果在全局或在函数内部使用严格模式，则全局对象不允许默认绑定。`this` is `undefined`
@@ -96,6 +100,52 @@ getName();
 // 12 'Jack'     (var定义的变量)
 // 13 undefined
 ```
+```js
+window.name = 'globalName';
+
+var myObject = {
+  name: 'sven',
+  getName: function(){
+    return this.name;
+  }
+};
+
+var getName = myObject.getName;
+console.log( getName() );    // globalName
+```
+
+- 在 `div` 节点的事件函数内部，有一个局部的 `callback` 方法，`callback` 被作为普通函数调用时，`callback` 内部的 `this` 指向了`window`，但我们往往是想让它指向该 `div` 节点，此时有一种简单的解决方案：可以用一个变量保存 `div` 节点的引用（另一种解决方案是使用`call`、`apply`修正`this`）：
+```html
+<html> 
+  <body> 
+    <div id="div1">我是div1</div>
+    <div id="div2">我是div2</div>
+  </body> 
+  <script> 
+
+  window.id = 'window'; 
+
+  document.getElementById( 'div1' ).onclick = function(){ 
+    alert ( this.id );        // 输出：'div1' 
+    var callback = function(){ 
+      alert ( this.id );        // 输出：'window' 
+    } 
+    callback(); 
+  };
+  
+  document.getElementById( 'div2' ).onclick = function(){
+    alert ( this.id );
+    var that = this;    // 保存div 的引用 
+    var callback = function(){ 
+      alert ( that.id );    // 输出：'div2' 
+    } 
+    callback(); 
+  };
+
+  </script> 
+</html>
+```
+[上述代码片段](https://code.juejin.cn/pen/7256347162497187901)
 
 #### Implicit Binding 隐式绑定
 ```js
@@ -208,10 +258,193 @@ var boundGetPokédexNo = unboundGetPokédexNo.bind(bulbasaur);
 console.log(boundGetPokédexNo());
 // Output: "001"
 ```
+- 实现`bind`
+  - 简易版
+  <CodeRun>
+  {
+    `
+    Function.prototype.bind = function(context) {
+      console.log('context -->', context)
+      console.log('this --->', this)
+      var self = this; // 保存原函数
+      return function() { // 返回一个新的函数
+        return self.apply(context, arguments); // 执行新的函数的时候，会把之前传入的context当作新函数体内的this
+      }
+    }
+    var obj = { 
+      name: 'sven' 
+    }; 
+    var func = function(){ 
+      console.log ( this.name );    // 输出：sven 
+    }.bind( obj); 
+    func();
+    `
+  }
+  </CodeRun>
+
+  - 复杂版
+  <CodeRun>
+  {
+    `
+    Function.prototype.bind = function(){
+      console.log('arguments --->', arguments)
+      var self = this, // 保存原函数
+          context = [].shift.call(arguments), // 需要绑定的this上下文
+          args = [].slice.call(arguments); // 剩余的参数转成数组
+      return function() {
+        console.log('arguments --->', arguments)
+        return self.apply( context, [].concat.call(args, [].slice.call(arguments)) );
+        // 执行新的函数的时候，会把之前传入的context当作新函数体内的this，并且组合两次分别传入的参数作为新函数的参数
+      }
+    }
+    var obj = { 
+      name: 'sven' 
+    }; 
+    var func = function( a, b, c, d ){ 
+      console.log ( this.name );        // 输出：sven 
+      console.log ( [ a, b, c, d ] )    // 输出：[ 1, 2, 3, 4 ] 
+    }.bind( obj, 1, 2 ); 
+    func( 3, 4 );
+    `
+  }
+  </CodeRun>
+
+  :::tip
+  [shift](../JS%E5%9F%BA%E7%A1%80.md#161-arrayprototypeshift)
+  :::
 
 ##### The `call()` and `apply()` methods
+> [用apply修正this](https://code.juejin.cn/pen/7256367395730620451)
+
 - `call()` 和 `apply()` 也是 `Function.prototype` 属性的方法，用法相似但略有不同，它们在调用时立即执行函数，而 `bind()` 不是立即执行一个函数，而是返回一个可以稍后执行的函数。
-- `call()` 方法 使用给定的`this`值和单独提供的参数 调用函数。而 `apply()` 方法调用 具有给定`this`值 的函数，并将参数作为数组（或类似数组的对象）提供。
+  
+- `apply` 接受两个参数，第一个参数指定了函数体内 `this` 对象的指向，第二个参数为一个带下标的集合，这个集合可以为数组，也可以为类数组，`apply` 方法把这个集合中的元素作为参数传递给被调用的函数。`call` 传入的参数数量不固定，跟`apply` 相同的是，第一个参数也是代表函数体内的`this` 指向，从第二个参数开始往后，每个参数被依次传入函数。
+<CodeRun>
+{
+  `
+  var func = function( a, b, c ){ 
+    console.log ( [ a, b, c ] );    // 输出 [ 1, 2, 3 ] 
+  };
+  func.apply( null, [ 1, 2, 3 ] );
+  `
+}
+</CodeRun>
+<CodeRun>
+{
+  `
+  var func = function( a, b, c ){ 
+    console.log ( [ a, b, c ] );    // 输出 [ 1, 2, 3 ] 
+  }; 
+  func.call( null, 1, 2, 3 ); 
+  `
+}
+</CodeRun>
+
+- 当使用 `call` 或者 `apply` 的时候，如果我们传入的第一个参数为 `null`，函数体内的 `this` 会指向默认的宿主对象，在浏览器中则是`window`。但如果是在严格模式下，函数体内的`this` 还是为`null`。
+```js
+var func = function( a, b, c ){ 
+  alert ( this === window );    // 输出true
+}; 
+ 
+func.apply( null, [ 1, 2, 3 ] );
+```
+```js
+var func = function( a, b, c ){ 
+  "use strict"; 
+  alert ( this === null );     // 输出true 
+} 
+ 
+func.apply( null, [ 1, 2, 3 ] );
+```
+
+- 有时候我们使用 `call` 或者 `apply` 的目的不在于指定 `this` 指向，而是另有用途，比如借用其他对象的方法。那么我们可以传入`null` 来代替某个具体的对象。
+<CodeRun>
+{
+  `
+  console.log( Math.max.apply( null, [ 1, 2, 5, 3, 4 ] ) )     // 输出：5
+  `
+}
+</CodeRun>
+
+:::info
+- 借用方法的第一种场景是“借用构造函数”，通过这种技术，可以实现一些类似继承的效果
+<CodeRun>
+{
+  `
+  var A = function( name ){ 
+    this.name = name; 
+  }; 
+  var B = function(){
+    console.log('arguments --->', arguments)
+    A.apply( this, arguments ); 
+  }; 
+  B.prototype.getName = function(){ 
+    return this.name; 
+  }; 
+  var b = new B( 'sven' ); 
+  console.log( b.getName() );  // 输出： 'sven'
+  `
+}
+</CodeRun>
+
+- 借用方法的第二种场景是：在操作arguments 的时候，我们经常非常频繁地找Array.prototype 对象借用方法。
+  - 函数的参数列表arguments 是一个类数组对象，虽然它也有“下标”，但它并非真正的数组，所以也不能像数组一样进行排序操作或者往集合里添加一个新的元素。想把 arguments 转成真正的数组的时候，可以借用 `Array.prototype.slice` 方法；想截去arguments 列表中的头一个元素时，又可以借用 `Array.prototype.shift` 方法。
+  <CodeRun>
+  {
+    `
+    (function(){ 
+      Array.prototype.push.call( arguments, 3 );
+      console.log ( arguments );
+    })( 1, 2 );
+    `
+  }
+  </CodeRun>
+
+  - 以`Array.prototype.push` 为例，看看V8 引擎中的具体实现，如下，通过这段代码可以看到，`Array.prototype.push` 实际上是一个属性复制的过程，把参数按照下标依次添加到被 push 的对象上面，顺便修改了这个对象的 length 属性。至于被修改的对象是谁，到底是数组还是类数组对象，这一点并不重要。
+  ```js
+  function ArrayPush() { 
+    var n = TO_UINT32( this.length );    // 被push 的对象的length 
+    var m = %_ArgumentsLength();     // push 的参数个数 
+    for (var i = 0; i < m; i++) { 
+      this[ i + n ] = %_Arguments( i );   // 复制元素     (1) 
+    } 
+    this.length = n + m;      // 修正length 属性的值    (2) 
+    return this.length; 
+  };
+  ```
+  <CodeRun>
+  {
+    `
+    var a = {}; 
+    Array.prototype.push.call( a, 'first' ); 
+    console.log ( a.length );    // 输出：1 
+    console.log ( a[ 0 ] );    // first
+    `
+  }
+  </CodeRun>
+
+  - **借用`Array.prototype.push` 方法的对象还要满足以下两个条件: (1)对象本身要可以存取属性；(2) 对象的length 属性可读写。**比如，一个number 类型的数据不可能借用到`Array.prototype. push` 方法，因为我们无法在 number 身上存取其他数据；一个function 类型的数据不可能借用到`Array.prototype. push` 方法，因为函数的 length 属性就是一个只读的属性，表示形参的个数。
+  <CodeRun>
+  {
+    `
+    var a = 1; 
+    Array.prototype.push.call( a, 'first' ); 
+    console.log ( a.length );      // 输出：undefined 
+    console.log ( a[ 0 ] );    // 输出：undefined
+    `
+  }
+  </CodeRun>
+  <CodeRun>
+  {
+    `
+    var func = function(){}; 
+    Array.prototype.push.call( func, 'first' ); 
+    console.log ( func.length ); // TypeError: Cannot assign to read only property 'length' of function 'function func() {}'
+    `
+  }
+  </CodeRun>
+:::
+
 - `call()`、`apply()`、`bind()`的区别：
 ```js
 // call()
@@ -583,6 +816,38 @@ function New(constructor, ...args) {
   return typeof result === 'object' ? result : obj;
 }
 ```
+
+:::tip
+- 如果构造器显式地返回了一个object 类型的对象，那么此次运算结果最终会返回这个对象，而不是`this`
+<CodeRun>
+{
+  `
+  var MyClass = function(){ 
+    this.name = 'sven'; 
+    return {    // 显式地返回一个对象 
+      name: 'anne' 
+    } 
+  }; 
+  var obj = new MyClass(); 
+  console.log( obj.name );     // 输出：anne
+  `
+}
+</CodeRun>
+
+- 如果构造器不显式地返回任何数据，或者是返回一个非对象类型的数据，那么此次运算结果最终返回`this`
+<CodeRun>
+{
+  `
+  var MyClass = function(){ 
+    this.name = 'sven' 
+    return 'anne';    // 返回string 类型 
+  }; 
+  var obj = new MyClass(); 
+  console.log( obj.name );     // 输出：sven
+  `
+}
+</CodeRun>
+:::
 
 - All done, let’s test it out.
 ```js

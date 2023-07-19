@@ -477,13 +477,6 @@ ECMAScript 6 带来了新的`Class` 语法。这让JavaScript 看起来像是一
 :::
 
 ## `this`、`call`、`apply`
-:::tip
-JavaScript 的 `this` 总是指向一个对象，而具体指向哪个对象是在运行时基于函数的执行环境动态绑定的，而非函数被声明时的环境。
-:::
+[js-core/this: call,apply,bind,new](./core/this%3A%20call%2Capply%2Cbind%2Cnew.md)
 
-### `this`的指向
-除去不常用的 `with` 和 `eval` 的情况，具体到实际应用中，`this` 的指向大致可以分为以下4 种:
-- 作为对象的方法调用
-- 作为普通函数调用
-- 构造器调用
-- `Function.prototype.call` 或 `Function.prototype.apply` 调用
+## 闭包和高阶函数

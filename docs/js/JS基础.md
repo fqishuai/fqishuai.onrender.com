@@ -199,6 +199,23 @@ const { data } = undefined
 // TypeError: Cannot destructure property 'data' of 'undefined' as it is undefined.
 ```
 
+### 11. Arguments 对象
+- arguments 是一个对应于传递给函数的参数的**类数组对象**
+- “类数组”意味着 arguments 有 length 属性 并且属性的索引是从零开始的，但是它没有 Array的 内置方法，例如 `forEach()` 和 `map()`都是没有的。
+- arguments对象是所有（非箭头）函数中都可用的局部变量。你可以使用arguments对象在函数中引用函数的参数。此对象包含传递给函数的每个参数，第一个参数在索引 0 处。
+<CodeRun>
+{
+  `
+  function func1(a, b, c) {
+    console.log(arguments[0]); // Expected output: 1
+    console.log(arguments[1]); // Expected output: 2
+    console.log(arguments[2]); // Expected output: 3
+  }
+  func1(1, 2, 3);
+  `
+}
+</CodeRun>
+
 ## 二、API(应区分JS内置API和宿主环境API)
 ### 1. Object
 #### 1.1 Object.fromEntries
@@ -476,6 +493,34 @@ console.log(searchParams3.has('query')); // true
 ```js
 document.querySelectorAll('[class^="operation"]')
 ```
+
+### 16. 改变数组
+#### 16.1 `Array.prototype.shift()`
+- 从数组中删除第一个元素，并返回该元素的值。此方法更改数组的长度。
+- shift 方法会读取 `this` 的 length 属性，如果长度为 0，length 再次设置为 0（而之前可能为负值或 undefined）。否则，返回 0 处的属性，其余属性向左移动 1。length 属性递减 1。
+<CodeRun>
+{
+  `
+  const arrayLike1 = {
+    length: 3,
+    unrelated: "foo",
+    2: 4,
+  };
+  console.log('arrayLike1 shift --->', Array.prototype.shift.call(arrayLike1)); // 没有属性0，返回undefined
+  console.log('arrayLike1 --->', arrayLike1); // 属性length的值减1，属性2变为1
+  const arrayLike2 = {
+    length: 3,
+    unrelated: "foo",
+    1: 4,
+    0: 3,
+  };
+  console.log('arrayLike2 shift --->', Array.prototype.shift.call(arrayLike2));
+  console.log('arrayLike2 --->', arrayLike2);
+  console.log('arrayLike2 shift --->', [].shift.call(arrayLike2));
+  console.log('arrayLike2 --->', arrayLike2);
+  `
+}
+</CodeRun>
 
 ## 三、手写函数
 ### 1. 去重
