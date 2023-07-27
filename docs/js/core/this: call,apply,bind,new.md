@@ -310,7 +310,7 @@ console.log(boundGetPokédexNo());
   </CodeRun>
 
   :::tip
-  [shift](../JS%E5%9F%BA%E7%A1%80.md#161-arrayprototypeshift)
+  [shift](https://fqishuai.onrender.com/docs/js/basic#161-arrayprototypeshift)
   :::
 
 ##### The `call()` and `apply()` methods

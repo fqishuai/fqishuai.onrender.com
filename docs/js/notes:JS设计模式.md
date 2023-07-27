@@ -477,6 +477,9 @@ ECMAScript 6 带来了新的`Class` 语法。这让JavaScript 看起来像是一
 :::
 
 ## `this`、`call`、`apply`
-[js-core/this: call,apply,bind,new](./core/this%3A%20call%2Capply%2Cbind%2Cnew.md)
+[js-core/this: call,apply,bind,new](https://fqishuai.onrender.com/docs/js/core/this)
 
 ## 闭包和高阶函数
+- [js-core/闭包](https://fqishuai.onrender.com/docs/js/core/closure)
+
+- [js-core/高阶函数](https://fqishuai.onrender.com/docs/js/core/callbacks&currying)

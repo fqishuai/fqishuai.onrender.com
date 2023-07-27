@@ -216,6 +216,43 @@ const { data } = undefined
 }
 </CodeRun>
 
+#### 11.1 `arguments.callee`
+callee 是 arguments 对象的一个属性。它可以用于引用该函数的函数体内当前正在执行的函数。这在函数的名称是未知时很有用，例如在没有名称的函数表达式 (也称为“匿名函数”) 内。
+
+如下定义一个递归函数：
+<CodeRun>
+{
+  `
+  function factorial (n) {
+    return !(n > 1) ? 1 : factorial(n - 1) * n;
+  }
+  [1,2,3,4,5].map(factorial);
+  `
+}
+</CodeRun>
+
+但是，匿名函数时应该怎么写：
+```js
+[1,2,3,4,5].map(function (n) {
+  return !(n > 1) ? 1 : /* what goes here? */ (n - 1) * n;
+});
+```
+
+为了解决这个问题， `arguments.callee` 添加进来了：
+<CodeRun>
+{
+  `
+  [1,2,3,4,5].map(function (n) {
+    return !(n > 1) ? 1 : arguments.callee(n - 1) * n;
+  });
+  `
+}
+</CodeRun>
+
+:::caution
+在严格模式下，第 5 版 ECMAScript (ES5) 禁止使用 `arguments.callee()`。当一个函数必须调用自身的时候，避免使用 `arguments.callee()`，通过要么给函数表达式一个名字，要么使用一个函数声明。
+:::
+
 ## 二、API(应区分JS内置API和宿主环境API)
 ### 1. Object
 #### 1.1 Object.fromEntries
@@ -521,6 +558,9 @@ document.querySelectorAll('[class^="operation"]')
   `
 }
 </CodeRun>
+
+#### 16.2 `Array.prototype.sort()`
+- 对数组的元素进行排序，此方法改变原数组。如果想要不改变原数组的排序方法，可以使用 `Array.prototype.toSorted()`。
 
 ## 三、手写函数
 ### 1. 去重
