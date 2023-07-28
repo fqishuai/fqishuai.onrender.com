@@ -1,5 +1,5 @@
 ---
-slug: usage
+slug: docs
 tags: [react]
 ---
 
