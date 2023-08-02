@@ -43,7 +43,7 @@ Redux Toolkit 包括以下 API：
 - `createSlice()`：接受一个reducer函数对象，一个slice名称，一个初始状态值，自动生成一个slice reducer，对应action creators和action types。
 
 - `createAsyncThunk`：接受一个 action type 字符串和一个返回promise的函数，并生成一个基于该 promise 的 thunk 用于分派pending/fulfilled/rejected（待处理/已完成/拒绝）的action types
-![动图演示](img/ReduxAsyncDataFlowDiagram.gif)
+![动图演示](../img/ReduxAsyncDataFlowDiagram.gif)
 
 - `createEntityAdapter`：生成一组可重用的reducer和selector来管理store中的规范化数据
 

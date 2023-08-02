@@ -198,7 +198,7 @@ function Button({ onClick, children }) {
 
 :::info
 不要调用事件处理函数，只需要传递它。
-![event handlers](img/event_handlers.jpeg)
+![event handlers](../img/event_handlers.jpeg)
 handleClick() 末尾的 () 在渲染期间立即触发该函数，无需任何点击。这是因为 JSX 花括号中的 JavaScript 会立即执行。
 :::
 
@@ -392,7 +392,7 @@ export default function Gallery() {
 - 一个文件只能有一个默认导出（one default export），但可以有任意多个命名导出（many named exports）。
 > 默认导出的文件导入时可以使用任何的名字；不要定义没有名字的组件。
 
-![default export & named export](img/default_export_&_named_export.jpeg)
+![default export & named export](../img/default_export_&_named_export.jpeg)
 
 - A component must return something. In some situations, you won’t want to render anything at all. In this case, you can return null.
 ```jsx
@@ -578,10 +578,10 @@ Why does React care about purity?
 :::
 
 （1）下面的示例中的副作用是 修改DOM。In this example, the side effect (modifying the DOM) was not necessary at all. You only needed to return JSX. 在此示例中，根本不需要副作用（修改 DOM）。你只需要返回 JSX
-![side effects](img/side_effects.jpeg)
+![side effects](../img/side_effects.jpeg)
 
 （2）下面的示例中，StoryTray函数 不纯。通过在接收到的 stories 数组（一个prop！）上调用 push，它正在改变一个在 StoryTray 开始渲染之前创建的对象。这使得它有缺陷并且很难预测。
-![change prop](img/change_prop.jpeg)
+![change prop](../img/change_prop.jpeg)
 ```jsx
 export default function StoryTray({ stories }) {
   // Copy the array!
@@ -808,7 +808,7 @@ const func2 = (x, y) => {
   return x + y;
 };
 ```
-![箭头函数的返回](img/arrow_function_return.jpeg)
+![箭头函数的返回](../img/arrow_function_return.jpeg)
 
 ##### 2.5.2. map中的JSX必须得有key
 >- 如果使用 Fragment （`<>...</>`）,`<>`不允许传key，这时可以使用[`<Fragment>`](https://beta.reactjs.org/apis/react/Fragment#rendering-a-list-of-fragments)
@@ -1111,7 +1111,7 @@ function Counter() {
 1. React queues this function to be processed after all the other code in the event handler has run. 在事件处理程序中的所有其他代码运行之后，React 将此函数排队等待处理。
 2. During the next render, React goes through the queue and gives you the final updated state. 在下一次渲染期间，React 遍历队列并为您提供最终的更新后的状态。
 :::
-![updater function works](img/updater_function.jpeg)
+![updater function works](../img/updater_function.jpeg)
 
 ##### 4.2.3 What happens if you update state after replacing it
 ```jsx live
@@ -1129,7 +1129,7 @@ function Counter() {
   )
 }
 ```
-![how it works](img/state_queue.jpeg)
+![how it works](../img/state_queue.jpeg)
 
 ##### 4.2.4 What happens if you replace state after updating it
 ```jsx live
@@ -1148,7 +1148,7 @@ function Counter() {
   )
 }
 ```
-![how it works](img/state_queue2.jpeg)
+![how it works](../img/state_queue2.jpeg)
 
 :::info
 state setter:
@@ -1191,7 +1191,7 @@ onPointerMove={e => {
 - Spread syntax is shallow: it only copies one level deep.
 - 也不应该使用改变数组的方法，比如 push() 和 pop()。
 - When dealing with arrays inside React state, you will need to avoid the methods in the left column, and instead prefer the methods in the right column:
-![array state](img/array_state.jpeg)
+![array state](../img/array_state.jpeg)
 
 - Unfortunately, slice and splice are named similarly but are very different. In React, you will be using slice (no p!) a lot more often because you don’t want to mutate objects or arrays in state.
   - slice lets you copy an array or a part of it.

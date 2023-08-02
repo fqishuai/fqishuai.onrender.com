@@ -78,6 +78,10 @@ export NVM_DIR="$HOME/.nvm"
 - 更新配置 `source ~/.zshrc`
 - 如果是在vscode的terminal操作的如上步骤，则terminal需要关闭再打开
 
+:::info
+[nvm-windows](https://github.com/coreybutler/nvm-windows/releases) 安装后查看[nvm环境变量](https://www.cnblogs.com/banbaibanzi/p/13307312.html)，默认安装后会自动添加环境变量及path，安装后重启电脑则生效。
+:::
+
 ##### 常用命令
 - `nvm install <version>`
 - `nvm uninstall <version>` 卸载制定的版本

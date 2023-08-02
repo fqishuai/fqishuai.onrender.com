@@ -45,7 +45,7 @@ function calculateGST( productPrice ) {
 }
 calculateGST(100); // return 5
 ```
-![数组中的纯函数方法和非纯函数方法](img/array_api.webp)
+![数组中的纯函数方法和非纯函数方法](../img/array_api.webp)
 
 :::note
 - 如果一个函数只要输入值一样，返回的结果就一样，那这个函数就是纯函数。
@@ -104,7 +104,7 @@ const C = 299792.458; // 光速 (km/s)
 ```
 :::
 
-![函数式编程](img/fp.webp)
+![函数式编程](../img/fp.webp)
 
 ### 1.2 Monad
 :::tip
@@ -183,7 +183,7 @@ console.log('结果7::', notice2.identify());
 ```
 [运行](https://code.juejin.cn/pen/7147272771171516449)
 
-![原型链](img/原型链.webp)
+![原型链](../img/原型链.webp)
 
 ### 2.2 基于类的继承
 
@@ -245,7 +245,7 @@ counter.counting();
 - 单纯从值的状态管理和围绕它的一系列行为的角度来看，可以说闭包和对象是同形态的(isomorphic)，即可以起到异曲同工的作用。闭包中的状态，就是对象中的属性；闭包中创建的针对值的行为，可以在对象中通过方法来实现。
 - 闭包和对象在 隐私(privacy)、状态拷贝(state cloning)、性能(performance) 有一定的差别，而这些差别在结构性地处理值的问题上，具有不同的优劣势。
 
-![结构型不可变性](img/closure_object.webp)
+![结构型不可变性](../img/closure_object.webp)
 
 - 闭包是带数据的行为，对象是带行为的数据。
 

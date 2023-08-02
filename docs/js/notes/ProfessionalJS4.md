@@ -11,7 +11,7 @@ tags: [读书笔记]
 2. 文档对象模型（DOM）：提供与网页内容交互的方法和接口。
 3. 浏览器对象模型（BOM）：提供与浏览器交互的方法和接口。
 
-![js实现](img/js实现.png)
+![js实现](../img/js实现.png)
 
 各种浏览器均以ECMAScript作为自己JavaScript实现的依据，具体实现各有不同：
 - Chrome的Blink/[V8](https://v8.dev/)
@@ -289,7 +289,7 @@ let floatNum2 = 10.0; // 小数点后面是零，当成整数10 处理
 > [Why 0.1 + 0.2 ≠ 0.3 in JavaScript](https://javascript.plainenglish.io/why-0-1-0-2-0-3-in-javascript-d7e218224a72)
 > - 因为浮点数运算的精度问题。在计算机运行过程中，需要将数据转化成二进制，然后再进行计算。
 > - js中的Number类型遵循IEEE754标准，在IEEE754标准的64位浮点数相加，因为浮点数自身小数位数的限制而截断的二进制在转化为十进制，就变成`0.30000000000000004`，所以在计算时会产生误差。
-![0.1+0.2](img/0.1+0.2.jpg)
+![0.1+0.2](../img/0.1+0.2.jpg)
 
 - ECMAScript 可以表示的最小数值保存在 `Number.MIN_VALUE` 中；可以表示的最大数值保存在 `Number.MAX_VALUE` 中。如果某个计算得到的数值结果超出了 JavaScript 可以表示的范围，那么这个数值会被自动转换为一个特殊的 `Infinity`（无穷）值。任何无法表示的负数以`-Infinity`（负无穷大）表示，任何无法表示的正数以`Infinity`（正无穷大）表示。如果计算返回正 Infinity 或负 Infinity，则该值将不能再进一步用于任何计算。这是因为Infinity 没有可用于计算的数值表示形式。
 - `Number.NEGATIVE_INFINITY`的值是`-Infinity`，`Number.POSITIVE_INFINITY`的值是`Infinity`
@@ -749,9 +749,9 @@ var asyncIterable = {
   </head>
 </html>
 ```
-![script async](img/script-async.png)
+![script async](../img/script-async.png)
 - **异步脚本(async script)在下载后立即开始执行**。无法保证在执行异步脚本时相关的 DOM 已加载到浏览器中。所以，不要将 `async` 属性与操作 DOM 的脚本一起使用。
 - **The most effective way of loading a script is by using the `defer` attribute.**
 - `defer` 在后台下载脚本，但它在执行时永远不会中断页面​​渲染。可以对执行 DOM 操作的所有脚本使用 `defer`。具有 `defer` 属性的脚本在页面加载结束时按顺序执行。
 - 具有 `defer` 属性的脚本与页面文档并行下载。不过，**defer script仅在文档加载后执行**。如果有多个具有 `defer` 属性的脚本，它们都在 `DOMContentLoaded` 事件之前 按顺序执行。
-![script位置](img/script位置.png)
+![script位置](../img/script位置.png)
