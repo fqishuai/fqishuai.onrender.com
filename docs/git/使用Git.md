@@ -67,67 +67,91 @@ tags: [git]
 
 ## 2. 使用git rebase合并commits
 命令语法：`git rebase -i [start-commitid]  [end-commitid]`
+:::tip
+注意：不包含start-commitid，包含end-commitid
+:::
+- pick：保留该commit（缩写:p）
+- reword：保留该commit，但我需要修改该commit的注释（缩写:r）
+- edit：保留该commit, 但我要停下来修改该提交(不仅仅修改注释)（缩写:e）
+- squash：将该commit和前一个commit合并（缩写:s）
+- fixup：将该commit和前一个commit合并，但我不要保留该提交的注释信息（缩写:f）
+- exec：执行shell命令（缩写:x）
+- drop：我要丢弃该commit（缩写:d）
 
-> 注意：不包含start-commitid，包含end-commitid
->- pick：保留该commit（缩写:p）
->- reword：保留该commit，但我需要修改该commit的注释（缩写:r）
->- edit：保留该commit, 但我要停下来修改该提交(不仅仅修改注释)（缩写:e）
->- squash：将该commit和前一个commit合并（缩写:s）
->- fixup：将该commit和前一个commit合并，但我不要保留该提交的注释信息（缩写:f）
->- exec：执行shell命令（缩写:x）
->- drop：我要丢弃该commit（缩写:d）
 ## 3. git pull 报错：fatal: Exiting because of unfinished merge.
-> 解决方法（放弃本地修改）：`git reset --hard origin/master`
+解决方法（放弃本地修改）：`git reset --hard origin/master`
+
 ## 4. 不要使用git rebase修改已经push到远端的commit
-> 否则rebase后push的时候会报错（因为git的push操作默认是假设远端的分支和你本地的分支可以进行fast-forward操作，换句话说就是这个push命令假设你的本地分支和远端分支的唯一区别是你本地有几个新的commit，而远端没有）让先pull，而pull后会有一堆冲突。
+否则rebase后push的时候会报错（因为git的push操作默认是假设远端的分支和你本地的分支可以进行fast-forward操作，换句话说就是这个push命令假设你的本地分支和远端分支的唯一区别是你本地有几个新的commit，而远端没有）让先pull，而pull后会有一堆冲突。
+
 ## 5. 强制推送到远端分支(e.g. feature分支)
-> 使用  `git push --force-with-lease origin feature`  来保证分支安全
+使用  `git push --force-with-lease origin feature`  来保证分支安全
+
 ## 6. 查看git graph
-> `git log --graph --decorate --oneline --simplify-by-decoration --all`
->- --decorate 标记会让git log显示每个commit的引用(如:分支、tag等)
->- --oneline 一行显示
->- --simplify-by-decoration 只显示被branch或tag引用的commit
->- --all 表示显示所有的branch，如果想显示分支ABC的关系，则将--all替换为branchA branchB branchC
+`git log --graph --decorate --oneline --simplify-by-decoration --all`
+- `--decorate` 标记会让git log显示每个commit的引用(如:分支、tag等)
+- `--oneline` 一行显示
+- `--simplify-by-decoration` 只显示被branch或tag引用的commit
+- `--all` 表示显示所有的branch，如果想显示分支ABC的关系，则将`--all`替换为branchA branchB branchC
 ## 7. git commit message规范
->- feat：新功能（feature）
->- fix：修补bug
->- docs：文档（documentation）
->- style： 格式（不影响代码运行的变动）
->- refactor：重构（即不是新增功能，也不是修改bug的代码变动）
->- test：增加测试
->- chore：构建过程或辅助工具的变动
+- feat：新功能（feature）
+- fix：修补bug
+- docs：文档（documentation）
+- style： 格式（不影响代码运行的变动）
+- refactor：重构（即不是新增功能，也不是修改bug的代码变动）
+- test：增加测试
+- chore：构建过程或辅助工具的变动
 
 ## 8. [如何切换git本地账号](https://www.jianshu.com/p/dca5e36d404e)
-- 1）查看配置：git config --list
-- 2）切换账号
-   >- git config --global user.name "xxx"
-   >- git config --global user.email "xxx"
+1. 查看配置：git config --list
+2. 切换账号
+- `git config --global user.name "xxx"`
+- `git config --global user.email "xxx"`
+
 ## 9. 创建一个新的存储库
->- git clone https://xxx
->- git add README.md
->- git commit -m "add README"
->- git push -u origin main
+1. `git clone https://xxx`
+2. `git add README.md`
+3. `git commit -m "add README"`
+4. `git push -u origin main`
+
 ## 10. 推送现有空的存储库
->- cd existing_folder
->- git init
->- git remote add origin https://xxx
->- git add .
->- git commit -m "Initial commit"
->- git push -u origin main
+1. `cd existing_folder`
+2. `git init`
+3. `git remote add origin https://xxx`
+4. `git add .`
+5. `git commit -m "Initial commit"`
+6. `git push -u origin main`
+
 ## 11. 推送已有存储库
->- cd existing_repo
->- git remote set-url origin https://xxx
->- git push --all https://xxx
+1. `cd existing_repo`
+2. `git remote set-url origin https://xxx`
+3. `git push --all https://xxx`
+
 ## 12. git大文件push 
 > You may want to try Git Large File Storage - https://git-lfs.github.com.
+
+使用git lfs，步骤：
+1. 开启上传大文件的开关命令：`git lfs install`
+2. 生成跟踪后缀文件：`git lfs track "*.pdf"` (`*.pdf`是大文件后缀，这里可以做修改，修改为大文件后缀即可 )
+3. 添加属性跟踪文件：`git add .gitattributes`
+4. 按git上传顺序进行操作
+```bash
+git add bookA.pdf
+git commit -m "feat: 上传大文件bookA"
+git push
+```
+
 ## 13. git branch --set-upstream-to=origin/remote_branch local_branch
 ## 14. 查看某个stash改动的文件
-> git stash show stash@{0}
+`git stash show stash@{0}`
+
 ## 15. 查看某个stash具体内容
-> git stash show -p stash@{0}
+`git stash show -p stash@{0}`
+
 ## 16. git subtree
 ## 17. 取出指定的stash
-> git stash apply --index stash的索引
+`git stash apply --index stash的索引`
+
 ## 18. [git cherry-pick](https://www.ruanyifeng.com/blog/2020/04/git-cherry-pick.html)
 - 转移一个提交：`git cherry-pick <Hash>`
 - cherry-pick 支持一次转移多个提交
