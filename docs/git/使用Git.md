@@ -60,6 +60,7 @@ tags: [git]
 - [43. 报错：HTTP/2 stream 1 was not closed cleanly before end of the underlying stream](#43-报错http2-stream-1-was-not-closed-cleanly-before-end-of-the-underlying-stream)
 - [44. 撤销中间某次commit](#44-撤销中间某次commit)
 - [45. 查询本地所有操作记录](#45-查询本地所有操作记录)
+- [46. 创建新分支](#46-创建新分支)
 
 
 ## 1. 使用git rebase合并分支
@@ -411,3 +412,11 @@ git config --global http.version HTTP/1.1
 
 ## 45. 查询本地所有操作记录
 > git reflog
+
+## 46. 创建新分支
+```bash
+git branch <branch_name>
+
+# 新建一个分支并切换至新分支
+git checkout -b <branch_name>
+```

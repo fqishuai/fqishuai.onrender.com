@@ -213,6 +213,32 @@ enum Direction {
 }
 ```
 
+## interface 覆盖
+有时候想复用某个类型，但又有些属性类型不一致，有2种方案：
+1. 覆盖指定的类型
+```ts
+interface A {
+  a: number;
+  b: number;
+}
+interface B extends Omit<A, 'a'> {
+  a: boolean;
+}
+```
+
+2. 批量覆盖
+```ts
+interface A {
+  name: string;
+  color?: string;
+}
+type B = Merge<A, {
+  name: string | number;
+  favorite?: boolean;
+}>;
+```
+
+
 ## 类型推断
 :::tip
 - 类型声明并不是必需的，如果没有，TypeScript 会自己推断类型。TypeScript 也可以推断函数的返回值。
@@ -266,35 +292,35 @@ tsc file1.ts file2.ts file3.ts
 
 #### tsc 参数
 tsc 有很多参数，可以调整编译行为：
-- `--outFile` 用于将多个 TypeScript 脚本编译成一个 JavaScript 文件
+1. `--outFile` 用于将多个 TypeScript 脚本编译成一个 JavaScript 文件
 ```bash
 tsc file1.ts file2.ts --outFile app.js
 ```
 
-- `--outDir` 用于指定编译后生成的文件保存的目录（编译结果默认都保存在当前目录）
+2. `--outDir` 用于指定编译后生成的文件保存的目录（编译结果默认都保存在当前目录）
 ```bash
 tsc app.ts --outDir dist
 ```
 
-- `--target` 用于指定编译后的 JavaScript 版本。为了保证编译结果能在各种 JavaScript 引擎运行，tsc 默认会将 TypeScript 代码编译成很低版本的 JavaScript，即3.0版本（以es3表示）
+3. `--target` 用于指定编译后的 JavaScript 版本。为了保证编译结果能在各种 JavaScript 引擎运行，tsc 默认会将 TypeScript 代码编译成很低版本的 JavaScript，即3.0版本（以es3表示）
 ```bash
 # 指定编译后的 JavaScript 版本 为 es2015
 tsc --target es2015 app.ts
 ```
 
-- `--noEmitOnError` 用于设置一旦报错就停止编译，不生成编译产物（默认情况下如果编译报错，tsc命令就会显示报错信息，但是依然会编译生成 JavaScript 脚本。）
+4. `--noEmitOnError` 用于设置一旦报错就停止编译，不生成编译产物（默认情况下如果编译报错，tsc命令就会显示报错信息，但是依然会编译生成 JavaScript 脚本。）
 ```bash
 # 报错后，就不会生成app.js
 tsc --noEmitOnError app.ts
 ```
 
-- `--noEmit` 用于设置只检查类型是否正确，不生成 JavaScript 文件
+5. `--noEmit` 用于设置只检查类型是否正确，不生成 JavaScript 文件
 ```bash
 # 只检查是否有编译错误，不会生成app.js
 tsc --noEmit app.ts
 ```
 
-- `--noImplicitAny` 用于设置只要推断出any类型就会报错
+6. `--noImplicitAny` 用于设置只要推断出any类型就会报错
 ```bash
 tsc --noImplicitAny app.ts
 ```
@@ -312,7 +338,7 @@ x = { foo: 'hello' };
 由于这个原因，建议使用`let`和`var`声明变量时，如果不赋值，就一定要显式声明类型，否则可能存在安全隐患。
 :::
 
-- `--strictNullChecks` 设置`strictNullChecks`以后，赋值为`undefined`的变量会被推断为`undefined`类型，赋值为`null`的变量会被推断为`null`类型；`undefined`和`null`就不能赋值给其他类型的变量（除了`any`类型和`unknown`类型）；`undefined`和`null`这两种值也不能互相赋值了。
+7. `--strictNullChecks` 设置`strictNullChecks`以后，赋值为`undefined`的变量会被推断为`undefined`类型，赋值为`null`的变量会被推断为`null`类型；`undefined`和`null`就不能赋值给其他类型的变量（除了`any`类型和`unknown`类型）；`undefined`和`null`这两种值也不能互相赋值了。
 ```ts
 // tsc --strictNullChecks app.ts
 
@@ -326,6 +352,15 @@ let y:null = undefined; // 报错 Type 'undefined' is not assignable to type 'nu
 
 let x:any = undefined;
 let y:unknown = null;
+```
+
+8. `--ExactOptionalPropertyTypes`。同时设置 `ExactOptionalPropertyTypes` 和 `strictNullChecks`，对象的可选属性就不能设为`undefined`。
+```ts
+// 设置 ExactOptionsPropertyTypes 和 strictNullChecks
+const obj: {
+  x: number;
+  y?: number;
+} = { x: 1, y: undefined }; // 报错 Type '{ x: number; y: undefined; }' is not assignable to type '{ x: number; y?: number; }' with 'exactOptionalPropertyTypes: true'. Types of property 'y' are incompatible(类型不兼容). Type 'undefined' is not assignable to type 'number'.
 ```
 
 #### tsconfig.json
@@ -1260,7 +1295,7 @@ add(...arr) // 正确
 ```
 :::
 
-## 函数类型声明
+## 函数 类型声明
 - 如果不指定函数的参数类型，TypeScript 就会推断参数类型，如果缺乏足够信息，就会推断该参数的类型为any。
 - 返回值的类型通常可以不写，因为 TypeScript 自己会推断出来。
 - 如果变量被赋值为一个函数，变量的类型有两种写法。
@@ -1435,3 +1470,504 @@ function f(x?: number = 0) {
   return x;
 }
 ```
+
+- 设有默认值的参数，如果传入undefined，也会触发默认值。
+```ts
+function f(x = 456) {
+  return x;
+}
+
+f(undefined) // 456
+```
+
+- 具有默认值的参数如果不位于参数列表的末尾，调用时不能省略，如果要触发默认值，必须显式传入undefined。
+```ts
+function add(
+  x:number = 0,
+  y:number
+) {
+  return x + y;
+}
+
+add(1) // 报错 Expected 2 arguments, but got 1.
+add(undefined, 1) // 正确
+```
+
+### 参数解构的类型写法
+参数解构可以结合类型别名（type 命令）一起使用，代码会看起来简洁一些。
+```ts
+type ABC = { a:number; b:number; c:number };
+
+function sum({ a, b, c }:ABC) {
+  console.log(a + b + c);
+}
+```
+
+### rest参数
+- rest参数表示函数剩余的所有参数，它可以是数组（剩余参数类型相同），也可能是元组（剩余参数类型不同）。
+```ts
+// rest 参数为数组
+function joinNumbers(...nums:number[]) {
+  // ...
+}
+function multiply(n:number, ...m:number[]) {
+  return m.map((x) => n * x);
+}
+
+// rest 参数为元组
+function f(...args:[boolean, number]) {
+  // ...
+}
+// 如果元组里面的参数是可选的，则要使用可选参数。
+function f(
+  ...args: [boolean, string?]
+) {}
+```
+
+- rest参数可以嵌套。
+```ts
+function f(...args:[boolean, ...string[]]) {
+  // ...
+}
+```
+
+- rest参数可以与变量解构结合使用。
+```ts
+function repeat(...[str, times]: [string, number]):string {
+  return str.repeat(times);
+}
+
+// 等同于
+function repeat(str: string, times: number):string {
+  return str.repeat(times);
+}
+```
+
+### 只读参数
+如果函数内部不能修改某个参数，可以在函数定义时，在参数类型前面加上readonly关键字，表示这是只读参数。
+```ts
+function arraySum(arr:readonly number[]) {
+  // ...
+  arr[0] = 0; // 报错 Index signature in type 'readonly number[]' only permits reading.
+}
+```
+
+### void 类型
+- void 类型表示函数没有返回值。函数字面量如果声明了返回值是 void 类型，返回其他值就会报错。
+```ts
+function f():void {
+  return 123; // 报错 Type 'number' is not assignable to type 'void'.
+}
+```
+:::tip
+如果 变量、对象的方法、函数的参数 的类型是 void 类型的函数，则该变量、对象方法和函数参数可以接受返回任意值的函数。这是因为，这时 TypeScript 认为，这里的 void 类型只是表示该函数的返回值没有利用价值，或者说不应该使用该函数的返回值。只要不用到这里的返回值，就不会报错。
+```ts
+type voidFunc = () => void;
+
+const f:voidFunc = () => {
+  return 123;
+};
+
+// 使用了这个函数的返回值，则会报错。
+f() * 2 // 报错 The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+```
+这样设计是有现实意义的。举例来说，数组方法`Array.prototype.forEach(fn)`的参数fn是一个函数，而且这个函数应该没有返回值，即返回值类型是void。但是，实际应用中，很多时候传入的函数是有返回值，但是它的返回值不重要，或者不产生作用。
+```ts
+const src = [1, 2, 3];
+const ret = [];
+
+src.forEach(el => ret.push(el)); // push()有返回值，表示新插入的元素在数组里面的位置。但是，对于forEach()方法来说，这个返回值是没有作用的，根本用不到，所以 TypeScript 不会报错。
+```
+:::
+
+- void 类型允许返回undefined或null。
+:::tip
+如果设置了`strictNullChecks`编译选项，那么 void 类型只允许返回undefined。如果返回null，就会报错。这是因为 JavaScript 规定，如果函数没有返回值，就等同于返回undefined。
+:::
+```ts
+function f():void {
+  return undefined; // 正确
+}
+
+function f():void {
+  return null; // 正确（若设置了strictNullChecks则报错：Type 'null' is not assignable to type 'void'.）
+}
+```
+
+### 局部类型
+函数内部允许声明其他类型，该类型只在函数内部有效，称为局部类型。
+```ts
+function hello(txt:string) {
+  type message = string;
+  let newTxt:message = 'hello ' + txt;
+  return newTxt;
+}
+
+const newTxt:message = hello('world'); // 报错 Exported variable 'newTxt' has or is using private name 'message'.
+```
+
+### 函数重载 的 类型声明
+:::tip
+根据参数类型不同，执行不同逻辑的行为，称为函数重载（function overload）。
+:::
+
+- 函数重载 先列举重载的各种情况，然后函数本身的类型声明必须与列举的重载声明兼容。
+```ts
+// reverse函数重载
+function reverse(str:string):string;
+function reverse(arr:any[]):any[];
+function reverse(
+  stringOrArray:string|any[]
+):string|any[] {
+  if (typeof stringOrArray === 'string')
+    return stringOrArray.split('').reverse().join('');
+  else
+    return stringOrArray.slice().reverse();
+}
+
+// add函数重载
+function add(
+  x:number,
+  y:number
+):number;
+function add(
+  x:any[],
+  y:any[]
+):any[];
+function add(
+  x:number|any[],
+  y:number|any[]
+):number|any[] {
+  if (typeof x === 'number' && typeof y === 'number') {
+    return x + y;
+  } else if (Array.isArray(x) && Array.isArray(y)) {
+    return [...x, ...y];
+  }
+
+  throw new Error('wrong parameters');
+}
+```
+:::tip
+- 重载的各个类型描述与函数的具体实现之间，不能有其他代码，否则报错。
+- 函数重载的每个类型声明之间，以及类型声明与函数实现的类型之间，不能有冲突。
+  ```ts
+  // 报错 This overload signature is not compatible with its implementation signature.
+  function fn(x:boolean):void;
+  function fn(x:string):void;
+  function fn(x:number|string) {
+    console.log(x);
+  }
+  ```
+- 重载声明的排序很重要，因为 TypeScript 是按照顺序进行检查的，一旦发现符合某个类型声明，就不再往下检查了，所以类型最宽的声明应该放在最后面，防止覆盖其他类型声明。
+  ```ts
+  function f(x:any):number;
+  function f(x:string): 0|1;
+  function f(x:any):any {
+    // ...
+  }
+
+  const a:0|1 = f('hi'); // 报错 Type 'number' is not assignable to type '0 | 1'.
+
+  /*
+  第一行类型声明x:any范围最宽，导致函数f()的调用都会匹配这行声明，无法匹配第二行类型声明
+  */
+  ```
+:::
+
+- 对象的方法也可以使用重载。
+  ```ts
+  class StringBuilder {
+    #data = '';
+
+    add(num:number): this;
+    add(bool:boolean): this;
+    add(str:string): this;
+    add(value:any): this {
+      this.#data += String(value);
+      return this;
+    }
+
+    toString() {
+      return this.#data;
+    }
+  }
+  ```
+
+- 函数重载也可以用来精确描述函数参数与返回值之间的对应关系。
+  ```ts
+  function createElement(
+    tag:'a'
+  ):HTMLAnchorElement;
+  function createElement(
+    tag:'canvas'
+  ):HTMLCanvasElement;
+  function createElement(
+    tag:'table'
+  ):HTMLTableElement;
+  function createElement(
+    tag:string
+  ):HTMLElement {
+    // ...
+  }
+
+  // 也可以用对象表示
+  type CreateElement = {
+    (tag:'a'): HTMLAnchorElement;
+    (tag:'canvas'): HTMLCanvasElement;
+    (tag:'table'): HTMLTableElement;
+    (tag:string): HTMLElement;
+  }
+  ```
+
+:::tip
+由于重载是一种比较复杂的类型声明方法，为了降低复杂性，一般来说，如果可以的话，应该优先使用联合类型替代函数重载。
+```ts
+// 写法一
+function len(s:string):number;
+function len(arr:any[]):number;
+function len(x:any):number {
+  return x.length;
+}
+
+// 写法二
+function len(x:any[]|string):number {
+  return x.length;
+}
+```
+:::
+
+### 构造函数 的 类型声明
+- 构造函数的类型声明，就是在参数列表前面加上new命令。
+  ```ts
+  class Animal {
+    numLegs:number = 4;
+  }
+
+  type AnimalConstructor = new () => Animal;
+
+  function create(c:AnimalConstructor):Animal {
+    return new c();
+  }
+
+  const a = create(Animal);
+  ```
+
+- 构造函数还有另一种类型声明写法，就是采用对象形式。
+  ```ts
+  type F = {
+    new (s:string): object;
+  };
+  ```
+
+- 某些函数既是构造函数，又可以当作普通函数使用，比如`Date()`。这时，类型声明可以写成下面这样。
+  ```ts
+  type F = {
+    new (s:string): object;
+    (n?:number): number;
+  }
+  ```
+
+## 对象 类型声明
+- 对象类型的最简单声明方法，就是使用大括号表示对象，在大括号内部声明每个属性的类型。属性的类型可以用分号结尾，也可以用逗号结尾。最后一个属性后面，可以写分号或逗号，也可以不写。
+  ```ts
+  // 属性类型以分号结尾
+  type MyObj = {
+    x:number;
+    y:number;
+  };
+
+  // 属性类型以逗号结尾
+  type MyObj = {
+    x:number,
+    y:number,
+  };
+  ```
+
+- 一旦声明了类型，对象赋值时，就不能缺少指定的属性，也不能有多余的属性。读写不存在的属性也会报错。也不能删除类型声明中存在的属性，修改属性值是可以的。
+  ```ts
+  type MyObj = {
+    x:number;
+    y:number;
+  };
+
+  const o1:MyObj = { x: 1 }; // 报错 Property 'y' is missing in type '{ x: number; }' but required in type 'MyObj'.
+  const o2:MyObj = { x: 1, y: 1, z: 1 }; // 报错 Type '{ x: number; y: number; z: number; }' is not assignable to type 'MyObj'. Object literal may only specify known properties(对象字面量只能指定已知属性), and 'z' does not exist in type 'MyObj'.
+
+  const obj:{
+    x:number;
+    y:number;
+  } = { x: 1, y: 1 };
+
+  console.log(obj.z); // 报错 Property 'z' does not exist on type '{ x: number; y: number; }'.
+  obj.z = 1; // 报错 Property 'z' does not exist on type '{ x: number; y: number; }'.
+
+  const myUser = {
+    name: "Sabrina",
+  };
+
+  delete myUser.name // 报错 The operand of a 'delete' operator must be optional.(“delete”运算符的操作数必须是可选的)
+  myUser.name = "Cynthia"; // 正确
+  ```
+
+- 对象的方法使用函数类型描述。
+  ```ts
+  const obj:{
+    x: number;
+    y: number;
+    add(x:number, y:number): number;
+    // 或者写成
+    // add: (x:number, y:number) => number;
+  } = {
+    x: 1,
+    y: 1,
+    add(x, y) {
+      return x + y;
+    }
+  };
+  ```
+
+- 对象类型可以使用方括号读取属性的类型。
+  ```ts
+  type User = {
+    name: string,
+    age: number
+  };
+  type Name = User['name']; // string
+  ```
+
+- 除了`type`命令可以为对象类型声明一个别名，TypeScript 还提供了`interface`命令，可以把对象类型提炼为一个接口。
+  ```ts
+  // 写法一
+  type MyObj = {
+    x:number;
+    y:number;
+  };
+
+  const obj:MyObj = { x: 1, y: 1 };
+
+  // 写法二
+  interface MyObj {
+    x: number;
+    y: number;
+  }
+
+  const obj:MyObj = { x: 1, y: 1 };
+  ```
+
+- 注意，TypeScript 不区分对象自身的属性和继承的属性，一律视为对象的属性。
+  ```ts
+  interface MyInterface {
+    toString(): string; // 继承的属性
+    prop: number; // 自身的属性
+  }
+
+  const obj:MyInterface = { // 正确
+    prop: 123,
+  };
+  /*
+  obj只写了prop属性，但是不报错。因为它可以继承原型上面的toString()方法。
+  */
+  ```
+
+### 可选属性
+- 可选属性等同于允许赋值为`undefined`。读取一个没有赋值的可选属性时，返回`undefined`。
+  ```ts
+  const obj: {
+    x: number;
+    y?: number;
+  } = { x: 1, y: undefined };
+
+  type MyObj = {
+    x: string,
+    y?: string
+  };
+  const obj:MyObj = { x: 'hello' };
+  obj.y.toLowerCase() // 报错 'obj.y' is possibly 'undefined'.
+  ```
+
+- 可选属性 与 允许设为`undefined`的必选属性是不等价的。
+  ```ts
+  type A = { x:number, y?:number };
+  type B = { x:number, y:number|undefined };
+
+  const ObjA:A = { x: 1 }; // 正确
+  const ObjB:B = { x: 1 }; // 报错 Property 'y' is missing in type '{ x: number; }' but required in type 'B'.
+  ```
+
+### 只读属性
+- 属性名前面加上`readonly`关键字，表示这个属性是只读属性，只能在对象初始化期间赋值，此后就不能修改该属性。
+  ```ts
+  interface MyInterface {
+    readonly prop: number;
+  }
+  const person:{
+    readonly age: number
+  } = { age: 20 };
+
+  person.age = 21; // 报错 Cannot assign to 'age' because it is a read-only property.
+  ```
+
+- 如果属性值是一个对象，`readonly`修饰符并不禁止修改该对象的属性，只是禁止完全替换掉该对象。
+  ```ts
+  interface Home {
+    readonly resident: {
+      name: string;
+      age: number
+    };
+  }
+
+  const h:Home = {
+    resident: {
+      name: 'Vicky',
+      age: 42
+    }
+  };
+
+  h.resident.age = 32; // 正确
+  h.resident = {
+    name: 'Kate',
+    age: 23 
+  } // 报错 annot assign to 'resident' because it is a read-only property.
+  ```
+  :::tip
+  如果一个对象有两个引用，即两个变量对应同一个对象，其中一个变量是可写的，另一个变量是只读的，那么从可写变量修改属性，会影响到只读变量。
+  ```ts
+  interface Person {
+    name: string;
+    age: number;
+  }
+
+  interface ReadonlyPerson {
+    readonly name: string;
+    readonly age: number;
+  }
+
+  let w:Person = {
+    name: 'Vicky',
+    age: 42,
+  };
+
+  let r:ReadonlyPerson = w;
+
+  w.age += 1;
+  r.age // 43
+  /*
+  变量w和r指向同一个对象，其中w是可写的，r是只读的。那么，对w的属性修改，会影响到r。
+  */
+  ```
+  :::
+
+- 声明只读属性的另一种方法，就是在赋值时，在对象后面加上只读断言`as const`。
+  ```ts
+  const myUser = {
+    name: "Sabrina",
+  } as const;
+
+  myUser.name = "Cynthia"; // 报错 Cannot assign to 'name' because it is a read-only property.
+  ```
+  :::tip
+  上面的`as const`属于 TypeScript 的类型推断，如果变量明确地声明了类型，那么 TypeScript 会以声明的类型为准。
+  ```ts
+  
+  ```
+  :::

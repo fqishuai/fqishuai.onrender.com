@@ -289,3 +289,83 @@ const router = createBrowserRouter(
   )
 );
 ```
+
+### 15. 传参接参
+> [react-router 路由传参的三种方式](https://segmentfault.com/a/1190000041136562)
+
+#### 15.1 使用`<Link>`或`<NavLink>`(`useParams`、`useLocation`、`useSearchParams`)
+1. params参数
+```jsx
+//路由链接(携带参数)：
+<Link to={{ pathname:`/b/child1/${id}/${title}` }}>Child1</Link>
+//或 <Link  to={`/b/child1/${id}/${title}`}>Child1</Link> 
+
+//注册路由(声明接收)：
+<Route path="/b/child1/:id/:title" component={Test}/>
+    
+//接收参数：
+import { useParams } from "react-router-dom";
+const params = useParams();
+//params参数 => {id: "01", title: "消息1"}
+```
+
+2. search参数
+```jsx
+//路由链接(携带参数)：
+<Link className="nav" to={`/b/child2?age=20&name=zhangsan`}>Child2</Link>
+
+//注册路由(无需声明，正常注册即可)：
+<Route path="/b/child2" component={Test}/>
+        
+//接收参数方法1：
+import { useLocation } from "react-router-dom";
+import qs from "query-string";
+const { search } = useLocation();
+//备注：获取到的search是urlencoded编码字符串(例如: ?age=20&name=zhangsan)，需要借助query-string解析参数成对象，转换后 => {age: "20", name: "zhangsan"}
+
+//接收参数方法2：
+import { useSearchParams } from "react-router-dom";
+const [searchParams, setSearchParams] = useSearchParams();
+// console.log( searchParams.get("id")); // 12
+```
+
+3. state参数
+```jsx
+//通过Link的state属性传递参数
+ <Link
+  className="nav"
+  to={`/b/child2`}
+  state={{ id: 999, name: "i love merlin" }} 
+ >
+  Child2
+</Link>
+
+//注册路由(无需声明，正常注册即可)：
+<Route path="/b/child2" component={Test}/>
+    
+//接收参数：
+import { useLocation } from "react-router-dom";
+const { state } = useLocation();
+//state参数 => {id: 999, name: "我是梅琳"}
+
+//备注：刷新也可以保留住参数
+```
+
+#### 15.2 手动跳转(`useNavigate`)
+```jsx
+import { useNavigate } from "react-router-dom";
+
+function useLogoutTimer() {
+  const userIsInactive = useFakeInactiveUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (userIsInactive) {
+      fake.logout();
+      navigate("/session-timed-out");
+    }
+  }, [userIsInactive]);
+}
+```
+- navigate函数接收两个参数，第一个参数是一个路径字符串，第二个参数是options(`options.replace`,`options.state`,`options.preventScrollReset`,`options.relative`)
+- navigate函数也可以传递想要进入历史堆栈的增量。例如，`navigate(-1)` 相当于点击后退按钮

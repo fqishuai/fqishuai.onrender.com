@@ -150,3 +150,28 @@ const value = input?.value;
 
 console.log(value); // 👉️ Initial value
 ```
+
+### 9. `allowImportingTsExtensions`
+Allow imports to include TypeScript file extensions. Requires '--moduleResolution bundler' and either '--noEmit' or '--emitDeclarationOnly' to be set.
+
+### 10. `allowSyntheticDefaultImports`
+
+### 11. `strict`
+
+### 12. No index signature with a parameter of type 'string' was found on type
+> 参考：[No index signature with a parameter of type 'string' was found on type](https://bobbyhadz.com/blog/typescript-no-index-signature-with-parameter-of-type-string)
+```ts
+const key = 'country' as string;
+
+const obj = {
+  name: 'Bobby Hadz',
+  country: 'Germany',
+};
+
+// ⛔️ Error:  No index signature with a parameter of type
+// 'string' was found on type '{ name: string; country: string; }'.ts(7053)
+console.log(obj[key]);
+
+// 使用类型断言来解决错误
+console.log(obj[key as keyof typeof obj]);
+```
