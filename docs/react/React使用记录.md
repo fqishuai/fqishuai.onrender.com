@@ -3,8 +3,6 @@ slug: usage
 tags: [react]
 ---
 
-[Stop using && in React Conditional Rendering](https://www.crocoder.dev/blog/react-conditional-rendering/)
-
 ## 使用vite搭建react+typescript工程
 1. `pnpm create vite` 选择React、TypeScript（SWC熟练的话可以选择TypeScript+SWC）
 2. 生成的`tsconfig.json` 和 `tsconfig.node.json`配置文件如下
@@ -209,3 +207,74 @@ export default {
 
 ## 使用useState声明state时声明类型
 [How to use React useState hook with Typescript](https://reacthustle.com/blog/how-to-use-react-usestate-with-typescript)
+
+## key是数组index或者key重复时删除数组渲染会有问题
+可以使用随机数
+```tsx
+setDetailList([{id: Math.random()}]);
+```
+
+## react项目keep-alive
+[react-activation](https://github.com/CJY0208/react-activation/tree/master)
+
+### 基本使用
+1. 安装：`pnpm add react-activation`
+2. 在不会被销毁的位置(一般为应用入口处)放置 `<AliveScope>` 外层，用 `<KeepAlive>` 包裹需要保持状态的组件
+
+:::tip
+- 建议使用 babel 配置：在 babel 配置文件 `.babelrc` 中增加 `react-activation/babel` 插件
+  ```js title="babel.config.js"
+  {
+    "plugins": [
+      "react-activation/babel"
+    ]
+  }
+  ```
+- 如果不使用 babel 配置，建议给每个 `<KeepAlive>` 声明全局唯一且不变的 cacheKey 属性，以确保缓存的稳定性
+- 与 react-router 或 react-redux 配合使用时，建议将 `<AliveScope>` 放置在 `<Router>` 或 `<Provider>` 内部
+:::
+
+```tsx title="src/main.tsx"
+import KeepAlive, { AliveScope } from 'react-activation';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <BrowserRouter basename='/aa'>
+    <AliveScope>
+      <Routes>
+        <Route path='/' element={<KeepAlive cacheKey="MANAGE" name="MANAGE"><Manage /></KeepAlive>}></Route>
+        <Route path='/detail' element={<Detail />}></Route>
+        <Route path='/update' element={<Edit />}></Route>
+        <Route path='/create' element={<Edit />}></Route>
+        <Route path='/done' element={<Done />}></Route>
+      </Routes>
+    </AliveScope>
+  </BrowserRouter>,
+)
+```
+
+### 注意事项
+1. 跳回被 `<KeepAlive>` 包裹保持状态的组件时，不会执行该组件的`useEffect(() => {}, []);`，还会执行`useEffect(() => {});`。要想还执行该组件的`useEffect(() => {}, []);`，则需要跳回该组件前，手动刷新缓存：
+```tsx
+import { useAliveController } from 'react-activation';
+
+export default function Demo() {
+  const { refreshScope } = useAliveController();
+
+  function handleLink() {
+    refreshScope('MANAGE');
+    navigate(`//?aa=${searchParams.get('aa')}`);
+  }
+}
+```
+
+2. 被缓存的组件会缓存路由param，如下的`aaValue`:
+```tsx
+import { useSearchParams } from 'react-router-dom';
+
+const [searchParams] = useSearchParams();
+
+const aaValue = searchParams.get('aa');
+```
+
+## JSX中使用`&&`的注意点
+[Stop using && in React Conditional Rendering](https://www.crocoder.dev/blog/react-conditional-rendering/)

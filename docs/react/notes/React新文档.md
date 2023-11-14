@@ -48,6 +48,7 @@ tags: [react]
       - [2.5.1. 箭头函数的隐式返回(implicitly return)及block body](#251-箭头函数的隐式返回implicitly-return及block-body)
       - [2.5.2. map中的JSX必须得有key](#252-map中的jsx必须得有key)
       - [2.5.3. React组件不接收key作为prop，key仅被React本身在其整个生命周期内识别对应的数组的项。](#253-react组件不接收key作为propkey仅被react本身在其整个生命周期内识别对应的数组的项)
+    - [2.6 The lifecycle of components](#26-the-lifecycle-of-components)
   - [3. Render and Commit](#3-render-and-commit)
     - [3.1 Triggering a render](#31-triggering-a-render)
     - [3.2 React renders your components](#32-react-renders-your-components)
@@ -70,6 +71,16 @@ tags: [react]
     - [5.5 Extracting state logic into a reducer](#55-extracting-state-logic-into-a-reducer)
     - [5.6 Passing data deeply with context](#56-passing-data-deeply-with-context)
     - [5.7 Scaling up with reducer and context 使用 reducer 和 context 进行扩展](#57-scaling-up-with-reducer-and-context-使用-reducer-和-context-进行扩展)
+  - [6. Escape Hatches](#6-escape-hatches)
+    - [6.1 Referencing Values with Refs](#61-referencing-values-with-refs)
+    - [6.2 Manipulating the DOM with Refs](#62-manipulating-the-dom-with-refs)
+      - [6.2.1 使用`flushSync`可以同步更新state](#621-使用flushsync可以同步更新state)
+    - [6.3 Synchronizing with Effects](#63-synchronizing-with-effects)
+      - [6.3.1 如何使用Effect](#631-如何使用effect)
+      - [6.3.2 发请求获取数据的方案](#632-发请求获取数据的方案)
+      - [6.3.3 每个渲染都有自己的Effect](#633-每个渲染都有自己的effect)
+    - [6.4 You Might Not Need an Effect](#64-you-might-not-need-an-effect)
+    - [6.5 Lifecycle of Reactive Effects](#65-lifecycle-of-reactive-effects)
 - [三、Hooks](#三hooks)
   - [1. useState](#1-usestate)
     - [1.1 useState怎么区分不同的state？](#11-usestate怎么区分不同的state)
@@ -843,6 +854,12 @@ function Parent() {
 }
 ```
 [查看执行结果](https://code.juejin.cn/pen/7163925086418763813)
+
+#### 2.6 The lifecycle of components
+每个React组件都经历相同的生命周期：
+- 挂载(mount)：当组件被添加到屏幕上时。
+- 更新(update)：当组件接收到新的props或state时(通常是作为对交互的响应)，它会更新。
+- 卸载(unmount)：当组件从屏幕中移除时。
 
 ### 3. Render and Commit
 :::tip
@@ -2141,6 +2158,497 @@ function Counter() {
 
 #### 5.7 Scaling up with reducer and context 使用 reducer 和 context 进行扩展
 [reducer和context结合使用](https://codesandbox.io/s/rxg0dv?file=/TasksContext.js&utm_medium=sandpack)
+
+### 6. Escape Hatches
+#### 6.1 Referencing Values with Refs
+
+#### 6.2 Manipulating the DOM with Refs
+##### 6.2.1 使用`flushSync`可以同步更新state
+```jsx
+setTodos([ ...todos, newTodo]);
+listRef.current.lastChild.scrollIntoView();
+```
+由于在React中，设置state仅仅会在下一次渲染时更改该state，So the time you scroll the list to its last element, the todo has not yet been added. To fix this issue, you can force React to update (“flush”) the DOM synchronously.
+```jsx
+import { flushSync } from 'react-dom';
+
+function handleAdd() {
+  const newTodo = { id: nextId++, text: text };
+  flushSync(() => {
+    setText('');
+    setTodos([ ...todos, newTodo]);      
+  });
+  listRef.current.lastChild.scrollIntoView({
+    behavior: 'smooth',
+    block: 'nearest'
+  });
+}
+```
+
+#### 6.3 Synchronizing with Effects
+:::tip
+Effects 通常用于“跳出”React 代码并与某些外部系统同步，这包括浏览器 API、第三方小部件、网络等。**如果不涉及外部系统（例如，如果您想在某些 props 或 state 更改时更新组件的state），则不需要 Effect。**
+:::
+
+##### 6.3.1 如何使用Effect
+1. 没有任何依赖的Effect：每次组件渲染时，React都会更新屏幕，然后运行useEffect内的代码。换句话说，useEffect会“延迟”一段代码的运行，直到该渲染在屏幕上反映出来。
+  ```jsx
+  useEffect(() => {
+    // Code here will run after *every* render
+  });
+  ```
+  ```jsx
+  import { useState, useRef, useEffect } from 'react';
+
+  function VideoPlayer({ src, isPlaying }) {
+    const ref = useRef(null);
+
+    /*
+    // 以下代码不放到useEffect中会报错，因为当第一次调用VideoPlayer时，它的DOM尚不存在！没有DOM节点可以调用play()或pause()，因为React在返回JSX之前不知道要创建什么DOM。
+    if (isPlaying) {
+      ref.current.play();  // Calling these while rendering isn't allowed.
+    } else {
+      ref.current.pause(); // Also, this crashes.
+    }
+    */
+    // React先更新屏幕，确保<video>标签在DOM中具有正确的props，然后运行useEffect内的代码
+    useEffect(() => {
+      if (isPlaying) {
+        ref.current.play();
+      } else {
+        ref.current.pause();
+      }
+    });
+
+    return <video ref={ref} src={src} loop playsInline />;
+  }
+
+  export default function App() {
+    const [isPlaying, setIsPlaying] = useState(false);
+    return (
+      <>
+        <button onClick={() => setIsPlaying(!isPlaying)}>
+          {isPlaying ? 'Pause' : 'Play'}
+        </button>
+        <VideoPlayer
+          isPlaying={isPlaying}
+          src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+        />
+      </>
+    );
+  }
+  ```
+  ```jsx
+  // 如下代码会产生无限循环
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    setCount(count + 1);
+  });
+  ```
+
+1. 有依赖的Effect：可以通过指定依赖项数组作为 `useEffect()` 的第二个参数来告诉 React 跳过不必要的 Effect运行。依赖数组可以包含多个依赖项。React使用 `Object.is()` 来比较依赖值。如果所有的依赖项都相同，则React会忽略本次渲染中的Effect。
+  ```jsx
+  // 将 [isPlaying] 指定为依赖项数组告诉 React，如果 isPlaying 与上一次渲染时相同，它应该跳过重新运行您的 Effect。
+  useEffect(() => {
+    if (isPlaying) { // It's used here...
+      // ...
+    } else {
+      // ...
+    }
+  }, [isPlaying]); // ...so it must be declared here!
+  ```
+  :::tip
+  Effect有没有依赖项的区别：
+  ```jsx
+  useEffect(() => {
+    // This runs after every render
+  });
+
+  useEffect(() => {
+    // This runs only on mount (when the component appears) 这告诉React仅在组件“挂载”时(开发环境中，React在每个组件初始挂载后立即重新挂载一次)运行此代码，即首次出现在屏幕上时。
+  }, []);
+
+  useEffect(() => {
+    // This runs on mount *and also* if either a or b have changed since the last render
+  }, [a, b]);
+  ```
+  :::
+
+3. 需要时可以在`useEffect`中增加cleanup function。**React在每次Effect再次运行之前都会调用您的清理函数，并在组件卸载（被移除）时最后一次调用。** [Effect cleanup 示例](https://code.juejin.cn/pen/7294184776930426906)（示例中把`clearTimeout(timeoutId);`注掉看看啥效果）
+  ```jsx
+  useEffect(() => {
+    const connection = createConnection();
+    connection.connect();
+    return () => {
+      connection.disconnect();
+    };
+  }, []);
+  ```
+  ```jsx
+  useEffect(() => {
+    function handleScroll(e) {
+      console.log(window.scrollX, window.scrollY);
+    }
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  ```
+  ```jsx
+  // 如果你的 Effect 请求了一些数据，清理函数应该要么中止这个请求，要么忽略它的结果。
+  useEffect(() => {
+    let ignore = false;
+
+    async function startFetching() {
+      const json = await fetchTodos(userId);
+      if (!ignore) {
+        setTodos(json);
+      }
+    }
+
+    startFetching();
+
+    return () => {
+      ignore = true;
+    };
+  }, [userId]); // 如果userId从'Alice'更改为'Bob'，清理函数确保即使'Alice'的响应在'Bob'的响应之后到达，也会忽略'Alice'的响应。
+  ```
+
+##### 6.3.2 发请求获取数据的方案
+1. 在Effect中发请求获取数据，可行，但有以下缺点：
+   - 不适用于SSR场景。Effects不在服务器上运行，这意味着初始服务器呈现的HTML是不带数据，客户端计算机将不得不下载所有JavaScript并渲染您的应用程序，然后发现需要加载数据。这不是非常有效的。
+   - 在Effects中直接获取数据容易造成“网络瀑布”(“network waterfalls”)。您渲染父组件，它获取一些数据，然后渲染子组件，然后它们开始获取它们的数据。如果网络不是很快，这比并行获取所有数据要慢得多。
+    > [网络瀑布是网络事件在时间轴上发生顺序的二维可视化表示](https://nischithbm.medium.com/web-performance-optimizing-the-network-waterfall-8a65df932df6)
+   - 直接在Effects中获取数据通常意味着您不会预加载或缓存数据。例如，如果组件卸载然后重新挂载，它将需要再次获取数据。
+
+2. 使用框架如`Next.js`等，集成了高效的数据获取机制，不会遇到上述问题。
+3. 使用 [React Query](https://tanstack.com/query/latest/docs/react/overview) 或 React Router(loader) 等
+   ```jsx
+   // React Router(loader)
+   createBrowserRouter([
+     {
+       path: "/",
+       element: <Root />,
+       children: [
+         {
+           path: "contact",
+           element: <Contact />,
+         },
+         {
+           path: "dashboard",
+           element: <Dashboard />,
+           loader: ({ request }) =>
+             fetch("/api/dashboard.json", {
+               signal: request.signal,
+             }),
+         },
+         {
+           element: <AuthLayout />,
+           children: [
+             {
+               path: "login",
+               element: <Login />,
+               loader: redirectIfUser,
+             },
+             {
+               path: "logout",
+               action: logoutUser,
+             },
+           ],
+         },
+       ],
+     },
+   ]);
+   ```
+4. 构建自己的解决方案，在这种情况下，你会使用Effects作为基础，然后添加逻辑来**去重请求、缓存响应并避免网络瀑布效应（通过预加载数据或提升数据要求到路由）**。
+
+##### 6.3.3 每个渲染都有自己的Effect
+每个渲染的Effect都是相互隔离的。（闭包）
+
+#### 6.4 You Might Not Need an Effect
+:::info
+有两种常见情况不需要 Effects：
+- 您不需要 Effects 来转换数据以进行渲染(例如您想在显示列表之前对其进行过滤)。当你更新state时，React 将首先调用你的组件函数来计算屏幕上应该显示的内容，然后 React 会将这些更改“提交”(commit)到 DOM，从而更新屏幕，然后 React 将运行你的 Effects。如果您的 Effect 也立即更新state，这将从头开始重新启动整个过程！为了避免不必要的渲染过程，请在组件的顶层转换所有数据。每当您的 props 或 state 发生变化时，该代码都会自动重新运行。
+  ```jsx
+  // 不推荐。效率很低：使用旧的 fullName 值执行整个渲染过程，然后立即使用更新的值重新渲染。
+  function Form() {
+    const [firstName, setFirstName] = useState('Taylor');
+    const [lastName, setLastName] = useState('Swift');
+
+    // 🔴 Avoid: redundant state and unnecessary Effect
+    const [fullName, setFullName] = useState('');
+    useEffect(() => {
+      setFullName(firstName + ' ' + lastName);
+    }, [firstName, lastName]);
+    // ...
+  }
+  ```
+  ```jsx
+  // 推荐
+  function Form() {
+    const [firstName, setFirstName] = useState('Taylor');
+    const [lastName, setLastName] = useState('Swift');
+    // ✅ Good: calculated during rendering
+    const fullName = firstName + ' ' + lastName;
+    // ...
+  }
+  ```
+
+- 您不需要 Effects 来处理用户事件。通常会在相应的事件处理程序中处理用户事件。
+:::
+1. 可以使用`useMemo`避免重复计算
+  ```jsx
+  // 不推荐
+  function TodoList({ todos, filter }) {
+    const [newTodo, setNewTodo] = useState('');
+
+    // 🔴 Avoid: redundant state and unnecessary Effect
+    const [visibleTodos, setVisibleTodos] = useState([]);
+    useEffect(() => {
+      setVisibleTodos(getFilteredTodos(todos, filter));
+    }, [todos, filter]);
+
+    // ...
+  }
+  ```
+  ```jsx
+  // 推荐
+  function TodoList({ todos, filter }) {
+    const [newTodo, setNewTodo] = useState('');
+    // ✅ This is fine if getFilteredTodos() is not slow.
+    const visibleTodos = getFilteredTodos(todos, filter);
+    // ...
+  }
+  ```
+  ```jsx
+  // 如果一些不相关的状态变量（如 newTodo）发生了变化，您不想重新计算 getFilteredTodos()（比如getFilteredTodos运算比较慢不想重复计算），可以使用 useMemo
+  import { useMemo, useState } from 'react';
+
+  function TodoList({ todos, filter }) {
+    const [newTodo, setNewTodo] = useState('');
+    const visibleTodos = useMemo(() => {
+      // ✅ Does not re-run unless todos or filter change
+      return getFilteredTodos(todos, filter);
+    }, [todos, filter]);
+    // ...
+  }
+  ```
+  ```js
+  // 打印耗时 可以使用 console.time console.timeEnd
+  console.time('filter array');
+  const visibleTodos = getFilteredTodos(todos, filter);
+  console.timeEnd('filter array');
+  ```
+
+2. 当prop改变需要重置state时，不建议使用 Effect，建议使用 `key`。通常，当同一组件在同一位置渲染时，React 会保留状态。通过将 userId 作为 Profile 组件的 `key` 传递，您要求 React 将具有不同 userId 的两个 Profile 组件视为两个不应该共享任何 state 的不同组件。每当 `key`（您设置为 userId）更改时，React 将重新创建 DOM 并重置 Profile 组件及其所有子组件的 state。
+  ```jsx
+  // 不推荐
+  function ProfilePage({ userId }) {
+    const [comment, setComment] = useState('');
+
+    // 🔴 Avoid: Resetting state on prop change in an Effect
+    useEffect(() => {
+      setComment('');
+    }, [userId]);
+    // ...
+  }
+  ```
+  ```jsx
+  // 推荐
+  function ProfilePage({ userId }) {
+    return (
+      <Profile
+        userId={userId}
+        key={userId}
+      />
+    );
+  }
+
+  function Profile({ userId }) {
+    // ✅ This and any other state below will reset on key change automatically
+    const [comment, setComment] = useState('');
+    // ...
+  }
+  ```
+
+3. 当prop改变需要更新部分state时，不建议使用 Effect，建议在渲染时更新state（Storing information from previous renders）
+  ```jsx
+  // 不推荐
+  function List({ items }) {
+    const [isReverse, setIsReverse] = useState(false);
+    const [selection, setSelection] = useState(null);
+
+    // 🔴 Avoid: Adjusting state on prop change in an Effect
+    useEffect(() => {
+      setSelection(null);
+    }, [items]);
+    // ...
+  }
+  ```
+  ```jsx
+  // 一般
+  function List({ items }) {
+    const [isReverse, setIsReverse] = useState(false);
+    const [selection, setSelection] = useState(null);
+
+    // Better: Adjust the state while rendering
+    const [prevItems, setPrevItems] = useState(items);
+    if (items !== prevItems) {
+      setPrevItems(items);
+      setSelection(null);
+    }
+    // ...
+  }
+  ```
+  ```jsx
+  // 推荐
+  function List({ items }) {
+    const [isReverse, setIsReverse] = useState(false);
+    const [selectedId, setSelectedId] = useState(null);
+    // ✅ Best: Calculate everything during rendering
+    const selection = items.find(item => item.id === selectedId) ?? null;
+    // ...
+  }
+  ```
+  :::tip
+  当您在渲染期间更新组件时，React 会丢弃返回的 JSX 并立即重试渲染(When you update a component during rendering, React throws away the returned JSX and immediately retries rendering.)。为了避免非常慢的级联重试(very slow cascading retries)，React 只允许您在渲染期间更新同一组件的 state。如果您在渲染期间更新另一个组件的 state，会报错。
+  :::
+
+4. 事件处理程序中的共享逻辑不要放到 Effect 中。当您不确定某些代码是否应该在 Effect 中还是在事件处理程序中时，问问自己为什么需要运行该代码。因页面被显示而运行的代码才考虑使用 Effect。如下示例中，`showNotification` 应该是用户点击按钮时调用，而不是页面被显示时调用。
+  ```jsx
+  // 不推荐
+  function ProductPage({ product, addToCart }) {
+    // 🔴 Avoid: Event-specific logic inside an Effect
+    useEffect(() => {
+      if (product.isInCart) {
+        showNotification(`Added ${product.name} to the shopping cart!`);
+      }
+    }, [product]);
+
+    function handleBuyClick() {
+      addToCart(product);
+    }
+
+    function handleCheckoutClick() {
+      addToCart(product);
+      navigateTo('/checkout');
+    }
+    // ...
+  }
+  ```
+  ```jsx
+  function ProductPage({ product, addToCart }) {
+    // ✅ Good: Event-specific logic is called from event handlers
+    function buyProduct() {
+      addToCart(product);
+      showNotification(`Added ${product.name} to the shopping cart!`);
+    }
+
+    function handleBuyClick() {
+      buyProduct();
+    }
+
+    function handleCheckoutClick() {
+      buyProduct();
+      navigateTo('/checkout');
+    }
+    // ...
+  }
+  ```
+
+5. 如果某些逻辑必须在每次应用程序加载时运行一次，而不是每次组件挂载(mount)时运行一次，请添加一个顶级变量来跟踪它是否已执行
+  ```jsx
+  // 不推荐
+  function App() {
+    // 🔴 Avoid: Effects with logic that should only ever run once
+    useEffect(() => {
+      loadDataFromLocalStorage();
+      checkAuthToken();
+    }, []);
+    // ...
+  }
+  ```
+  ```jsx
+  // 推荐
+  let didInit = false;
+
+  function App() {
+    useEffect(() => {
+      if (!didInit) {
+        didInit = true;
+        // ✅ Only runs once per app load
+        loadDataFromLocalStorage();
+        checkAuthToken();
+      }
+    }, []);
+    // ...
+  }
+  ```
+
+6. race condition(两个不同的请求相互“竞争”，并且以与您预期不同的顺序呈现。). 如下示例，假如快速输入"hello"，变量 `query` will change from "h", to "he", "hel", "hell", and "hello"，每次改变都会发起请求，“hell”的响应可能在“hello”的响应之后到达，这种情况下调用 `setResults` 导致 `results` 的值是错误的。
+  ```jsx
+  function SearchResults({ query }) {
+    const [results, setResults] = useState([]);
+    const [page, setPage] = useState(1);
+
+    useEffect(() => {
+      // 🔴 Avoid: Fetching without cleanup logic
+      fetchResults(query, page).then(json => {
+        setResults(json);
+      });
+    }, [query, page]);
+
+    function handleNextPageClick() {
+      setPage(page + 1);
+    }
+    // ...
+  }
+  ```
+  ```jsx
+  // 推荐。添加一个清理函数来忽略过时的响应，这确保了当您的 Effect 获取数据时，除了最后请求的响应之外的所有响应都将被忽略。
+  function SearchResults({ query }) {
+    const [results, setResults] = useState([]);
+    const [page, setPage] = useState(1);
+    useEffect(() => {
+      let ignore = false;
+      fetchResults(query, page).then(json => {
+        if (!ignore) {
+          setResults(json);
+        }
+      });
+      return () => {
+        ignore = true;
+      };
+    }, [query, page]);
+
+    function handleNextPageClick() {
+      setPage(page + 1);
+    }
+    // ...
+  }
+  ```
+  ```jsx
+  // 抽取 获取数据 作为一个自定义hook
+  function useData(url) {
+    const [data, setData] = useState(null);
+    useEffect(() => {
+      let ignore = false;
+      fetch(url)
+        .then(response => response.json())
+        .then(json => {
+          if (!ignore) {
+            setData(json);
+          }
+        });
+      return () => {
+        ignore = true;
+      };
+    }, [url]);
+    return data;
+  }
+  ```
+
+#### 6.5 Lifecycle of Reactive Effects
+
 
 ## 三、Hooks
 ### 1. useState
