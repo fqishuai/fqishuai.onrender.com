@@ -64,6 +64,7 @@
 ## 文档
 - [官方文档](https://www.webpackjs.com)
 ## 参考资料
+- [深入浅出Webpack](https://webpack.wuhaolin.cn/)
 - [webpack入门进阶知识](https://juejin.cn/post/6991966321529815053)
 - [Webpack揭秘——走向高阶前端的必经之路](https://juejin.cn/post/6844903685407916039)
 - [当面试官问Webpack的时候他想知道什么](https://juejin.cn/post/6943468761575849992)

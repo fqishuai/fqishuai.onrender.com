@@ -6,6 +6,32 @@ tags: [js-core]
 ## [How well do you know “this” in JavaScript?](https://javascript.plainenglish.io/how-well-do-you-know-this-ce4355bc9b)
 > 用最简单的术语来说，JavaScript 关键字 `this` 是指它在运行时所属的对象，具体取决于调用它的地方(call-site)。
 
+:::tip
+**[一个函数在声明时，可能就使用了 `this`，但是这个 `this` 只有在函数被调用时才会有值。](https://zh.javascript.info/object-methods#zong-jie)**
+<CodeRun>{`
+function makeUser() {
+  return {
+    name: "John",
+    ref: this
+  };
+}
+let user = makeUser();
+console.log( user.ref.name ); // 非严格模式下为undefined; 严格模式下报错Error: Cannot read property 'name' of undefined
+`}</CodeRun>
+<CodeRun>{`
+function makeUser() {
+  return {
+    name: "John",
+    ref() {
+      return this;
+    }
+  };
+}
+let user = makeUser();
+console.log( user.ref().name ); // "John"
+`}</CodeRun>
+:::
+
 :::info
 `this` can have the following values depending upon where it is accessed:
 - By default : `this` refers to the global object.

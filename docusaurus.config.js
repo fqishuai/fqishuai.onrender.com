@@ -293,7 +293,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Blog - fqishuai, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Blog - fqishuai, Inc. 学而不思则罔，思而不学则殆。`,
       },
       prism: {
         theme: lightCodeTheme,
