@@ -16,6 +16,7 @@ tags: [vue]
   - [7.1 pages](#71-pages)
   - [7.2 configureWebpack](#72-configurewebpack)
 - [8. 动态组件`<component>/component>`](#8-动态组件componentcomponent)
+- [9. vue中如何使用节流（throttle）函数](#9-vue中如何使用节流throttle函数)
 
 
 ## 1. 渲染函数 & JSX
@@ -245,4 +246,25 @@ new Vue({
     },
   }
 </script>
+```
+
+## 9. vue中如何使用节流（throttle）函数
+```html
+<div @click="limit">查询</div>
+```
+```js
+import funHelper from 'lodash/function';
+
+export default {
+  methods: {
+    limit: funHelper.throttle(function() {
+      console.log('1秒内点击n次只打印1次')
+      // this指向当前Vue组件实例
+      // this.queryData();
+    }, 1000, { 'trailing': false }),
+    queryData() {
+
+    },
+  },
+}
 ```
