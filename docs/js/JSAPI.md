@@ -240,6 +240,44 @@ const paddingValue = parseInt(parentStyle.paddingLeft.replace('px', '')) + parse
 
 ### 11. XMLHttpRequest
 XMLHttpRequest (XHR) 对象用于与服务器交互，这使网页可以只更新页面的一部分，而不会中断用户正在做的事情。
+```ts
+function upload(options: any) {
+  const xhr = new XMLHttpRequest()
+  xhr.timeout = options.timeout
+  if (xhr.upload) {
+    xhr.upload.addEventListener(
+      'progress',
+      (e: ProgressEvent<XMLHttpRequestEventTarget>) => {
+        options.onProgress?.(e, options)
+      },
+      false
+    )
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        if (xhr.status === options.xhrState) {
+          options.onSuccess?.(xhr.responseText, options)
+        } else {
+          options.onFailure?.(xhr.responseText, options)
+        }
+      }
+    }
+    xhr.withCredentials = options.withCredentials
+    xhr.open(options.method, options.url, true)
+    // headers
+    for (const [key, value] of Object.entries(options.headers)) {
+      xhr.setRequestHeader(key, value as string)
+    }
+    options.onStart?.(options)
+    if (options.beforeXhrUpload) {
+      options.beforeXhrUpload(xhr, options)
+    } else {
+      xhr.send(options.formData)
+    }
+  } else {
+    console.warn('浏览器不支持 XMLHttpRequest')
+  }
+}
+```
 
 ### 12. Fetch API
 #### 12.1 `fetch()`

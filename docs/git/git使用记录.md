@@ -1,6 +1,6 @@
 ---
 slug: usage
-tags: [git]
+tags: [git, 记录]
 ---
 
 - [1. 使用git rebase合并分支](#1-使用git-rebase合并分支)

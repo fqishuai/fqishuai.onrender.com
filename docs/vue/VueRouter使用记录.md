@@ -1,6 +1,6 @@
 ---
 slug: usage-router
-tags: [vue]
+tags: [vue, 记录]
 ---
 
 ## 1. router.addRoute

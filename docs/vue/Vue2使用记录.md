@@ -1,6 +1,6 @@
 ---
 slug: usage
-tags: [vue]
+tags: [vue, 记录]
 ---
 
 - [1. 渲染函数 \& JSX](#1-渲染函数--jsx)

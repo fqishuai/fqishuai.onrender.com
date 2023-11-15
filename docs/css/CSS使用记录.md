@@ -1,6 +1,6 @@
 ---
 slug: usage
-tags: [css]
+tags: [css, 记录]
 ---
 
 - [一、CSS Modules](#一css-modules)

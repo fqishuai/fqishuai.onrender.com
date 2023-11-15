@@ -1,6 +1,6 @@
 ---
 slug: usage
-tags: [nginx]
+tags: [nginx, 记录]
 ---
 
 ## 1. 使用`-c`指定配置文件

@@ -1,16 +1,88 @@
 ---
-slug: compressor
-tags: [优化]
+slug: web
+tags: [web, 记录]
 ---
 
-## 使用
-### 手写及使用
+## 文件上传
+```html
+<div className="empty">
+  <input
+    className="uploader-wrapper__input"
+    type="file"
+    <!-- capture="environment" 直接调起后置摄像头  capture="user" 直接调起前置摄像头 -->
+    accept="image/jpg,image/jpeg,image/gif,image/png"
+    onChange={handleFileChange}
+  />
+  <img src={cameraIcon} />
+  <div>上传照片</div>
+</div>
+```
+```scss
+.empty {
+  width: 186px;
+  height: 186px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  &>img {
+    width: 56px;
+    height: 56px;
+  }
+  position: relative;
+  .uploader-wrapper__input {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden;
+    cursor: pointer !important;
+    opacity: 0;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+}
+```
+```ts
+function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+  // loading
+  setShowLoadOverlay(true);
+  const $el = event.target;
+  const { files } = $el;
+  if (files && files[0]) {
+    const formData = new FormData();
+    formData.append('file', files[0]);
+    axios.post(import.meta.env.VITE_UPLOAD_URL, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    }).then(response => {
+      setShowLoadOverlay(false);
+      // 上传成功后的业务逻辑
+      // ...
+    }).catch(error => {
+      console.error('上传失败', error);
+      Toast.show({
+        content: '上传失败',
+      });
+      setShowLoadOverlay(false);
+    });
+  } else {
+    setShowLoadOverlay(false);
+  }
+}
+```
+
+## 图片压缩
 ```ts
 /**
  * 图片压缩
  * @param files 原始图片file列表
  * @returns 压缩后的图片file列表
- * 注意：图片越大压缩效果越明显，1kb以下可能会出现压缩后size变大/图片变黑的情况
+ * 注意：图片越大压缩效果越明显，1kb以下可能会出现压缩后size变大的情况
  */
 export const compressImg = async (files: FileList) => {
   const canvas = document.createElement('canvas');
@@ -82,12 +154,3 @@ async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
   }
 }
 ```
-
-### npm包
-- [Compressor.js](https://github.com/fengyuanchen/compressorjs)
-- [js-image-compressor](https://github.com/wuwhs/js-image-compressor)
-
-## 原理
-[了解JS压缩图片，这一篇就够了](https://zhuanlan.zhihu.com/p/187021794)
-
-## 相关API

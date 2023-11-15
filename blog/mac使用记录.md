@@ -1,5 +1,6 @@
 ---
 slug: mac-usage
+tags: [mac, 记录]
 ---
 
 ## 1. Homebrew

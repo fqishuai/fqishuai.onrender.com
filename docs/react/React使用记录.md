@@ -1,6 +1,6 @@
 ---
 slug: usage
-tags: [react]
+tags: [react, 记录]
 ---
 
 ## 使用vite搭建react+typescript工程

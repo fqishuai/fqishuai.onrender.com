@@ -1,5 +1,6 @@
 ---
 slug: elementui
+tags: [npmlib, 记录]
 ---
 
 ### 1. el-radio切换不了

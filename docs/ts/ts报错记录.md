@@ -1,6 +1,6 @@
 ---
 slug: ts-error
-tags: [ts]
+tags: [ts, 记录]
 ---
 
 ### 1. Argument of type not assignable to parameter type 'never'
