@@ -440,6 +440,170 @@ console.log(clone.sizes.width);            // 51，能从另外一个获取到�
 
 #### 对象到原始值的转换
 对于类似 `obj1 > obj2` 的比较，或者跟一个原始类型值的比较 `obj == 5`，对象都会被转换为原始值。
+##### hint
+JavaScript 是通过 hint 决定对象转换为哪种原始值的，如[规范](https://tc39.github.io/ecma262/#sec-toprimitive)所述，有3种hint：
+1. "string"
+   当我们对期望一个字符串的对象执行操作时，如 `alert(obj)` `anotherObj[obj]`(将对象作为属性键)，对象转换为字符串。
+
+2. "number"
+   当我们对 对象 进行数学运算时，对象转换为数字。
+   ```js
+   // 显式转换
+   let num = Number(obj);
+
+   // 数学运算（除了二元加法）
+   let n = +obj; // 一元加法
+   let delta = date1 - date2;
+
+   // 小于/大于的比较
+   let greater = user1 > user2;
+   ```
+
+3. "default"
+   当运算符“不确定”期望值的类型时，将依据 "default" hint 来对 对象 进行转换。例如，二元加法 可用于字符串（连接），也可以用于数字（相加）。此外，如果对象被用于与字符串、数字或 symbol 进行 == 比较，这时到底应该进行哪种转换也不是很明确，因此使用 "default" hint。
+   ```js
+   // 二元加法使用默认 hint
+   let total = obj1 + obj2;
+
+   // obj == number 使用默认 hint
+   if (user == 1) { ... };
+   ```
+
+:::info
+像 `<` 和 `>` 这样的小于/大于比较运算符，也可以同时用于字符串和数字。不过，它们使用 “number” hint，而不是 “default” hint。这是历史原因。
+:::
+
+##### 转换规则
+为了进行转换，JavaScript 尝试查找并调用三个对象方法：
+1. 如果对象有 `[Symbol.toPrimitive](hint)` 方法的话，调用该方法（这个方法是带有 symbol 键 `Symbol.toPrimitive`（系统 symbol）的方法），
+2. 如果对象没有 `[Symbol.toPrimitive](hint)` 方法，那么 JavaScript 将尝试寻找 `toString` 和 `valueOf` 方法：
+- 对于 hint 是 "string"：调用 `toString` 方法，如果它不存在，则调用 `valueOf` 方法（因此，对于字符串转换，优先调用 `toString`）。
+- 对于hint 是 "number" 或 "default"：调用 `valueOf` 方法，如果它不存在，则调用 `toString` 方法（因此，对于数学运算，优先调用 `valueOf` 方法）。
+
+:::info
+默认情况下，普通对象具有 `toString` 和 `valueOf` 方法：
+- `toString` 方法返回一个字符串 "[object Object]"。
+- `valueOf` 方法返回对象自身。
+
+```js
+let user = {name: "John"};
+
+alert(user);                     // [object Object]，尝试将一个对象当做字符串来使用
+alert(user.valueOf() === user);  // true
+```
+:::
+:::tip
+至于布尔值，所有的对象在布尔上下文（context）中均为 `true`。
+:::
+
+对象有 `[Symbol.toPrimitive](hint)` 方法的例子：
+<CodeRun>{`
+let obj = {
+  [Symbol.toPrimitive]: function (hint) {
+    switch(hint) {
+      case 'number':
+        return 3;
+      case 'string':
+        return 'string case';
+      case 'default':
+      default:
+        return 'default case';
+    }
+  }
+};
+console.log( 3 + obj );     // "3default case", 二元加法 使用"default"hint
+console.log( 3 - obj );     // 0
+console.log( String(obj) ); // "string case"
+`}</CodeRun>
+<CodeRun>{`
+let user = {
+  name: "John",
+  money: 1000,
+  [Symbol.toPrimitive](hint) {
+    console.log( "hint: " + hint );
+    return hint == "string" ? "name: " + this.name : this.money;
+  }
+};
+// 转换演示：
+console.log( String(user) );       // hint: string -> "name: John"
+console.log( +user );              // hint: number -> 1000
+console.log( user + 500 );         // hint: default -> 1500
+`}</CodeRun>
+
+对象没有 `[Symbol.toPrimitive](hint)` 方法的例子：
+<CodeRun>{`
+let user = {
+  name: "John",
+  money: 1000,
+  // 对于 hint="string"
+  toString() {
+    return "name: " + this.name;
+  },
+  // 对于 hint="number" 或 "default"
+  valueOf() {
+    return this.money;
+  }
+};
+console.log( String(user) );       // toString -> "name: John"
+console.log( +user );              // valueOf -> 1000
+console.log( user + 500 );         // valueOf -> 1500
+`}</CodeRun>
+
+如果没有 `[Symbol.toPrimitive](hint)` 方法 和 `valueOf` 方法，`toString` 方法将处理所有原始转换：
+<CodeRun>{`
+let user = {
+  name: "John",
+  toString() {
+    return this.name;
+  }
+};
+console.log( String(user) ); // toString -> John
+console.log( user + 500 );   // toString -> John500
+`}</CodeRun>
+
+:::warning
+注意，对象转换原始值 不一定会返回 “hint” 的原始值。比如 hint 是 "number"，转换后不一定是number类型的原始值。唯一强制性的事情是：这些方法必须返回一个原始值，而不是对象。由于历史原因，如果 `toString` 或 `valueOf` 返回一个对象，则不会出现 error，但是这种值会被忽略（就像这种方法根本不存在）。`[Symbol.toPrimitive](hint)` 更严格，它 必须 返回一个原始值，否则就会出现 error。
+<CodeRun>{`
+let user = {
+  name: "John",
+  money: 1000,
+  // 对于 hint="string"
+  toString() {
+    return "name: " + this.name;
+  },
+  // 对于 hint="number" 或 "default"
+  valueOf() {
+    return this.money + "";
+  }
+};
+console.log( String(user) );       // toString -> "name: John"
+console.log( +user );              // valueOf -> 1000
+console.log( user + 500 );         // valueOf -> "1000500"
+`}</CodeRun>
+:::
+
+##### 进一步的转换
+如果对象作为操作数参与运算，则会出现两个运算阶段：
+1. 对象被转换为原始值。
+2. 如果还需要进一步计算，则生成的原始值会被进一步转换。
+
+<CodeRun>{`
+let obj = {
+  // toString 在没有其他方法的情况下处理所有转换
+  toString() {
+    return "2";
+  }
+};
+console.log( obj * 2 ); // 4，对象被转换为原始值字符串 "2"，之后它被乘法转换为数字 2。
+`}</CodeRun>
+<CodeRun>{`
+let obj = {
+  toString() {
+    return "2";
+  }
+};
+console.log( obj + 2 ); // 22（"2" + 2）被转换为原始值字符串
+`}</CodeRun>
 
 #### 其他对象
 有时候大家会说“Array 类型”或“Date 类型”，但其实它们并不是自身所属的类型，而是属于一个对象类型即 “object”。它们以不同的方式对 “object” 做了一些扩展。
@@ -450,36 +614,129 @@ console.log(clone.sizes.width);            // 51，能从另外一个获取到�
 - Error 用于存储错误信息
 
 ### Symbol 类型
+- 可以使用 `Symbol()` 来创建这种类型的值，Symbol 类型的值表示唯一的标识符。
+  ```js
+  let id = Symbol();
+  ```
 
-### `typeof` 运算符
-`typeof` 是一个操作符，不是一个函数。`typeof(x)` 与 `typeof x` 相同，但是这里的括号不是 `typeof` 的一部分，它是数学运算分组的括号。
-```jsx live
-function typeofDemo() {
-  function showResult() {
-    alert( typeof undefined );      // 'undefined'
-    alert( typeof 0 );              // 'number'
-    // console.log( typeof 10n );   // 'bigint'
-    alert( typeof true );           // 'boolean'
-    alert( typeof "foo" );          // 'string'
-    alert( typeof Symbol("id") );   // 'symbol'
-    alert( typeof Math );           // 'object'
-    alert( typeof null );           // 'object'
-    alert( typeof console.log );    // 'function'
-  }
+- 创建时，我们可以给 symbol 一个描述（也称为 symbol 名）。symbol 保证是唯一的。即使我们创建了许多具有相同描述的 symbol，它们的值也是不同。描述只是一个标签，不影响任何东西。
+  <CodeRun>{`
+  let id1 = Symbol("id");
+  let id2 = Symbol("id");
+  console.log( id1 == id2 ); // false
+  `}</CodeRun>
 
-  return (
-    <div>
-      <p onClick={showResult}>查看执行结果</p>
-    </div>
-  );
-}
-```
-- `Math` 是一个提供数学运算的内建 object。
+- Symbol值 不会被自动转换为字符串
+  ```js
+  let id = Symbol("id");
+  alert(id); // TypeError: Cannot convert a Symbol value to a string 类型错误：无法将 Symbol 值转换为字符串。
+  ```
+  <CodeRun>{`
+  let id = Symbol("id");
+  console.log( id.toString() );  // "Symbol(id)"
+  console.log( id.description ); // "id"
+  `}</CodeRun>
 
-- 在 JavaScript 语言中没有一个特别的 “function” 类型。函数隶属于 object 类型。但是 `typeof` 会对函数区分对待，并返回 "function"。这也是来自于 JavaScript 语言早期的问题。从技术上讲，这种行为是不正确的，但在实际编程中却非常方便。
+- Symbol值 可以作为对象的“隐藏”属性。如果我们想要向“属于”另一个脚本或者库的对象添加一个属性，我们可以创建一个 symbol 并使用它作为属性的键。使用 `Symbol("id")` 作为键，比起用字符串 "id" 来有什么好处呢？假如我们使用第三方库的`user`对象，向它添加字符串属性是不安全的，因为可能会影响代码库中的其他预定义行为。但 symbol 属性不会被意外访问到。第三方代码不会知道新定义的 symbol，因此将 symbol 添加到 `user` 对象是安全的。
+  ```js
+  let user = { // 假设属于第三方代码库
+    name: "John"
+  };
 
-- `typeof null` 的结果为 "object"，这是官方承认的 `typeof` 的错误，这个问题来自于 JavaScript 语言的早期阶段，并为了兼容性而保留了下来。`null` 绝对不是一个 `object`。`null` 有自己的类型，它是一个特殊值。
-  ![typeof null](img/typeofnull.jpeg)
+  let id = Symbol("id");
+
+  user[id] = 1;
+
+  let id = Symbol("id");
+
+  user[id] = "Their id value"; // 不会有冲突，因为 symbol 总是不同的，即使它们有相同的名字。
+
+  // 如果使用字符串作为属性key
+  user.id = "Our id value";
+
+  user.id = "Their id value"; // 无意中重写了 id！
+  ```
+  :::info
+  从技术上说，symbol 不是 100% 隐藏的。有一个内建方法 `Object.getOwnPropertySymbols(obj)` 允许我们获取所有的 symbol。还有一个名为 `Reflect.ownKeys(obj)` 的方法可以返回一个对象的 所有 键，包括 symbol。但大多数库、内建方法和语法结构都没有使用这些方法。
+  :::
+
+- 在对象字面量 `{...}` 中使用 symbol，需要使用方括号把它括起来。
+  ```js
+  let id = Symbol("id");
+
+  let user = {
+    name: "John",
+    [id]: 123 // 而不是 "id"：123
+  };
+  ```
+
+- symbol属性在 `for…in`、`Object.keys(...)` 中会被忽略。
+  <CodeRun>{`
+  let id = Symbol("id");
+  let user = {
+    name: "John",
+    age: 30,
+    [id]: 123
+  };
+  // for..in 会忽略symbol属性
+  for (let key in user) console.log( key );             // "name" "age"（没有 symbol）
+  // 可以直接访问
+  console.log( "Direct: " + user[id] );                 // "Direct: 123"
+  // Object.keys(...) 会忽略symbol属性
+  Object.keys(user).forEach(key => console.log( key )); // "name" "age"（没有 symbol）
+  `}</CodeRun>
+
+- `Object.assign` 会同时复制字符串和 symbol 属性。
+  <CodeRun>{`
+  let id = Symbol("id");
+  let user = {
+    [id]: 123
+  };
+  let clone = Object.assign({}, user);
+  console.log( clone[id] ); // 123
+  `}</CodeRun>
+
+#### 全局symbol
+- 通常所有的 symbol 都是不同的，即使它们有相同的名字。但有时我们想要名字相同的 symbol 具有相同的实体。
+
+- 使用 `Symbol.for(key)` 可以检查全局symbol注册表，如果有一个描述为 `key` 的 symbol，则返回该 symbol，否则将创建一个新 symbol（`Symbol(key)`），并通过给定的 `key` 将其存储在注册表中。注册表内的 symbol 被称为 全局symbol。使用 `Symbol.for(key)` 多次调用 `key` 相同的 symbol 时，返回的就是同一个 symbol。
+  <CodeRun>{`
+  // 从全局注册表中读取
+  let id = Symbol.for("id"); // 如果该 symbol 不存在，则创建它
+  // 再次读取（可能是在代码中的另一个位置）
+  let idAgain = Symbol.for("id");
+  // 相同的 symbol
+  console.log( id === idAgain );                        // true
+  console.log( Symbol.for("id") === Symbol.for("id") ); // true
+  console.log( Symbol("id") === Symbol("id") )          // false
+  `}</CodeRun>
+
+- 对于全局symbol，`Symbol.for(key)` 按名字返回一个 symbol；`Symbol.keyFor(sym)`通过全局symbol 返回一个名字。
+  <CodeRun>{`
+  // 通过 name 获取 symbol
+  let sym = Symbol.for("name");
+  let sym2 = Symbol.for("id");
+  // 通过 symbol 获取 name
+  console.log( Symbol.keyFor(sym) );  // "name"
+  console.log( Symbol.keyFor(sym2) ); // "id"
+  `}</CodeRun>
+
+- `Symbol.keyFor` 内部使用全局symbol注册表来查找 symbol 的键，所以它不适用于非全局 symbol。如果 symbol 不是全局的，它将无法找到它并返回 `undefined`。
+  <CodeRun>{`
+  let globalSymbol = Symbol.for("name");
+  let localSymbol = Symbol("name");
+  console.log( Symbol.keyFor(globalSymbol) ); // "name"，全局 symbol
+  console.log( Symbol.keyFor(localSymbol) );  // undefined，非全局
+  console.log( localSymbol.description );     // "name"，可以使用description属性获取symbol名字
+  `}</CodeRun>
+
+#### 系统symbol
+JavaScript 内部有很多“系统” symbol，我们可以使用它们来改变一些内建行为。它们都被列在了 [众所周知的 symbol](https://tc39.es/ecma262/#sec-well-known-symbols) 中:
+- `Symbol.hasInstance`
+- `Symbol.isConcatSpreadable`
+- `Symbol.iterator`
+- `Symbol.toPrimitive`
+- ……等等。
 
 ## 数据类型的转换
 > [数据类型的转换](https://wangdoc.com/javascript/features/conversion)
@@ -970,6 +1227,102 @@ console.log(height ?? 100); // 0
 ```
 
 `??` 运算符的优先级与 `||` 相同
+
+### 可选链运算符`?.`
+- 可选链(Optional chaining operator) 是一种访问嵌套对象属性的安全的方式。即使中间的属性不存在，也不会出现错误。
+- 不使用可选链时，可以使用`&&`运算符
+  <CodeRun>{`
+  let user = {};
+  console.log( user.address && user.address.street && user.address.street.name ); // undefined（不报错）
+  `}</CodeRun>
+
+- 短链效应：如果可选链 `?.` 前面的值为 `undefined` 或者 `null`，它会立即停止运算并返回 `undefined`。
+  ```js
+  let user = null;
+  console.log( user?.address ); // undefined
+
+  let x = 0;
+  user?.sayHi(x++); // 代码执行没有到达 sayHi 调用和 x++
+
+  alert(x); // 0，值没有增加
+  ```
+
+:::warning
+- 不要过度使用可选链。例如，如果根据我们的代码逻辑，`user` 对象必须存在，但 `address` 是可选的，那么我们应该这样写 `user.address?.street`，而不是这样 `user?.address?.street`。如果 `user` 恰巧为 `undefined`，我们会看到一个编程错误并修复它。否则，如果我们滥用 `?.`，会导致代码中的错误在不应该被消除的地方消除了，这会导致调试更加困难。
+
+- `?.` 左边的变量必须已声明。可选链仅适用于已声明的变量。
+
+- 可选链 `?.` 不能用在赋值语句的左侧。
+  ```js
+  let user = null;
+
+  user?.name = "John"; // SyntaxError: Invalid left-hand side in assignment
+  // 因为它在计算的是：undefined = "John"
+  ```
+:::
+
+#### 可选函数调用`?.()`
+`?.()` 用于调用一个可能不存在的函数。
+```js
+let userAdmin = {
+  admin() {
+    alert("I am admin");
+  }
+};
+
+let userGuest = {};
+
+// ?.() 会检查它左边的部分：如果 admin 函数存在，那么就调用运行它（对于 userAdmin）。否则（对于 userGuest）运算停止，没有报错。
+userAdmin.admin?.(); // I am admin
+userGuest.admin?.(); // 啥都没发生（没有这样的方法）
+console.log( userGuest.admin?.() ); // undefined
+```
+
+#### 另一种语法`?.[]`
+`?.[]` 用于从一个可能不存在的对象上安全地读取属性。
+```js
+let key = "firstName";
+
+let user1 = {
+  firstName: "John"
+};
+
+let user2 = null;
+
+// 如果 obj 存在则返回 obj[prop]，否则返回 undefined。
+alert( user1?.[key] ); // John
+alert( user2?.[key] ); // undefined
+```
+
+### `typeof` 运算符
+`typeof` 是一个操作符，不是一个函数。`typeof(x)` 与 `typeof x` 相同，但是这里的括号不是 `typeof` 的一部分，它是数学运算分组的括号。
+```jsx live
+function typeofDemo() {
+  function showResult() {
+    alert( typeof undefined );      // 'undefined'
+    alert( typeof 0 );              // 'number'
+    // console.log( typeof 10n );   // 'bigint'
+    alert( typeof true );           // 'boolean'
+    alert( typeof "foo" );          // 'string'
+    alert( typeof Symbol("id") );   // 'symbol'
+    alert( typeof Math );           // 'object'
+    alert( typeof null );           // 'object'
+    alert( typeof console.log );    // 'function'
+  }
+
+  return (
+    <div>
+      <p onClick={showResult}>查看执行结果</p>
+    </div>
+  );
+}
+```
+- `Math` 是一个提供数学运算的内建 object。
+
+- 在 JavaScript 语言中没有一个特别的 “function” 类型。函数隶属于 object 类型。但是 `typeof` 会对函数区分对待，并返回 "function"。这也是来自于 JavaScript 语言早期的问题。从技术上讲，这种行为是不正确的，但在实际编程中却非常方便。
+
+- `typeof null` 的结果为 "object"，这是官方承认的 `typeof` 的错误，这个问题来自于 JavaScript 语言的早期阶段，并为了兼容性而保留了下来。`null` 绝对不是一个 `object`。`null` 有自己的类型，它是一个特殊值。
+  ![typeof null](img/typeofnull.jpeg)
 
 ## 值的比较
 ### 字符串比较
