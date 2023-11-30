@@ -56,6 +56,9 @@ tags: [css, 记录]
   - [41. 子元素在父元素的最右侧](#41-子元素在父元素的最右侧)
   - [42. 渐变](#42-渐变)
   - [43. 阴影](#43-阴影)
+  - [44. `:root`](#44-root)
+  - [45. 吸底](#45-吸底)
+  - [46. flex-grow](#46-flex-grow)
 
 ## 一、[CSS Modules](http://www.ruanyifeng.com/blog/2016/06/css_modules.html)
 
@@ -637,3 +640,37 @@ box-shadow: inset 5em 1em gold;
 /* 任意数量的阴影，以逗号分隔 */
 box-shadow: 3px 3px red, -1em 0 0.4em olive;
 ```
+
+### 44. `:root`
+伪类`:root` 表示 html 选择器
+```css
+:root {
+  background-color: blue;
+}
+
+html {
+  background-color: yellow;
+}
+
+/* 最终文档的背景色将会是 blue */
+```
+```css
+:root {
+  --bg-color: green;
+  --Bg-color: yellow;
+}
+```
+
+### 45. 吸底
+```css
+.footer {
+  width: 100%;
+  height: 112px;
+  position: fixed;
+  bottom: 0;
+}
+```
+
+### 46. flex-grow
+如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍。
+![flex-grow](img/flex_grow.jpeg)

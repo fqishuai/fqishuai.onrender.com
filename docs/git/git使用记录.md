@@ -61,6 +61,7 @@ tags: [git, 记录]
 - [44. 撤销中间某次commit](#44-撤销中间某次commit)
 - [45. 查询本地所有操作记录](#45-查询本地所有操作记录)
 - [46. 创建新分支](#46-创建新分支)
+- [47. 本地远程同步修改仓库名](#47-本地远程同步修改仓库名)
 
 
 ## 1. 使用git rebase合并分支
@@ -419,4 +420,24 @@ git branch <branch_name>
 
 # 新建一个分支并切换至新分支
 git checkout -b <branch_name>
+```
+
+## 47. 本地远程同步修改仓库名
+```bash
+# 1. 查看关联的远程仓库信息
+git remote -v
+
+# 2. 删除远程仓库关联
+git remote rm origin
+
+# 3. 在GitHub上操作rename仓库名
+# 4. 本地仓库文件夹重命名
+
+# 5. git remote add origin xxx （如：git remote add origin https://github.com/fqishuai/blog-fqishuai-note.git）
+
+# 6. 关联分支
+git branch --set-upstream-to=origin/main main
+
+# 7. 拉取
+git pull
 ```

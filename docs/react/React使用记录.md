@@ -179,7 +179,7 @@ VITE_NODE_ENV=production
 如下配置，浏览器访问时提示“使用了不受支持的协议”，这是因为https协议需要一个合法可用的证书。
 ```ts title="vite.config.ts"
 server: {
-  host: 'test.jd.com',
+  host: 'test.com',
   port: 443,
   strictPort: true,
   https: true,

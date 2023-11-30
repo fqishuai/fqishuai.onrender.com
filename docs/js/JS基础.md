@@ -55,7 +55,8 @@ num = 5; // 错误：num 未定义
 
 ### Number 类型
 Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（special numeric values）”：`Infinity`、`-Infinity` 和 `NaN`。
-- `Infinity` 代表数学概念中的 无穷大 ，是一个比任何数字都大的特殊值。`alert( 1 / 0 ); // Infinity`
+- `Infinity` 代表数学概念中的 无穷大 ，是一个比任何数字都大的特殊值。`alert( 1 / 0 ); // Infinity` `alert( 1e500 ); // Infinity`
+
 - `NaN` 代表一个计算错误。它是一个不正确的或者一个未定义的数学操作所得到的结果。`NaN` 是粘性的:任何对 `NaN` 的进一步数学运算都会返回 `NaN`（只有一个例外：`NaN ** 0` 结果为 1）。
 > 幂（`**`）运算符返回第一个操作数取第二个操作数的幂的结果。它等价于 `Math.pow()`，不同之处在于，它还接受 `BigInt` 作为操作数。
 
@@ -70,6 +71,183 @@ Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（s
   `
 }
 </CodeRun>
+
+- `isNaN(value)` 将`value`转换为数字，然后测试它是否为 `NaN`
+  ```js
+  alert( isNaN(NaN) );   // true
+  alert( isNaN("str") ); // true
+  ```
+
+- `isFinite(value)` 将`value`转换为数字，转换后如果是常规数字而不是 `NaN`或`Infinity`或`-Infinity`，则返回 true
+  ```js
+  alert( isFinite("15") );     // true
+  alert( isFinite("str") );    // false，因为是一个特殊的值：NaN
+  alert( isFinite(Infinity) ); // false，因为是一个特殊的值：Infinity
+  alert( isFinite(null) );     // true
+  alert( isFinite('') );       // true
+  ```
+
+:::tip
+请注意，在所有数字函数中，包括 `isFinite`，空字符串或仅有空格的字符串均被视为 `0`。
+:::
+
+- 下划线分隔符 使得数字具有更强的可读性。JavaScript 引擎会直接忽略数字之间的 `_`
+  ```js
+  let billion = 1_000_000_000;
+  ```
+
+- 使用字母`e`指定零的个数来缩短数字。例如 `e3`表示`乘以10的3次方`；`e-3`表示`除以10的3次方`
+  ```js
+  let billion = 1e9;  // 10 亿，字面意思：数字 1 后面跟 9 个 0
+
+  alert( 7.3e9 );  // 73 亿（与 7300000000 和 7_300_000_000 相同）
+
+  1e3 === 1 * 1000; // e3 表示 *1000
+
+  1.23e6 === 1.23 * 1000000; // e6 表示 *1000000
+
+  0.000001 === 1e-6; // 1 / 10**6
+  ```
+
+- 十六进制数字使用`0x`前缀，二进制数字使用`0b`前缀，八进制数字使用`0o`前缀。只有这三种进制支持这种写法。对于其他进制，应该使用函数`parseInt`
+  ```js
+  alert( 0xff ); // 255
+  alert( 0xFF ); // 255（一样，大小写没影响）
+
+  let a = 0b11111111; // 二进制形式的 255
+  let b = 0o377;      // 八进制形式的 255
+  alert( a == b );    // true，两边是相同的数字，都是 255
+  ```
+
+- 存在两个零：0 和 -0。这是因为在存储时，使用一位来存储符号（64位存储一个数字：其中 52位被用于存储这些数字，11位用于存储小数点的位置，1位用于符号），因此对于包括零在内的任何数字，可以设置这一位或者不设置。
+
+#### `toString(base)`
+方法 `toString(base)` 返回给定 `base` 进制 的字符串表示形式。`base` 的范围可以从 2 到 36。默认情况下是 10。
+- base=16 用于十六进制颜色，字符编码等，数字可以是 0..9 或 A..F。
+- base=2 主要用于调试按位操作，数字可以是 0 或 1。
+  ```js
+  let num = 255;
+
+  alert( num.toString(16) );  // ff
+  alert( num.toString(2) );   // 11111111
+  ```
+- base=36 是最大进制，数字可以是 0..9 或 A..Z。所有拉丁字母都被用于了表示数字。对于 36 进制来说，一个有趣且有用的例子是，当我们需要将一个较长的数字标识符转换成较短的时候，例如做一个短的 URL。可以简单地使用基数为 36 的数字系统表示:
+  ```js
+  alert( 123456..toString(36) ); // 2n9c
+  ```
+
+:::info
+如果我们想直接在一个数字上调用一个方法，比如上面例子中的 toString，那么我们需要在它后面放置两个点 `..`。如果我们放置一个点：`123456.toString(36)`，那么就会出现一个 error，因为 JavaScript 语法隐含了第一个点之后的部分为小数部分。如果我们再放一个点，那么 JavaScript 就知道小数部分为空，现在使用该方法。也可以写成 `(123456).toString(36)`。
+:::
+
+#### 舍入
+对数字进行舍入的内建函数:
+- `Math.floor` 向下舍入
+- `Math.ceil` 向上舍入
+- `Math.round` 向最近的整数舍入（0到4 会被舍去，而 5到9 会进一位）
+- `Math.trunc` 移除小数点后的所有内容而没有舍入
+
+![舍入函数](img/math.jpeg)
+
+##### 将数字舍入到小数点后 n 位
+有两种方式:
+1. 乘除法。例如，要将数字舍入到小数点后两位，我们可以将数字乘以 100，调用舍入函数，然后再将其除回。
+   ```js
+   let num = 1.23456;
+
+   alert( Math.round(num * 100) / 100 ); // 1.23456 -> 123.456 -> 123 -> 1.23
+   ```
+
+2. 函数 `toFixed(n)` 将数字舍入到小数点后 n 位（这会向上或向下舍入到最接近的值(0到4 会被舍去，而 5到9 会进一位)，类似于 `Math.round`），并以字符串形式返回结果。
+   ```js
+   let num = 12.34;
+   alert( num.toFixed(1) ); // "12.3"
+
+   let num = 12.36;
+   alert( num.toFixed(1) ); // "12.4"
+
+   // 注意 toFixed 的结果是一个字符串。如果小数部分比所需要的短，则在结尾添加零
+   let num = 12.34;
+   alert( num.toFixed(5) ); // "12.34000"，在结尾添加了 0，以达到小数点后五位
+   ```
+
+#### 精度损失
+- 在十进制数字系统中，可以保证以 10 的整数次幂作为除数能够正常工作，但是以 3 作为除数则不能（1/3 是无限循环小数 0.33333(3)）。同样的原因，在二进制数字系统中，可以保证以 2 的整数次幂作为除数时能够正常工作，但 1/10（0.1）就变成了一个无限循环的二进制小数（0.0 0011 0011 0011(0011) 0011无限循环）。在内部，数字是以 64 位格式 IEEE-754 表示的，所以正好有 64 位可以存储一个数字：其中 52 位被用于存储这些数字，其中 11 位用于存储小数点的位置，而 1 位用于符号。无限循环小数超出64位，会被截断处理，就会损失精度。
+  ```js
+  alert( 0.1 + 0.2 == 0.3 ); // false
+
+  alert( 0.1 + 0.2 ); // 0.30000000000000004
+  ```
+
+- IEEE-754 数字格式通过将数字舍入到最接近的可能数字来解决此问题。这些舍入规则通常不允许我们看到“极小的精度损失”，但是它确实存在。
+  ```js
+  alert( 0.1.toFixed(20) ); // 0.10000000000000000555
+  alert( 9999999999999999 ); // 显示 10000000000000000
+  ```
+
+- 最可靠的方法是借助方法 `toFixed(n)` 对结果进行舍入，以解决精度损失的问题（即，在必要时剪掉其“尾巴”来对其进行舍入）
+  ```js
+  let sum = 0.1 + 0.2;
+  alert( sum.toFixed(2) ); // "0.30"
+  alert( +sum.toFixed(2) ); // 0.3
+  ```
+  :::warning
+  为什么 6.35 被舍入为 6.3 而不是 6.4？
+  <CodeRun>{`
+  console.log( 6.35.toFixed(1) ); // "6.3"
+  console.log( 1.35.toFixed(1) ); // "1.4"
+  `}</CodeRun>
+  在内部，6.35 的小数部分是一个无限的二进制，它的存储会造成精度损失。精度损失可能会导致数字的增加和减小。
+  <CodeRun>{`
+  // 可以看到 6.35 存储的其实是 6.34999...
+  console.log( 6.35.toFixed(20) ); // "6.34999999999999964473"
+  console.log( 1.35.toFixed(20) ); // "1.35000000000000008882"
+  `}</CodeRun>
+  应该如何解决 6.35 的舍入问题呢？在进行舍入前，我们应该使其更接近整数：
+  <CodeRun>{`
+  console.log( Math.round(6.35 * 10) / 10); // 6.35 -> 63.5 -> 64(rounded) -> 6.4
+  // 63.5 完全没有精度损失。这是因为小数部分 0.5 实际上是 1/2，以 2 的整数次幂为分母的小数在二进制数字系统中可以被精确地表示。
+  console.log( (6.35 * 10).toFixed(20) );   // "63.50000000000000000000"
+  `}</CodeRun>
+  :::
+
+- 乘/除法可以减少误差，但不能完全消除误差。
+  ```js
+  alert( (0.1 * 10 + 0.2 * 10) / 10 ); // 0.3
+  alert( (0.28 * 100 + 0.14 * 100) / 100); // 0.4200000000000001
+  ```
+
+- 由于精度损失的问题存在，所以在处理小数时应避免相等性检查。
+
+#### `parseInt` 和 `parseFloat`
+`parseInt` 和 `parseFloat` 可以从字符串中“读取”数字，直到无法读取为止。如果发生 error，则返回收集到的数字。函数 `parseInt` 返回一个整数，而 `parseFloat` 返回一个浮点数
+<CodeRun>{`
+console.log( parseInt('100px') );    // 100
+console.log( parseFloat('12.5em') ); // 12.5
+console.log( parseInt('12.3') );     // 12，只有整数部分被返回了
+console.log( parseFloat('12.3.4') ); // 12.3，在第二个点处停止了读取
+`}</CodeRun>
+
+- 如果第一个字符就是非数字，则会返回`NaN`
+  <CodeRun>{`
+  console.log( parseInt('a123') );
+  console.log( parseFloat('a123') );
+  `}</CodeRun>
+
+- `parseInt` 函数具有可选的第二个参数，它指定了数字系统的基数，因此 `parseInt` 还可以解析十六进制数字、二进制数字等的字符串
+  <CodeRun>{`
+  console.log( parseInt('0xff', 16) ); // 255
+  console.log( parseInt('ff', 16) );   // 255，没有 0x 仍然有效
+  console.log( parseInt('2n9c', 36) ); // 123456
+  `}</CodeRun>
+
+#### 其他数学函数
+JavaScript 有一个内建的 Math 对象，它包含了一个小型的数学函数和常量库。
+- `Math.random()` 返回一个从 0 到 1 的随机数（不包括 1）
+- `Math.max(a, b, c...)` 从任意数量的参数中返回最大值
+- `Math.min(a, b, c...)` 从任意数量的参数中返回最小值
+- `Math.pow(n, power)` 返回 n 的给定（power）次幂
+- ...等等
 
 ### BigInt 类型
 - 在 JavaScript 中，Number 类型超出安全整数范围 ±(2^53-1) 会出现精度问题，因为并非所有数字都适合固定的 64 位存储。因此，可能存储的是“近似值”。如下两个数字（正好超出了安全整数范围）是相同的：
@@ -90,6 +268,174 @@ Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（s
 
 
 ### String 类型
+- 字符串的内部使用 UTF-16 编码(即：每个字符都有对应的数字代码)，它不依赖于页面编码。
+- 单引号和双引号基本相同。反引号允许我们通过 `${…}` 将任何表达式嵌入到字符串中。使用反引号的另一个优点是它们允许字符串跨行。
+- 反引号还允许我们在第一个反引号之前指定一个“模版函数”。语法是：
+  ```js
+  func`string` // 函数 func 被自动调用，接收字符串和嵌入式表达式，并处理它们。
+  ```
+
+- 要获取在 `pos` 位置的一个字符，可以使用方括号 `[pos]` 或者调用 `charAt(pos)` 方法（第一个字符从零位置开始）。它们之间的唯一区别是，如果没有找到字符，方括号 `[pos]` 返回 `undefined`，而 `charAt(pos)` 方法 返回一个空字符串。
+  ```js
+  let str = `Hello`;
+
+  alert( str[1000] );        // undefined
+  alert( str.charAt(1000) ); // ''（空字符串）
+  ```
+
+- 也可以使用 `for..of` 遍历字符
+  ```js
+  for (let char of "Hello") {
+    alert(char); // H,e,l,l,o
+  }
+  ```
+
+- 在 JavaScript 中，字符串不可更改。
+  ```js
+  let str = 'Hi';
+
+  str[0] = 'h'; // 非严格模式下会忽略；严格模式下会报错 TypeError: Cannot assign to read only property '0' of string 'Hi'
+  console.log(str[0]);
+  ```
+
+- `toLowerCase()` 和 `toUpperCase()` 方法可以改变大小写
+  ```js
+  alert( 'Interface'.toUpperCase() );    // INTERFACE
+  alert( 'Interface'.toLowerCase() );    // interface
+  alert( 'Interface'[0].toLowerCase() ); // 'i'
+  ```
+
+#### 特殊字符
+- 所有的特殊字符都以反斜杠字符 `\` 开始。它也被称为“转义字符”。
+![特殊字符列表](img/special_characters.jpeg)
+
+- 注意：反斜杠 `\` 在 JavaScript 中用于正确读取字符串，然后消失。用作转义字符时，内存中的字符串没有 `\`。
+
+换行符：
+```js
+let str1 = "Hello\nWorld"; // 使用“换行符”创建的两行字符串
+
+// 使用反引号和普通的换行创建的两行字符串
+let str2 = `Hello
+World`;
+
+alert(str1 == str2); // true
+```
+
+Unicode 示例:
+```js
+alert( "\u00A9" );    // ©
+alert( "\u{20331}" ); // 佫，罕见的中国象形文字（长 Unicode）
+alert( "\u{1F60D}" ); // 😍，笑脸符号（另一个长 Unicode）
+```
+
+#### `length`属性
+`length`属性表示字符串长度。请注意 `length` 是一个属性，而不是函数，后面不需要添加括号。
+```js
+alert( `My\n`.length ); // 3 注意 \n 是一个单独的“特殊”字符
+```
+
+#### 查找子字符串
+##### `indexOf(substr, pos)` 和 `lastIndexOf(substr, position)`
+`indexOf(substr, pos)` 从给定位置 `pos`(可选参数) 开始，在 str 中查找 substr，如果没有找到，则返回 -1，否则返回匹配成功的位置。检索是大小写敏感的。
+```js
+let str = 'Widget with id';
+
+alert( str.indexOf('Widget') ); // 0，因为 'Widget' 一开始就被找到
+alert( str.indexOf('widget') ); // -1，没有找到，检索是大小写敏感的
+
+alert( str.indexOf("id") ); // 1，"id" 在位置 1 处（……idget 和 id）
+// 从位置 2 开始检索
+alert( str.indexOf('id', 2) ) // 12
+```
+
+查找子字符串的所有位置：
+```js
+let str = "As sly as a fox, as strong as an ox";
+let target = "as";
+
+let pos = -1;
+while ((pos = str.indexOf(target, pos + 1)) != -1) {
+  alert( pos );
+}
+```
+
+`lastIndexOf(substr, position)` 从字符串的末尾开始搜索到开头。
+
+##### Bitwise NOT (`~`) 按位取反
+- `~` 将数字转换为 32-bit 整数（如果存在小数部分，则删除小数部分），然后对其二进制表示形式中的所有位均取反。
+- 对于 32-bit 整数，`~n` 等于 `-(n+1)`。
+  ```js
+  alert( ~2 );  // -3，和 -(2+1) 相同
+  alert( ~1 );  // -2，和 -(1+1) 相同
+  alert( ~0 );  // -1，和 -(0+1) 相同
+  alert( ~-1 ); // 0，和 -(-1+1) 相同
+  ```
+- 如上，只有当 `n == -1` 时，`~n` 才为零（适用于任何 32-bit 带符号的整数 n）。可以用它来简写 `indexOf` 检查: 仅当 `indexOf` 的结果不是 -1 时，检查 `if ( ~str.indexOf("...") )` 才为真。注意：种检查只有在字符串没有那么长的情况下才是正确的。
+  ```js
+  let str = "Widget";
+
+  if (~str.indexOf("Widget")) {
+    alert( 'Found it!' ); // 正常运行
+  }
+  ```
+
+##### includes，startsWith，endsWith
+`str.includes(substr, pos)` 根据 str 中是否包含 substr 来返回 true/false。第二个可选参数是开始搜索的起始位置。
+```js
+alert( "Widget".includes("id") );    // true
+alert( "Widget".includes("id", 3) ); // false, 从位置 3 开始没有 "id"
+```
+```js
+alert( "Widget".startsWith("Wid") ); // true，"Widget" 以 "Wid" 开始
+alert( "Widget".endsWith("get") );   // true，"Widget" 以 "get" 结束
+```
+
+#### 获取子字符串
+JavaScript 中有三种获取字符串的方法：substring、substr 和 slice。
+![获取子字符串](img/substring.jpeg)
+##### `str.slice(start [, end])`
+返回字符串从 start 到（但不包括）end 的部分。如果没有第二个参数，slice 会一直运行到字符串末尾。不影响原字符串。
+```js
+let str = "stringify";
+alert( str.slice(0, 5) ); // 'strin'，从 0 到 5 的子字符串（不包括 5）
+alert( str.slice(0, 1) ); // 's'，从 0 到 1，但不包括 1，所以只有在 0 处的字符
+alert( str.slice(2) );    // 'ringify' 从第二个位置直到结束
+```
+
+start/end 也有可能是负值，意思是起始位置从字符串结尾计算
+```js
+let str = "stringify";
+
+// 从右边的第四个位置开始，在右边的第一个位置结束
+alert( str.slice(-4, -1) ); // 'gif'
+```
+
+##### `str.substring(start [, end])`
+返回字符串从 start 到（但不包括）end 的部分。与 `slice` 的区别是，`substring` 允许 start 大于 end；`substring` 不支持负参数（负参数被视为 0）。
+```js
+let str = "stringify";
+
+// 如下对于 substring 是相同的
+alert( str.substring(2, 6) ); // "ring"
+alert( str.substring(6, 2) ); // "ring"
+
+// ……但对 slice 是不同的：
+alert( str.slice(2, 6) ); // "ring"（一样）
+alert( str.slice(6, 2) ); // ""（空字符串）
+```
+
+##### `str.substr(start [, length])`
+返回字符串从 start 开始的给定 length 的部分。第一个参数可能是负数，表示从结尾算起。
+```js
+let str = "stringify";
+alert( str.substr(2, 4) );  // 'ring'，从位置 2 开始，获取 4 个字符
+alert( str.substr(-4, 2) ); // 'gi'，从第 4 位获取 2 个字符
+```
+:::warning
+`substr` 有一个小缺点：它不是在 JavaScript 核心规范中描述的，而是在附录 B 中。附录 B 的内容主要是描述因历史原因而遗留下来的仅浏览器特性。因此，理论上非浏览器环境可能无法支持 `substr`，但实际上它在别的地方也都能用。
+:::
+
 ### Boolean 类型
 Boolean类型仅包含两个值：true 和 false。
 
@@ -98,6 +444,131 @@ JavaScript 中的 `null` 仅仅是一个代表“无”、“空”或“值未�
 
 ### undefined
 `undefined` 的含义是 未被赋值。如果一个变量已被声明，但未被赋值，那么它的值就是 `undefined`。从技术上讲，可以显式地将 `undefined` 赋值给变量，但是不建议这样做。**通常，使用 `null` 将一个“空”或者“未知”的值写入变量中，而 `undefined` 则保留作为未进行初始化的事物的默认初始值。**
+
+### Symbol 类型
+- 可以使用 `Symbol()` 来创建这种类型的值，Symbol 类型的值表示唯一的标识符。
+  ```js
+  let id = Symbol();
+  ```
+
+- 创建时，我们可以给 symbol 一个描述（也称为 symbol 名）。symbol 保证是唯一的。即使我们创建了许多具有相同描述的 symbol，它们的值也是不同。描述只是一个标签，不影响任何东西。
+  <CodeRun>{`
+  let id1 = Symbol("id");
+  let id2 = Symbol("id");
+  console.log( id1 == id2 ); // false
+  `}</CodeRun>
+
+- Symbol值 不会被自动转换为字符串
+  ```js
+  let id = Symbol("id");
+  alert(id); // TypeError: Cannot convert a Symbol value to a string 类型错误：无法将 Symbol 值转换为字符串。
+  ```
+  <CodeRun>{`
+  let id = Symbol("id");
+  console.log( id.toString() );  // "Symbol(id)"
+  console.log( id.description ); // "id"
+  `}</CodeRun>
+
+- Symbol值 可以作为对象的“隐藏”属性。如果我们想要向“属于”另一个脚本或者库的对象添加一个属性，我们可以创建一个 symbol 并使用它作为属性的键。使用 `Symbol("id")` 作为键，比起用字符串 "id" 来有什么好处呢？假如我们使用第三方库的`user`对象，向它添加字符串属性是不安全的，因为可能会影响代码库中的其他预定义行为。但 symbol 属性不会被意外访问到。第三方代码不会知道新定义的 symbol，因此将 symbol 添加到 `user` 对象是安全的。
+  ```js
+  let user = { // 假设属于第三方代码库
+    name: "John"
+  };
+
+  let id = Symbol("id");
+
+  user[id] = 1;
+
+  let id = Symbol("id");
+
+  user[id] = "Their id value"; // 不会有冲突，因为 symbol 总是不同的，即使它们有相同的名字。
+
+  // 如果使用字符串作为属性key
+  user.id = "Our id value";
+
+  user.id = "Their id value"; // 无意中重写了 id！
+  ```
+  :::info
+  从技术上说，symbol 不是 100% 隐藏的。有一个内建方法 `Object.getOwnPropertySymbols(obj)` 允许我们获取所有的 symbol。还有一个名为 `Reflect.ownKeys(obj)` 的方法可以返回一个对象的 所有 键，包括 symbol。但大多数库、内建方法和语法结构都没有使用这些方法。
+  :::
+
+- 在对象字面量 `{...}` 中使用 symbol，需要使用方括号把它括起来。
+  ```js
+  let id = Symbol("id");
+
+  let user = {
+    name: "John",
+    [id]: 123 // 而不是 "id"：123
+  };
+  ```
+
+- symbol属性在 `for…in`、`Object.keys(...)` 中会被忽略。
+  <CodeRun>{`
+  let id = Symbol("id");
+  let user = {
+    name: "John",
+    age: 30,
+    [id]: 123
+  };
+  // for..in 会忽略symbol属性
+  for (let key in user) console.log( key );             // "name" "age"（没有 symbol）
+  // 可以直接访问
+  console.log( "Direct: " + user[id] );                 // "Direct: 123"
+  // Object.keys(...) 会忽略symbol属性
+  Object.keys(user).forEach(key => console.log( key )); // "name" "age"（没有 symbol）
+  `}</CodeRun>
+
+- `Object.assign` 会同时复制字符串和 symbol 属性。
+  <CodeRun>{`
+  let id = Symbol("id");
+  let user = {
+    [id]: 123
+  };
+  let clone = Object.assign({}, user);
+  console.log( clone[id] ); // 123
+  `}</CodeRun>
+
+#### 全局symbol
+- 通常所有的 symbol 都是不同的，即使它们有相同的名字。但有时我们想要名字相同的 symbol 具有相同的实体。
+
+- 使用 `Symbol.for(key)` 可以检查全局symbol注册表，如果有一个描述为 `key` 的 symbol，则返回该 symbol，否则将创建一个新 symbol（`Symbol(key)`），并通过给定的 `key` 将其存储在注册表中。注册表内的 symbol 被称为 全局symbol。使用 `Symbol.for(key)` 多次调用 `key` 相同的 symbol 时，返回的就是同一个 symbol。
+  <CodeRun>{`
+  // 从全局注册表中读取
+  let id = Symbol.for("id"); // 如果该 symbol 不存在，则创建它
+  // 再次读取（可能是在代码中的另一个位置）
+  let idAgain = Symbol.for("id");
+  // 相同的 symbol
+  console.log( id === idAgain );                        // true
+  console.log( Symbol.for("id") === Symbol.for("id") ); // true
+  console.log( Symbol("id") === Symbol("id") )          // false
+  `}</CodeRun>
+
+- 对于全局symbol，`Symbol.for(key)` 按名字返回一个 symbol；`Symbol.keyFor(sym)`通过全局symbol 返回一个名字。
+  <CodeRun>{`
+  // 通过 name 获取 symbol
+  let sym = Symbol.for("name");
+  let sym2 = Symbol.for("id");
+  // 通过 symbol 获取 name
+  console.log( Symbol.keyFor(sym) );  // "name"
+  console.log( Symbol.keyFor(sym2) ); // "id"
+  `}</CodeRun>
+
+- `Symbol.keyFor` 内部使用全局symbol注册表来查找 symbol 的键，所以它不适用于非全局 symbol。如果 symbol 不是全局的，它将无法找到它并返回 `undefined`。
+  <CodeRun>{`
+  let globalSymbol = Symbol.for("name");
+  let localSymbol = Symbol("name");
+  console.log( Symbol.keyFor(globalSymbol) ); // "name"，全局 symbol
+  console.log( Symbol.keyFor(localSymbol) );  // undefined，非全局
+  console.log( localSymbol.description );     // "name"，可以使用description属性获取symbol名字
+  `}</CodeRun>
+
+#### 系统symbol
+JavaScript 内部有很多“系统” symbol，我们可以使用它们来改变一些内建行为。它们都被列在了 [众所周知的 symbol](https://tc39.es/ecma262/#sec-well-known-symbols) 中:
+- `Symbol.hasInstance`
+- `Symbol.isConcatSpreadable`
+- `Symbol.iterator`
+- `Symbol.toPrimitive`
+- ……等等。
 
 ### Object 类型
 - 创建对象的2种语法: 构造函数、字面量(object literal)。
@@ -613,130 +1084,123 @@ console.log( obj + 2 ); // 22（"2" + 2）被转换为原始值字符串
 - RegExp（正则表达式）
 - Error 用于存储错误信息
 
-### Symbol 类型
-- 可以使用 `Symbol()` 来创建这种类型的值，Symbol 类型的值表示唯一的标识符。
+## 对象包装器(object wrappers)
+- 为了允许访问字符串、数字、布尔值和 symbol 的方法和属性，JavaScript创建了提供额外功能的特殊“对象包装器”，**使用后即被销毁**。
+<CodeRun>{`
+let str = "Hello";
+console.log( str.toUpperCase() ); // HELLO
+// 1. 字符串 str 是一个原始值。因此，在访问其属性时，会创建一个包含字符串字面值的特殊对象，并且具有可用的方法，例如 toUpperCase()。
+// 2. 该方法运行并返回一个新的字符串。
+// 3. 特殊对象被销毁，只留下原始值 str。
+`}</CodeRun>
+<CodeRun>{`
+let n = 1.23456;
+console.log( n.toFixed(2) ); // 1.23
+`}</CodeRun>
+
+- 从形式上讲，原始类型（字符串、数字(number、bigint)、布尔值、symbol）的方法通过临时对象工作，但 JavaScript 引擎可以很好地调整，以在内部对其进行优化，因此调用它们并不需要太高的成本。
+
+- `null` 和 `undefined` 没有对应的“对象包装器”。
+
+- 原始类型不是对象，它们不能存储额外的数据。
   ```js
-  let id = Symbol();
+  let str = "Hello";
+
+  str.test = 5;
+
+  alert(str.test);
+
+  /*
+  根据你是否开启了严格模式 use strict，会得到如下结果：undefined（非严格模式）; 报错（严格模式）
+  1. 当访问 str 的属性时，一个“对象包装器”被创建了。
+  2. 在严格模式下，向其写入内容会报错。
+  3. 否则，将继续执行带有属性的操作，该对象将获得 test 属性，但是此后，“对象包装器”将消失，因此在最后一行，str 并没有该属性的踪迹。
+  */
   ```
 
-- 创建时，我们可以给 symbol 一个描述（也称为 symbol 名）。symbol 保证是唯一的。即使我们创建了许多具有相同描述的 symbol，它们的值也是不同。描述只是一个标签，不影响任何东西。
+### [包装对象的设计目的](https://wangdoc.com/javascript/stdlib/wrapper)
+包装对象的设计目的，首先是使得“对象”这种类型可以覆盖 JavaScript 所有的值，整门语言有一个通用的数据模型，其次是使得原始类型的值也有办法调用自己的方法。某些场合，原始类型的值会自动当作包装对象调用，即调用包装对象的属性和方法。这时，JavaScript 引擎会自动将原始类型的值转为包装对象实例，并在使用后立刻销毁实例。
+```js
+var str = 'abc';
+str.length // 3
+
+// 等同于
+var strObj = new String(str)
+// String {
+//   0: "a", 1: "b", 2: "c", length: 3, [[PrimitiveValue]]: "abc"
+// }
+strObj.length // 3
+
+/*
+ abc是一个字符串，本身不是对象，不能调用length属性。JavaScript 引擎自动将其转为包装对象，在这个对象上调用length属性(字符串abc的包装对象提供了多个属性，length只是其中之一)。调用结束后，这个临时对象就会被销毁。
+ */
+```
+```js
+var s = 'Hello World';
+s.x = 123;
+s.x // undefined
+
+/*
+ 使用结束后，包装对象实例会自动销毁。这意味着，下一次使用字符串的属性时，实际会新生成一个包装对象，而不是上一次调用时生成的那个对象，所以取不到赋值在上一个对象的属性。
+*/
+```
+
+:::tip
+如果要为 原始类型 添加属性和方法，只有在它的原型对象上定义
+<CodeRun>{`
+String.prototype.double = function () {
+  return this.valueOf() + this.valueOf();
+};
+console.log( 'abc'.double() ) // "abcabc"
+Number.prototype.double = function () {
+  return this.valueOf() + this.valueOf();
+};
+console.log( (123).double() ) // 246
+`}</CodeRun>
+:::
+
+:::info
+Number、String和Boolean这三个对象，作为构造函数使用（带有`new`）时，可以将原始类型的值转为对象；作为普通函数使用时（不带有`new`），可以将任意类型的值，转为原始类型的值。
+<CodeRun>{`
+var v1 = new Number(123);
+var v2 = new String('abc');
+var v3 = new Boolean(true);
+console.log( typeof v1 )    // "object"
+console.log( typeof v2 )    // "object"
+console.log( typeof v3 )    // "object"
+console.log( v1 === 123 )   // false
+console.log( v2 === 'abc' ) // false
+console.log( v3 === true )  // false
+`}</CodeRun>
+<CodeRun>{`
+// 字符串转为数值
+console.log( Number('123') ) // 123
+// 数值转为字符串
+console.log( String(123) )   // "123"
+// 数值转为布尔值
+console.log( Boolean(123) )  // true
+`}</CodeRun>
+:::
+
+### 包装对象共有的方法
+包装对象各自提供了许多实例方法。它们共同具有的、从Object对象继承的方法：`valueOf()` 和 `toString()`。
+- `valueOf()`方法返回包装对象实例对应的原始类型的值。
   <CodeRun>{`
-  let id1 = Symbol("id");
-  let id2 = Symbol("id");
-  console.log( id1 == id2 ); // false
+  console.log( 'abc'.valueOf() )             // "abc"
+  // 上面等同于
+  console.log( new String('abc').valueOf() ) // "abc"
+  console.log( new Number(123).valueOf() )   // 123
+  console.log( new Boolean(true).valueOf() ) // true
   `}</CodeRun>
 
-- Symbol值 不会被自动转换为字符串
-  ```js
-  let id = Symbol("id");
-  alert(id); // TypeError: Cannot convert a Symbol value to a string 类型错误：无法将 Symbol 值转换为字符串。
-  ```
+- `toString()`方法返回对应的字符串形式。
   <CodeRun>{`
-  let id = Symbol("id");
-  console.log( id.toString() );  // "Symbol(id)"
-  console.log( id.description ); // "id"
+  console.log( (123).toString() )             // "123" 注意：123外面必须要加上圆括号，否则后面的点运算符（.）会被解释成小数点
+  // 上面等同于
+  console.log( new Number(123).toString() )   // "123"
+  console.log( new String('abc').toString() ) // "abc"
+  console.log( new Boolean(true).toString() ) // "true"
   `}</CodeRun>
-
-- Symbol值 可以作为对象的“隐藏”属性。如果我们想要向“属于”另一个脚本或者库的对象添加一个属性，我们可以创建一个 symbol 并使用它作为属性的键。使用 `Symbol("id")` 作为键，比起用字符串 "id" 来有什么好处呢？假如我们使用第三方库的`user`对象，向它添加字符串属性是不安全的，因为可能会影响代码库中的其他预定义行为。但 symbol 属性不会被意外访问到。第三方代码不会知道新定义的 symbol，因此将 symbol 添加到 `user` 对象是安全的。
-  ```js
-  let user = { // 假设属于第三方代码库
-    name: "John"
-  };
-
-  let id = Symbol("id");
-
-  user[id] = 1;
-
-  let id = Symbol("id");
-
-  user[id] = "Their id value"; // 不会有冲突，因为 symbol 总是不同的，即使它们有相同的名字。
-
-  // 如果使用字符串作为属性key
-  user.id = "Our id value";
-
-  user.id = "Their id value"; // 无意中重写了 id！
-  ```
-  :::info
-  从技术上说，symbol 不是 100% 隐藏的。有一个内建方法 `Object.getOwnPropertySymbols(obj)` 允许我们获取所有的 symbol。还有一个名为 `Reflect.ownKeys(obj)` 的方法可以返回一个对象的 所有 键，包括 symbol。但大多数库、内建方法和语法结构都没有使用这些方法。
-  :::
-
-- 在对象字面量 `{...}` 中使用 symbol，需要使用方括号把它括起来。
-  ```js
-  let id = Symbol("id");
-
-  let user = {
-    name: "John",
-    [id]: 123 // 而不是 "id"：123
-  };
-  ```
-
-- symbol属性在 `for…in`、`Object.keys(...)` 中会被忽略。
-  <CodeRun>{`
-  let id = Symbol("id");
-  let user = {
-    name: "John",
-    age: 30,
-    [id]: 123
-  };
-  // for..in 会忽略symbol属性
-  for (let key in user) console.log( key );             // "name" "age"（没有 symbol）
-  // 可以直接访问
-  console.log( "Direct: " + user[id] );                 // "Direct: 123"
-  // Object.keys(...) 会忽略symbol属性
-  Object.keys(user).forEach(key => console.log( key )); // "name" "age"（没有 symbol）
-  `}</CodeRun>
-
-- `Object.assign` 会同时复制字符串和 symbol 属性。
-  <CodeRun>{`
-  let id = Symbol("id");
-  let user = {
-    [id]: 123
-  };
-  let clone = Object.assign({}, user);
-  console.log( clone[id] ); // 123
-  `}</CodeRun>
-
-#### 全局symbol
-- 通常所有的 symbol 都是不同的，即使它们有相同的名字。但有时我们想要名字相同的 symbol 具有相同的实体。
-
-- 使用 `Symbol.for(key)` 可以检查全局symbol注册表，如果有一个描述为 `key` 的 symbol，则返回该 symbol，否则将创建一个新 symbol（`Symbol(key)`），并通过给定的 `key` 将其存储在注册表中。注册表内的 symbol 被称为 全局symbol。使用 `Symbol.for(key)` 多次调用 `key` 相同的 symbol 时，返回的就是同一个 symbol。
-  <CodeRun>{`
-  // 从全局注册表中读取
-  let id = Symbol.for("id"); // 如果该 symbol 不存在，则创建它
-  // 再次读取（可能是在代码中的另一个位置）
-  let idAgain = Symbol.for("id");
-  // 相同的 symbol
-  console.log( id === idAgain );                        // true
-  console.log( Symbol.for("id") === Symbol.for("id") ); // true
-  console.log( Symbol("id") === Symbol("id") )          // false
-  `}</CodeRun>
-
-- 对于全局symbol，`Symbol.for(key)` 按名字返回一个 symbol；`Symbol.keyFor(sym)`通过全局symbol 返回一个名字。
-  <CodeRun>{`
-  // 通过 name 获取 symbol
-  let sym = Symbol.for("name");
-  let sym2 = Symbol.for("id");
-  // 通过 symbol 获取 name
-  console.log( Symbol.keyFor(sym) );  // "name"
-  console.log( Symbol.keyFor(sym2) ); // "id"
-  `}</CodeRun>
-
-- `Symbol.keyFor` 内部使用全局symbol注册表来查找 symbol 的键，所以它不适用于非全局 symbol。如果 symbol 不是全局的，它将无法找到它并返回 `undefined`。
-  <CodeRun>{`
-  let globalSymbol = Symbol.for("name");
-  let localSymbol = Symbol("name");
-  console.log( Symbol.keyFor(globalSymbol) ); // "name"，全局 symbol
-  console.log( Symbol.keyFor(localSymbol) );  // undefined，非全局
-  console.log( localSymbol.description );     // "name"，可以使用description属性获取symbol名字
-  `}</CodeRun>
-
-#### 系统symbol
-JavaScript 内部有很多“系统” symbol，我们可以使用它们来改变一些内建行为。它们都被列在了 [众所周知的 symbol](https://tc39.es/ecma262/#sec-well-known-symbols) 中:
-- `Symbol.hasInstance`
-- `Symbol.isConcatSpreadable`
-- `Symbol.iterator`
-- `Symbol.toPrimitive`
-- ……等等。
 
 ## 数据类型的转换
 > [数据类型的转换](https://wangdoc.com/javascript/features/conversion)
@@ -768,14 +1232,16 @@ JavaScript 内部有很多“系统” symbol，我们可以使用它们来改�
 </CodeRun>
 
 :::tip
-`Number`函数将字符串转为数值，要比`parseInt`函数严格很多。`parseInt`逐个解析字符，而`Number`函数整体转换字符串的类型。
+`Number`函数 及 加号`+` 将字符串转为数值，要比`parseInt`函数严格很多。`parseInt`逐个解析字符，而`Number`函数 及 加号`+` 整体转换字符串的类型。
 <CodeRun>
 {
   `
   console.log( parseInt('42 cats') )         // 42
   console.log( Number('42 cats') )           // NaN
+  console.log( +'42 cats' )                  // NaN
   console.log( parseInt('12.34') )           // 12
   console.log( Number('12.34') )             // 12.34
+  console.log( +'12.34' )                    // 12.34
   `
 }
 </CodeRun>
@@ -1052,278 +1518,6 @@ JavaScript 内部有很多“系统” symbol，我们可以使用它们来改�
 }
 </CodeRun>
 
-## 运算符
-所有的运算符中都隐含着优先级顺序。[优先级汇总表](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#%E6%B1%87%E6%80%BB%E8%A1%A8)
-- 圆括号拥有最高优先级
-- 一元运算符优先级高于二元运算符
-- 如果优先级相同，则按照由左至右的顺序执行
-
-### 赋值运算符
-在 JavaScript 中，所有运算符都会返回一个值。**语句 `x = value` 将值 `value` 写入 `x` 然后返回 `value`。**
-```js
-// (a = b + 1) 的结果是 赋给 a 的值（也就是 3）。然后该值被用于进一步的运算。
-let a = 1;
-let b = 2;
-
-let c = 3 - (a = b + 1);
-
-alert( a ); // 3
-alert( c ); // 0
-```
-
-### “修改并赋值”运算符
-所有算术和位运算符都有简短的“修改并赋值”运算符：`/=` 和 `-=` 等。这类运算符的优先级与普通赋值运算符的优先级相同，所以它们在大多数其他运算之后执行:
-<CodeRun>
-{
-  `
-  let n = 2;
-  n *= 3 + 5;
-  console.log( n ); // 16 （右边部分先被计算，等同于 n *= 8）
-  `
-}
-</CodeRun>
-
-### 位运算符
-- 按位与 ( `&` )
-- 按位或 ( `|` )
-- 按位异或 ( `^` )
-- 按位非 ( `~` )
-- 左移 ( `<<` )
-- 右移 ( `>>` )
-- 无符号右移 ( `>>>` )
-
-### 逗号运算符
-逗号运算符能让我们处理多个表达式，使用 `,` 将它们分开，每个表达式都运行了，但是只有最后一个的结果会被返回。
-<CodeRun>
-{
-  `
-  let a = (1 + 2, 3 + 4); // 逗号运算符的优先级非常低，比 = 还要低，因此此处圆括号非常重要
-  console.log(a) // 7（3 + 4 的结果）
-  // 一行上有三个运算符
-  for (a = 1, b = 3, c = a * b; a < 10; a++) {
-   // ...
-  }
-  `
-}
-</CodeRun>
-
-### 逻辑运算符
-JavaScript 中有四个逻辑运算符：`||`（或），`&&`（与），`!`（非），`??`（空值合并运算符, Nullish Coalescing）。
-
-#### 或运算寻找第一个真值
-一个或运算 `||` 的链，将返回第一个真值，如果不存在真值，就返回该链的最后一个值。
-```js
-result = value1 || value2 || value3;
-```
-- 从左到右依次计算操作数。
-- 处理每一个操作数时，**都将其转化为布尔值**。如果结果是 `true`，就停止计算，返回这个操作数的初始值。
-- 如果所有的操作数都被计算过（也就是，转换结果都是 `false`），则返回最后一个操作数。
-<CodeRun>
-{
-  `
-  console.log( 1 || 0 );                 // 1（1 是真值）
-  console.log( null || 1 );              // 1（1 是第一个真值）
-  console.log( null || 0 || 1 );         // 1（第一个真值）
-  console.log( undefined || null || 0 ); // 0（都是假值，返回最后一个值）
-  `
-}
-</CodeRun>
-
-#### 短路求值（Short-circuit evaluation）
-- 或运算符 `||` 在遇到 “真值” 时立即停止运算
-<CodeRun>
-{
-  `
-  // 或运算符 || 在遇到 true 时立即停止运算
-  true || console.log("not printed");
-  false || console.log("printed");
-  // 先输出1然后输出2
-  // 第一个或运算 || 对它的左值 console.log(1) 进行了计算。这就显示了第一条信息 1。
-  // 函数console.log没有返回值，或者说返回的是 undefined。所以或运算继续检查第二个操作数以寻找真值
-  console.log( console.log(1) || 2 || console.log(3) );
-  `
-}
-</CodeRun>
-
-- 与运算符 `&&` 在遇到 “假值” 时立即停止运算
-<CodeRun>
-{
-  `
-  // 先输出1然后输出undefined
-  console.log( console.log(1) && console.log(2) );
-  `
-}
-</CodeRun>
-
-#### 与运算寻找第一个假值
-与运算返回第一个假值，如果没有假值就返回最后一个值。
-```js
-result = value1 && value2 && value3;
-```
-- 从左到右依次计算操作数。
-- 在处理每一个操作数时，都将其转化为布尔值。如果结果是 `false`，就停止计算，并返回这个操作数的初始值。
-- 如果所有的操作数都被计算过（例如都是真值），则返回最后一个操作数。
-<CodeRun>
-{
-  `
-  // 与运算寻找第一个假值，找不到就返回最后一个操作数的初始值
-  console.log( 1 && 0 );                // 0
-  console.log( 1 && 5 );                // 5
-  console.log( 1 && 2 && null && 3 );   // null
-  // 如果第一个操作数是假值，
-  // 与运算将直接返回它。后面的操作数会被忽略
-  console.log( null && 5 );             // null
-  console.log( 0 && "no matter what" ); // 0
-  `
-}
-</CodeRun>
-
-:::tip
-与运算 `&&` 的优先级比或运算 `||` 要高。`a && b || c && d` 等同于 `(a && b) || (c && d)`
-<CodeRun>
-{
-  `
-  // 与运算 && 的优先级比 || 高，所以它第一个被执行。
-  console.log( null || 2 && 3 || 4 );
-  `
-}
-</CodeRun>
-:::
-
-#### 逻辑非运算符
-逻辑非运算符接受一个参数，并按如下运作：
-1. 将操作数转化为布尔类型：`true` 或 `false`。
-2. 返回相反的值。
-
-- **两个非运算 `!!` 用来将某个值转化为布尔类型**
-<CodeRun>
-{
-  `
-  // 第一个非运算将该值转化为布尔类型并取反，第二个非运算再次取反。
-  console.log( !!"non-empty string" );        // true
-  console.log( !!null );                      // false
-  // 内建的 Boolean 函数也可以实现同样的效果
-  console.log( Boolean("non-empty string") ); // true
-  console.log( Boolean(null) );               // false
-  `
-}
-</CodeRun>
-
-- 非运算符 `!` 的优先级在所有逻辑运算符里面最高
-
-#### 空值合并运算符`??`
-如果第一个操作数不是 `null` 或 `undefined`，则 `??` 返回第一个操作数。否则，返回第二个操作数。
-```js
-result = a ?? b;
-// 等同于
-result = (a !== null && a !== undefined) ? a : b;
-```
-
-`||` 无法区分 `false`、`0`、空字符串 ""、 `null`、`undefined`。它们都一样是假值（falsy values）。如果其中任何一个是 `||` 的第一个操作数，那么我们将得到第二个操作数作为结果。
-```js
-let height = 0;
-console.log(height || 100); // 100
-console.log(height ?? 100); // 0
-```
-
-`??` 运算符的优先级与 `||` 相同
-
-### 可选链运算符`?.`
-- 可选链(Optional chaining operator) 是一种访问嵌套对象属性的安全的方式。即使中间的属性不存在，也不会出现错误。
-- 不使用可选链时，可以使用`&&`运算符
-  <CodeRun>{`
-  let user = {};
-  console.log( user.address && user.address.street && user.address.street.name ); // undefined（不报错）
-  `}</CodeRun>
-
-- 短链效应：如果可选链 `?.` 前面的值为 `undefined` 或者 `null`，它会立即停止运算并返回 `undefined`。
-  ```js
-  let user = null;
-  console.log( user?.address ); // undefined
-
-  let x = 0;
-  user?.sayHi(x++); // 代码执行没有到达 sayHi 调用和 x++
-
-  alert(x); // 0，值没有增加
-  ```
-
-:::warning
-- 不要过度使用可选链。例如，如果根据我们的代码逻辑，`user` 对象必须存在，但 `address` 是可选的，那么我们应该这样写 `user.address?.street`，而不是这样 `user?.address?.street`。如果 `user` 恰巧为 `undefined`，我们会看到一个编程错误并修复它。否则，如果我们滥用 `?.`，会导致代码中的错误在不应该被消除的地方消除了，这会导致调试更加困难。
-
-- `?.` 左边的变量必须已声明。可选链仅适用于已声明的变量。
-
-- 可选链 `?.` 不能用在赋值语句的左侧。
-  ```js
-  let user = null;
-
-  user?.name = "John"; // SyntaxError: Invalid left-hand side in assignment
-  // 因为它在计算的是：undefined = "John"
-  ```
-:::
-
-#### 可选函数调用`?.()`
-`?.()` 用于调用一个可能不存在的函数。
-```js
-let userAdmin = {
-  admin() {
-    alert("I am admin");
-  }
-};
-
-let userGuest = {};
-
-// ?.() 会检查它左边的部分：如果 admin 函数存在，那么就调用运行它（对于 userAdmin）。否则（对于 userGuest）运算停止，没有报错。
-userAdmin.admin?.(); // I am admin
-userGuest.admin?.(); // 啥都没发生（没有这样的方法）
-console.log( userGuest.admin?.() ); // undefined
-```
-
-#### 另一种语法`?.[]`
-`?.[]` 用于从一个可能不存在的对象上安全地读取属性。
-```js
-let key = "firstName";
-
-let user1 = {
-  firstName: "John"
-};
-
-let user2 = null;
-
-// 如果 obj 存在则返回 obj[prop]，否则返回 undefined。
-alert( user1?.[key] ); // John
-alert( user2?.[key] ); // undefined
-```
-
-### `typeof` 运算符
-`typeof` 是一个操作符，不是一个函数。`typeof(x)` 与 `typeof x` 相同，但是这里的括号不是 `typeof` 的一部分，它是数学运算分组的括号。
-```jsx live
-function typeofDemo() {
-  function showResult() {
-    alert( typeof undefined );      // 'undefined'
-    alert( typeof 0 );              // 'number'
-    // console.log( typeof 10n );   // 'bigint'
-    alert( typeof true );           // 'boolean'
-    alert( typeof "foo" );          // 'string'
-    alert( typeof Symbol("id") );   // 'symbol'
-    alert( typeof Math );           // 'object'
-    alert( typeof null );           // 'object'
-    alert( typeof console.log );    // 'function'
-  }
-
-  return (
-    <div>
-      <p onClick={showResult}>查看执行结果</p>
-    </div>
-  );
-}
-```
-- `Math` 是一个提供数学运算的内建 object。
-
-- 在 JavaScript 语言中没有一个特别的 “function” 类型。函数隶属于 object 类型。但是 `typeof` 会对函数区分对待，并返回 "function"。这也是来自于 JavaScript 语言早期的问题。从技术上讲，这种行为是不正确的，但在实际编程中却非常方便。
-
-- `typeof null` 的结果为 "object"，这是官方承认的 `typeof` 的错误，这个问题来自于 JavaScript 语言的早期阶段，并为了兼容性而保留了下来。`null` 绝对不是一个 `object`。`null` 有自己的类型，它是一个特殊值。
-  ![typeof null](img/typeofnull.jpeg)
-
 ## 值的比较
 ### 字符串比较
 字符串是按字符（母）逐个进行比较的(遵循 Unicode 编码顺序)：
@@ -1342,9 +1536,46 @@ function typeofDemo() {
 }
 </CodeRun>
 
-:::tip
-字符串比较对字母大小写是敏感的。大写的 "A" 并不等于小写的 "a"。小写的 "a" 更大。这是因为在 JavaScript 使用的内部编码表中（Unicode），小写字母的字符索引值更大。
-:::
+#### 字符串比较对字母大小写是敏感的
+所有的字符串都使用 UTF-16 编码。即：每个字符都有对应的数字代码。字符通过数字代码进行比较，越大的代码意味着字符越大。a（97）的代码大于 Z（90）的代码。
+- `codePointAt(pos)` 返回在 `pos` 位置的字符代码
+  ```js
+  // 不同的字母有不同的代码
+  alert( "z".codePointAt(0) ); // 122
+  alert( "Z".codePointAt(0) ); // 90
+  ```
+
+- `String.fromCodePoint(code)` 通过数字 code 创建字符
+  ```js
+  alert( String.fromCodePoint(90) ); // 'Z'
+  // 还可以用 \u 后跟十六进制代码，在十六进制系统中 90 为 5a
+  alert( '\u005a' ); // Z
+  ```
+  ```js
+  let str = '';
+
+  for (let i = 65; i <= 220; i++) {
+    str += String.fromCodePoint(i);
+  }
+  alert( str );
+  // ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+  // ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜ
+  ```
+
+#### [`localeCompare`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare)
+所有现代浏览器（IE10 需要额外的库 [Intl.JS](https://github.com/andyearnshaw/Intl.js/)）都支持国际化标准 [ECMA-402](http://www.ecma-international.org/ecma-402/1.0/ECMA-402.pdf)。它提供了`localeCompare`方法来比较不同语言的字符串，遵循它们的规则。
+
+调用 `str.localeCompare(str2)` 会根据语言规则返回一个整数，这个整数能指示字符串 str 在排序顺序中排在字符串 str2 前面、后面、还是相同：
+- 如果 str 排在 str2 前面，则返回负数。
+- 如果 str 排在 str2 后面，则返回正数。
+- 如果它们在相同位置，则返回 0。
+
+```js
+alert( 'Österreich'.localeCompare('Zealand') ); // -1
+```
+
+`localeCompare`方法 还指定了两个额外的参数，这两个参数允许它指定语言（默认语言从环境中获取，字符顺序视语言不同而不同）并设置诸如区分大小写，或应该将 "a" 和 "á" 作相同处理等附加的规则。
+
 
 ### 不同类型间的比较
 **当对不同类型的值进行比较时，JavaScript 会首先将其转化为数字（number）再判定大小。**
@@ -1406,7 +1637,7 @@ function typeofDemo() {
 }
 </CodeRun>
 
-3. 当使用数学式或其他比较方法 `<` `>` `<=` `>=` 时，`null`、`undefined` 会被转化为数字：`null` 被转化为 `0`，`undefined` 被转化为 `NaN`。**`NaN` 是一个特殊的数值型值，它与任何值进行比较都会返回 `false`。**
+3. 当使用数学式或其他比较方法 `<` `>` `<=` `>=` 时，`null`、`undefined` 会被转化为数字：`null` 被转化为 `0`，`undefined` 被转化为 `NaN`。**`NaN` 是一个特殊的数值型值，它与任何值(包括它自身)进行比较都会返回 `false`。**
 <CodeRun>
 {
   `
@@ -1416,163 +1647,24 @@ function typeofDemo() {
   console.log( undefined > 0 );  // false
   console.log( undefined < 0 );  // false
   console.log( undefined == 0 ); // false
+  console.log( NaN === NaN );    // false
   `
 }
 </CodeRun>
 
-## 循环
-循环体的单次执行叫作 一次迭代。
-### `for` 循环
-```js
-for (begin; condition; step) {
-  // ……循环体……
-}
+### `Object.is`
+在所有其他情况下，`Object.is(a, b)` 与 `a === b` 相同。以下两种情况不同：
+1. `NaN`自身的比较
+<CodeRun>{`
+console.log( Object.is(NaN, NaN) ); // true
+console.log( NaN === NaN );         // false
+`}</CodeRun>
 
-// 变量 i 是在循环中声明的，这叫做“内联”变量声明
-for (let i = 0; i < 3; i++) { // 结果为 0、1、2
-  alert(i);
-}
-```
-- `for` 循环的任何语句段都可以被省略。
-```js
-let i = 0; // 我们已经声明了 i 并对它进行了赋值
-
-for (; i < 3; i++) { // 不再需要 "begin" 语句段
-  alert( i ); // 0, 1, 2
-}
-for (; i < 3;) {
-  alert( i++ );
-}
-for (;;) {
-  // 无限循环
-}
-```
-
-### 使用 `break` 指令跳出循环
-```js
-let sum = 0;
-
-while (true) {
-
-  let value = +prompt("Enter a number", '');
-
-  if (!value) break; // 执行后立刻终止循环，将控制权传递给循环后的第一行，即alert( 'Sum: ' + sum );
-
-  sum += value;
-
-}
-alert( 'Sum: ' + sum );
-```
-
-### 使用 `continue` 指令继续下一次迭代
-`continue` 不会停掉整个循环，而是停止当前这一次迭代，并强制启动新一轮循环（如果条件允许的话）。
-<CodeRun>
-{`
-for (let i = 0; i < 10; i++) {
-  //如果为真，跳过循环体的剩余部分。
-  if (i % 2 == 0) continue;
-  console.log(i); // 1，然后 3，5，7，9
-}
-`}
-</CodeRun>
-
-### break/continue 标签
-- 用于一次从多层嵌套的循环中跳出来或跳转到标记循环的下一次迭代
-- 标签 是在循环之前带有冒号的标识符
-  ```js
-  labelName: for (...) {
-    ...
-  }
-  ```
-- `break <labelName>` 语句跳出循环至标签处
-  ```js
-  outer: for (let i = 0; i < 3; i++) {
-
-    for (let j = 0; j < 3; j++) {
-
-      let input = prompt(`Value at coords (${i},${j})`, '');
-
-      // 如果是空字符串或被取消，则中断并跳出这两个循环。
-      if (!input) break outer; // 执行后 向上寻找名为 outer 的标签并跳出当前循环，控制权转至 alert('Done!')。
-
-      // 用得到的值做些事……
-    }
-  }
-
-  alert('Done!');
-  ```
-- `continue` 指令也可以与标签一起使用。在这种情况下，执行跳转到标记循环的下一次迭代。
-
-## `switch` 语句
-```js
-switch(x) {
-  case 'value1':  // if (x === 'value1')
-    ...
-    [break]
-
-  case 'value2':  // if (x === 'value2')
-    ...
-    [break]
-
-  default:
-    ...
-    [break]
-}
-```
-- 比较 `x` 值与第一个 `case`（也就是 `value1`）**是否严格相等(被比较的值必须是相同的类型才能进行匹配)**，然后比较第二个 `case`（`value2`）以此类推。
-- 如果相等，`switch` 语句就执行相应 `case` 下的代码块，直到遇到最靠近的 `break` 语句（或者直到 `switch` 语句末尾）。
-- 如果没有符合的 `case`，则执行 `default` 代码块（如果 `default` 存在）。
-
-- 如果没有 `break`，程序将不经过任何检查就会继续执行下一个 `case`。
-  <CodeRun>
-  {`
-  let a = 2 + 2;
-  switch (a) {
-    case 3:
-      console.log( 'Too small' );
-    case 4:
-      console.log( 'Exactly!' );
-    case 5:
-      console.log( 'Too big' );
-    default:
-      console.log( "I don't know such values" );
-  }
-  `}
-  </CodeRun>
-
-- `switch` 和 `case` 都允许任意表达式。
-  <CodeRun>
-  {`
-  let a = "1";
-  let b = 0;
-  switch (+a) {
-    case b + 1:
-      console.log("this runs, because +a is 1, exactly equals b+1");
-      break;
-    default:
-      console.log("this doesn't run");
-  }
-  `}
-  </CodeRun>
-
-- 共享同一段代码的几个 `case` 分支可以被分为一组
-  <CodeRun>
-  {`
-  let a = 3;
-  switch (a) {
-    case 4:
-      console.log('Right!');
-      break;
-    case 3: // (*) 下面这两个 case 被分在一组
-    case 5:
-      console.log('Wrong!');
-      console.log("Why don't you take a math class?");
-      break;
-    default:
-      console.log('The result is strange. Really.');
-  }
-  `}
-  </CodeRun>
+2. 0 和 -0
+<CodeRun>{`
+console.log( Object.is(0, -0) ); // false 从技术上讲 0 和 -0 是不同的，因为在内部，数字的符号位可能会不同，即使其他所有位均为零。
+console.log( 0 === -0 );         // true
+`}</CodeRun>
 
 ## 函数
 - 在函数中声明的变量只在该函数内部可见。
@@ -1942,6 +2034,834 @@ console.log( new SmallUser().name );  // John
 
 ### pure functions and side effects
 [What are Pure Functions and Side Effects in JavaScript?](https://blog.greenroots.info/what-are-pure-functions-and-side-effects-in-javascript)
+
+## 数组
+- 数组扩展了对象，提供了特殊的方法来处理有序的数据集合以及 length 属性。但从本质上讲，它仍然是一个对象。但是数组真正特殊的是它的内部实现。JavaScript 引擎尝试把这些元素一个接一个地存储在连续的内存区域，而且还有一些其它的优化，以使数组更好地作用于连续的有序数据。如果我们不像“有序集合”那样使用数组，而是像常规对象那样使用数组，从技术上讲，这是可以的，因为数组是基于对象的，但是这些优化就都不生效了。
+  ```js
+  let fruits = []; // 创建一个数组
+
+  // 以下操作不会报错，但是Javascript 引擎会发现，我们在像使用常规对象一样使用数组，那么针对数组的优化就不再适用了
+  fruits[99999] = 5; // 分配索引远大于数组长度的属性
+
+  fruits.age = 25; // 创建一个具有任意名称的属性
+  ```
+
+- 数组是存储有序数据的集合。数组元素从 0 开始编号。数组可以存储任何类型的元素。
+  ```js
+  // 混合值
+  let arr = [ 'Apple', { name: 'John' }, true, function() { alert('hello'); } ];
+
+  // 获取索引为 1 的对象然后显示它的 name
+  alert( arr[1].name ); // John
+
+  // 获取索引为 3 的函数并执行
+  arr[3](); // hello
+  ```
+
+- `length`属性不是数组里元素的个数，而是最大的数字索引值加一。
+  ```js
+  let fruits = [];
+  fruits[123] = "Apple";
+
+  console.log( fruits.length ); // 124
+
+  // 查找数组最中间的元素(要求适用于任何奇数长度的数组)
+  arr[Math.floor((arr.length - 1) / 2)]
+  ```
+
+- `length`属性是可写的。如果我们减少它，数组就会被截断，该过程是不可逆的。所以，清空数组最简单的方法就是：`arr.length = 0;`。
+  ```js
+  let arr = [1, 2, 3, 4, 5];
+
+  arr.length = 2; // 截断到只剩 2 个元素
+  console.log( arr ); // [1, 2]
+
+  arr.length = 5; // 又把 length 加回来
+  console.log( arr[3] ); // undefined：被截断的那些数值并没有回来
+  ```
+
+- 如果使用单个参数（即数字）调用 `new Array`，那么它会创建一个 指定了长度，却没有任何项 的数组。
+  ```js
+  let arr = new Array("Apple", "Pear", "etc");
+
+  let arr = new Array(2);
+  alert( arr[0] ); // undefined！没有元素。
+  alert( arr.length ); // length 2
+  ```
+
+- 数组里的项也可以是数组。我们可以将其用于多维数组，例如存储矩阵：
+  ```js
+  let matrix = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+  ];
+
+  alert( matrix[1][1] ); // 最中间的那个数
+  ```
+
+- 在数组上下文调用
+  <CodeRun>{`
+  // this的隐式绑定
+  let arr = ["a", "b"];
+  arr.push(function() {
+    console.log( this );
+  });
+  arr[2](); // ["a", "b", function()]
+  /*
+  arr[2]() 调用从句法来看可以类比于 obj[method]()，与 obj 对应的是 arr，与 method 对应的是 2。
+  所以调用 arr[2] 函数也就是调用对象函数。自然地，它接收 this 引用的对象 arr 然后输出该数组
+  */
+  `}</CodeRun>
+
+### `Array.prototype.at()`
+接收一个整数值并返回该索引对应的元素，允许正数和负数。负整数从数组中的最后一个元素开始倒数。
+- 如果 `i >= 0`，则 `arr.at(i)` 与 `arr[i]` 完全相同。
+- 如果 `i` 为负数，则从数组的尾部向前数。
+```js
+let fruits = ["Apple", "Orange", "Plum"];
+
+// 与 fruits[fruits.length-1] 相同
+alert( fruits.at(-1) ); // Plum
+```
+
+### pop/push, shift/unshift 方法
+JavaScript 中的数组既可以用作队列(First-In-First-Out)，也可以用作栈(Last-In-First-Out)。它们允许你从首端/末端来添加/删除元素。[双端队列](https://wangtunan.github.io/blog/books/javascript/algorithm.html#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+- `pop` 取出并返回数组的最后一个元素
+  ```js
+  let fruits = ["Apple", "Orange", "Pear"];
+
+  alert( fruits.pop() ); // 移除 "Pear" 然后 alert 显示出来
+
+  alert( fruits );       // Apple, Orange
+  ```
+
+- `push` 在数组末端添加元素。调用 `fruits.push(...)` 与 `fruits[fruits.length] = ...` 是一样的。
+
+- `shift` 取出数组的第一个元素并返回它
+  ```js
+  let fruits = ["Apple", "Orange", "Pear"];
+
+  alert( fruits.shift() ); // 移除 Apple 然后 alert 显示出来
+
+  alert( fruits ); // Orange, Pear
+  ```
+
+- `unshift` 在数组的首端添加元素。`push` 和 `unshift` 方法都可以一次添加多个元素
+  ```js
+  let fruits = ["Apple"];
+
+  fruits.push("Orange", "Peach");
+  fruits.unshift("Pineapple", "Lemon");
+
+  // ["Pineapple", "Lemon", "Apple", "Orange", "Peach"]
+  alert( fruits );
+  ```
+  
+- push/pop 方法运行的比较快，而 shift/unshift 比较慢。
+  ![shift](img/shift.jpeg)
+  ![pop](img/pop.jpeg)
+
+### splice/slice 方法
+- 如何从数组中删除元素？数组是对象，所以我们可以尝试使用 `delete`，如下发现元素被删除了，但数组仍然有 3 个元素。这是因为 `delete obj.key` 是通过 `key` 来移除对应的值。对于普通对象来说是可以的。但是对于数组来说，我们通常希望剩下的元素能够移动并占据被释放的位置。
+<CodeRun>{`
+let arr = ["I", "go", "home"];
+delete arr[1]; // remove "go"
+console.log( arr[1] ); // undefined
+console.log( arr.toString() ); // now arr = ["I",  , "home"];
+cosole.log( arr.length ); // 3
+`}</CodeRun>
+
+- `arr.splice(start[, deleteCount, elem1, ..., elemN])` 可以添加、删除和插入元素。它从索引 `start` 开始修改 `arr`：删除 `deleteCount` 个元素并在当前位置插入 `elem1, ..., elemN`，最后返回被删除的元素所组成的数组。(当只填写了 splice 的 `start` 参数时，将删除从索引 `start` 开始的所有数组项)
+  ```js
+  let arr = ["I", "study", "JavaScript"];
+
+  arr.splice(1, 1); // 从索引 1 开始删除 1 个元素
+
+  alert( arr ); // ["I", "JavaScript"]
+  ```
+  ```js
+  let arr = ["I", "study", "JavaScript", "right", "now"];
+
+  // 删除数组的前三项，并使用其他内容代替它们
+  arr.splice(0, 3, "Let's", "dance");
+
+  alert( arr ) // 现在 ["Let's", "dance", "right", "now"]
+  ```
+  ```js
+  // splice 返回被删除的元素所组成的数组
+  let arr = ["I", "study", "JavaScript", "right", "now"];
+
+  // 删除前两个元素
+  let removed = arr.splice(0, 2);
+
+  alert( removed ); // "I", "study" <-- 被从数组中删除了的元素
+  ```
+  ```js
+  // 将 deleteCount 设置为 0，splice 方法就能够插入元素而不用删除任何元素
+  let arr = ["I", "study", "JavaScript"];
+
+  // 从索引 2 开始
+  // 删除 0 个元素
+  // 然后插入 "complex" 和 "language"
+  arr.splice(2, 0, "complex", "language");
+
+  alert( arr ); // "I", "study", "complex", "language", "JavaScript"
+  ```
+  ```js
+  // 允许负向索引
+  let arr = [1, 2, 5];
+
+  // 从索引 -1（尾端前一位）
+  // 删除 0 个元素，
+  // 然后插入 3 和 4
+  arr.splice(-1, 0, 3, 4);
+
+  alert( arr ); // 1,2,3,4,5
+  ```
+
+- `arr.slice([start], [end])` 会返回一个新数组，将所有从索引 `start` 到 `end`（不包括 `end`）的数组项复制到一个新的数组。`start` 和 `end` 都可以是负数，在这种情况下，从末尾计算索引。我们也可以不带参数地调用它：`arr.slice()` 会创建一个 `arr` 的副本。其通常用于获取副本，以进行不影响原始数组的进一步转换。
+  ```js
+  let arr = ["t", "e", "s", "t"];
+
+  alert( arr.slice(1, 3) ); // e,s（复制从位置 1 到位置 3 的元素）
+
+  alert( arr.slice(-2) );   // s,t（复制从位置 -2 到尾端的元素）
+  ```
+
+### concat 方法
+- `arr.concat(arg1, arg2...)` 创建一个新数组，其中包含来自于 `arr`，然后是 `arg1`，`arg2` 的元素。它接受任意数量的参数(数组或值都可以，如果参数是一个数组，那么其中的所有元素都会被复制，否则，将复制参数本身)。
+  ```js
+  let arr = [1, 2];
+
+  // 从 arr 和 [3,4] 创建一个新数组
+  alert( arr.concat([3, 4]) );         // 1,2,3,4
+
+  // 从 arr、[3,4] 和 [5,6] 创建一个新数组
+  alert( arr.concat([3, 4], [5, 6]) ); // 1,2,3,4,5,6
+
+  // 从 arr、[3,4]、5 和 6 创建一个新数组
+  alert( arr.concat([3, 4], 5, 6) );   // 1,2,3,4,5,6
+  ```
+
+- concat的参数如果是个类数组对象，通常会被作为一个整体添加。但是，如果类数组对象具有 `Symbol.isConcatSpreadable` 属性，那么它就会被 concat 当作一个数组来处理：此对象中的元素将被添加。
+  ```js
+  let arr = [1, 2];
+
+  let arrayLike = {
+    0: "something",
+    length: 1
+  };
+
+  alert( arr.concat(arrayLike) ); // 1,2,[object Object]
+  ```
+  <CodeRun>{`
+  let arr = [1, 2];
+  let arrayLike = {
+    0: "something",
+    1: "else",
+    [Symbol.isConcatSpreadable]: true,
+    length: 2
+  };
+  console.log( String(arr.concat(arrayLike)) ); // 1,2,something,else
+  `}</CodeRun>
+
+### indexOf/lastIndexOf 和 includes 方法
+- `arr.indexOf(item, from)` 从索引 `from` 开始搜索 `item`，如果找到则返回索引，否则返回 -1。默认情况下，搜索是从头开始的。
+
+- `arr.includes(item, from)` 从索引 `from` 开始搜索 `item`，如果找到则返回 true，否则返回 false。默认情况下，搜索是从头开始的。
+
+- 方法 `lastIndexOf` 与 `indexOf` 相似，但从右向左查找。
+
+```js
+let arr = [1, 0, false];
+
+alert( arr.indexOf(0) );     // 1
+alert( arr.indexOf(false) ); // 2
+alert( arr.indexOf(null) );  // -1
+
+alert( arr.includes(1) );    // true
+
+let fruits = ['Apple', 'Orange', 'Apple'];
+
+alert( fruits.indexOf('Apple') );     // 0（第一个 Apple）
+alert( fruits.lastIndexOf('Apple') ); // 2（最后一个 Apple）
+```
+
+:::tip
+- `indexOf` 和 `includes` 使用严格相等 `===` 进行比较。
+
+- 方法 `includes` 可以正确地处理 `NaN`，而 `indexOf`不能
+  <CodeRun>{`
+  const arr = [NaN];
+  alert( arr.indexOf(NaN) );  // -1（错，应该为 0）
+  alert( arr.includes(NaN) ); // true（正确）
+  `}</CodeRun>
+:::
+
+### find 和 findIndex/findLastIndex
+- `arr.find(function(item, index, array) {...})` 依次对数组中的每个元素调用该函数，如果该函数返回 true，则搜索停止，并返回 `item`。对于假值（falsy）的情况，则返回 `undefined`。
+  ```js
+  let users = [
+    {id: 1, name: "John"},
+    {id: 2, name: "Pete"},
+    {id: 3, name: "Mary"}
+  ];
+
+  let user = users.find(item => item.id == 1);
+
+  alert(user.name); // John
+  ```
+
+- `findIndex` 方法与 `find` 具有相同的语法，但它返回找到的元素的索引，而不是元素本身。如果没找到，则返回 -1。
+- `findLastIndex` 方法类似于 `findIndex`，但从右向左搜索
+  ```js
+  let users = [
+    {id: 1, name: "John"},
+    {id: 2, name: "Pete"},
+    {id: 3, name: "Mary"},
+    {id: 4, name: "John"}
+  ];
+
+  // 寻找第一个 John 的索引
+  alert(users.findIndex(user => user.name == 'John')); // 0
+
+  // 寻找最后一个 John 的索引
+  alert(users.findLastIndex(user => user.name == 'John')); // 3
+  ```
+
+### filter 方法
+返回的是所有匹配元素组成的数组。对于假值（falsy）的情况，则返回空数组。
+```js
+let users = [
+  {id: 1, name: "John"},
+  {id: 2, name: "Pete"},
+  {id: 3, name: "Mary"}
+];
+
+// 返回前两个用户的数组
+let someUsers = users.filter(item => item.id < 3);
+
+alert(someUsers.length); // 2
+```
+
+### map 方法
+对数组的每个元素都调用函数，并返回结果数组。
+```js
+let lengths = ["Bilbo", "Gandalf", "Nazgul"].map(item => item.length);
+alert(lengths); // 5,7,6
+```
+
+### sort 方法
+- 对数组进行 原位（in-place，是指在此数组内，而非生成一个新数组）排序，更改元素的顺序(**默认情况下按字符串进行排序**)。
+<CodeRun>{`
+let arr = [ 1, 2, 15 ];
+arr.sort(); // 该方法重新排列 arr 的内容，所有元素都被转换为字符串，然后进行比较，"2" > "15"
+console.log( arr.toString() );  // 1, 15, 2
+`}</CodeRun>
+
+- 要使用我们自己的排序顺序，我们需要提供一个函数作为 `sort()` 的参数。
+  <CodeRun>{`
+  function compareNumeric(a, b) {
+    if (a > b) return 1;
+    if (a == b) return 0;
+    if (a < b) return -1;
+  }
+  let arr = [ 1, 15, 2 ];
+  arr.sort(compareNumeric);
+  console.log(arr);  // [1, 2, 15]
+  `}</CodeRun>
+
+- 比较函数只需要返回一个正数表示“大于”，一个负数表示“小于”。
+  <CodeRun>{`
+  let arr = [ 1, 15, 2 ];
+  arr.sort(function(a, b) { return a - b; });
+  alert(arr);  // [1, 2, 15]
+  `}</CodeRun>
+  <CodeRun>{`
+  let arr = [ 1, 15, 2 ];
+  arr.sort( (a, b) => a - b );
+  alert(arr);  // [1, 2, 15]
+  `}</CodeRun>
+
+### 遍历数组
+- `for` 运行得最快，可兼容旧版本浏览器。
+  ```js
+  let arr = ["Apple", "Orange", "Pear"];
+
+  for (let i = 0; i < arr.length; i++) {
+    alert( arr[i] );
+  }
+  ```
+
+- `for..of` 现代语法，只能访问 items。
+  ```js
+  let fruits = ["Apple", "Orange", "Plum"];
+
+  // 遍历数组元素
+  for (let fruit of fruits) {
+    alert( fruit );
+  }
+  ```
+
+- 技术上来讲，因为数组也是对象，所以使用 `for..in` 也是可以的，但是会有一些潜在问题存在：1. `for..in`循环会遍历所有属性(不仅仅是数组的数字属性)，如果使用`for..in`遍历类数组对象(类数组对象看似是数组，也就是说，它们有 length 和索引属性，但是也可能有其它的非数字的属性和方法)，非数字的属性也会被遍历；2. `for..in` 循环适用于普通对象，并且做了对应的优化。但是不适用于数组，因此速度要慢 10-100 倍(当然即使是这样也依然非常快,只有在遇到瓶颈时可能会有问题)。通常来说，我们不应该用 `for..in` 来处理数组。
+
+- `Array.prototype.forEach()` 允许为数组的每个元素都运行一个函数(该函数的结果（如果它有返回）会被抛弃和忽略)。
+  ```js
+  ["Bilbo", "Gandalf", "Nazgul"].forEach((item, index, array) => {
+    alert(`${item} is at index ${index} in ${array}`);
+  });
+  ```
+
+### 数组的转换
+- **数组没有 `Symbol.toPrimitive`，也没有 `valueOf`，它们只能执行 `toString` 进行转换。** 数组的 `toString` 方法，会返回以逗号隔开的元素列表。
+  <CodeRun>{`
+  let arr = [1, 2, 3];
+  console.log( String(arr) === '1,2,3' ); // true
+  console.log( [] + 1 );                  // "1"
+  console.log( [1] + 1 );                 // "11"
+  console.log( [1,2] + 1 );               // "1,21"
+  `}</CodeRun>
+
+- 不要使用 `==` 比较数组，该运算符不会对数组进行特殊处理，它会像处理任意对象那样处理数组。所以，如果我们使用 `==` 来比较数组，除非我们比较的是两个引用同一数组的变量，否则它们永远不相等。
+  ```js
+  alert( [] == [] );   // false
+  alert( [0] == [0] ); // false
+  ```
+
+- 数组和原始类型进行比较时，数组会被转换为原始类型以进行比较，比如`[]`会被转换为一个空字符串 ''
+  ```js
+  alert( 0 == [] ); // true 数组(对象)与原始类型比较先被转换为原始类型（[]会被转换为一个空字符串 ''），不同原始类型比较会被转换为Number类型以进行比较（'' 被转换成了数字 0）
+
+  alert('0' == [] ); // false
+  ```
+
+
+## 运算符
+所有的运算符中都隐含着优先级顺序。[优先级汇总表](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Operator_Precedence#%E6%B1%87%E6%80%BB%E8%A1%A8)
+- 圆括号拥有最高优先级
+- 一元运算符优先级高于二元运算符
+- 如果优先级相同，则按照由左至右的顺序执行
+
+### 赋值运算符
+在 JavaScript 中，所有运算符都会返回一个值。**语句 `x = value` 将值 `value` 写入 `x` 然后返回 `value`。**
+```js
+// (a = b + 1) 的结果是 赋给 a 的值（也就是 3）。然后该值被用于进一步的运算。
+let a = 1;
+let b = 2;
+
+let c = 3 - (a = b + 1);
+
+alert( a ); // 3
+alert( c ); // 0
+```
+
+### “修改并赋值”运算符
+所有算术和位运算符都有简短的“修改并赋值”运算符：`/=` 和 `-=` 等。这类运算符的优先级与普通赋值运算符的优先级相同，所以它们在大多数其他运算之后执行:
+<CodeRun>
+{
+  `
+  let n = 2;
+  n *= 3 + 5;
+  console.log( n ); // 16 （右边部分先被计算，等同于 n *= 8）
+  `
+}
+</CodeRun>
+
+### 位运算符
+- 按位与 ( `&` )
+- 按位或 ( `|` )
+- 按位异或 ( `^` )
+- 按位非 ( `~` )
+- 左移 ( `<<` )
+- 右移 ( `>>` )
+- 无符号右移 ( `>>>` )
+
+### 逗号运算符
+逗号运算符能让我们处理多个表达式，使用 `,` 将它们分开，每个表达式都运行了，但是只有最后一个的结果会被返回。
+<CodeRun>
+{
+  `
+  let a = (1 + 2, 3 + 4); // 逗号运算符的优先级非常低，比 = 还要低，因此此处圆括号非常重要
+  console.log(a) // 7（3 + 4 的结果）
+  // 一行上有三个运算符
+  for (a = 1, b = 3, c = a * b; a < 10; a++) {
+   // ...
+  }
+  `
+}
+</CodeRun>
+
+### 逻辑运算符
+JavaScript 中有四个逻辑运算符：`||`（或），`&&`（与），`!`（非），`??`（空值合并运算符, Nullish Coalescing）。
+
+#### 或运算寻找第一个真值
+一个或运算 `||` 的链，将返回第一个真值，如果不存在真值，就返回该链的最后一个值。
+```js
+result = value1 || value2 || value3;
+```
+- 从左到右依次计算操作数。
+- 处理每一个操作数时，**都将其转化为布尔值**。如果结果是 `true`，就停止计算，返回这个操作数的初始值。
+- 如果所有的操作数都被计算过（也就是，转换结果都是 `false`），则返回最后一个操作数。
+<CodeRun>
+{
+  `
+  console.log( 1 || 0 );                 // 1（1 是真值）
+  console.log( null || 1 );              // 1（1 是第一个真值）
+  console.log( null || 0 || 1 );         // 1（第一个真值）
+  console.log( undefined || null || 0 ); // 0（都是假值，返回最后一个值）
+  `
+}
+</CodeRun>
+
+#### 短路求值（Short-circuit evaluation）
+- 或运算符 `||` 在遇到 “真值” 时立即停止运算
+<CodeRun>
+{
+  `
+  // 或运算符 || 在遇到 true 时立即停止运算
+  true || console.log("not printed");
+  false || console.log("printed");
+  // 先输出1然后输出2
+  // 第一个或运算 || 对它的左值 console.log(1) 进行了计算。这就显示了第一条信息 1。
+  // 函数console.log没有返回值，或者说返回的是 undefined。所以或运算继续检查第二个操作数以寻找真值
+  console.log( console.log(1) || 2 || console.log(3) );
+  `
+}
+</CodeRun>
+
+- 与运算符 `&&` 在遇到 “假值” 时立即停止运算
+<CodeRun>
+{
+  `
+  // 先输出1然后输出undefined
+  console.log( console.log(1) && console.log(2) );
+  `
+}
+</CodeRun>
+
+#### 与运算寻找第一个假值
+与运算返回第一个假值，如果没有假值就返回最后一个值。
+```js
+result = value1 && value2 && value3;
+```
+- 从左到右依次计算操作数。
+- 在处理每一个操作数时，都将其转化为布尔值。如果结果是 `false`，就停止计算，并返回这个操作数的初始值。
+- 如果所有的操作数都被计算过（例如都是真值），则返回最后一个操作数。
+<CodeRun>
+{
+  `
+  // 与运算寻找第一个假值，找不到就返回最后一个操作数的初始值
+  console.log( 1 && 0 );                // 0
+  console.log( 1 && 5 );                // 5
+  console.log( 1 && 2 && null && 3 );   // null
+  // 如果第一个操作数是假值，
+  // 与运算将直接返回它。后面的操作数会被忽略
+  console.log( null && 5 );             // null
+  console.log( 0 && "no matter what" ); // 0
+  `
+}
+</CodeRun>
+
+:::tip
+与运算 `&&` 的优先级比或运算 `||` 要高。`a && b || c && d` 等同于 `(a && b) || (c && d)`
+<CodeRun>
+{
+  `
+  // 与运算 && 的优先级比 || 高，所以它第一个被执行。
+  console.log( null || 2 && 3 || 4 );
+  `
+}
+</CodeRun>
+:::
+
+#### 逻辑非运算符
+逻辑非运算符接受一个参数，并按如下运作：
+1. 将操作数转化为布尔类型：`true` 或 `false`。
+2. 返回相反的值。
+
+- **两个非运算 `!!` 用来将某个值转化为布尔类型**
+<CodeRun>
+{
+  `
+  // 第一个非运算将该值转化为布尔类型并取反，第二个非运算再次取反。
+  console.log( !!"non-empty string" );        // true
+  console.log( !!null );                      // false
+  // 内建的 Boolean 函数也可以实现同样的效果
+  console.log( Boolean("non-empty string") ); // true
+  console.log( Boolean(null) );               // false
+  `
+}
+</CodeRun>
+
+- 非运算符 `!` 的优先级在所有逻辑运算符里面最高
+
+#### 空值合并运算符`??`
+如果第一个操作数不是 `null` 或 `undefined`，则 `??` 返回第一个操作数。否则，返回第二个操作数。
+```js
+result = a ?? b;
+// 等同于
+result = (a !== null && a !== undefined) ? a : b;
+```
+
+`||` 无法区分 `false`、`0`、空字符串 ""、 `null`、`undefined`。它们都一样是假值（falsy values）。如果其中任何一个是 `||` 的第一个操作数，那么我们将得到第二个操作数作为结果。
+```js
+let height = 0;
+console.log(height || 100); // 100
+console.log(height ?? 100); // 0
+```
+
+`??` 运算符的优先级与 `||` 相同
+
+### 可选链运算符`?.`
+- 可选链(Optional chaining operator) 是一种访问嵌套对象属性的安全的方式。即使中间的属性不存在，也不会出现错误。
+- 不使用可选链时，可以使用`&&`运算符
+  <CodeRun>{`
+  let user = {};
+  console.log( user.address && user.address.street && user.address.street.name ); // undefined（不报错）
+  `}</CodeRun>
+
+- 短链效应：如果可选链 `?.` 前面的值为 `undefined` 或者 `null`，它会立即停止运算并返回 `undefined`。
+  ```js
+  let user = null;
+  console.log( user?.address ); // undefined
+
+  let x = 0;
+  user?.sayHi(x++); // 代码执行没有到达 sayHi 调用和 x++
+
+  alert(x); // 0，值没有增加
+  ```
+
+:::warning
+- 不要过度使用可选链。例如，如果根据我们的代码逻辑，`user` 对象必须存在，但 `address` 是可选的，那么我们应该这样写 `user.address?.street`，而不是这样 `user?.address?.street`。如果 `user` 恰巧为 `undefined`，我们会看到一个编程错误并修复它。否则，如果我们滥用 `?.`，会导致代码中的错误在不应该被消除的地方消除了，这会导致调试更加困难。
+
+- `?.` 左边的变量必须已声明。可选链仅适用于已声明的变量。
+
+- 可选链 `?.` 不能用在赋值语句的左侧。
+  ```js
+  let user = null;
+
+  user?.name = "John"; // SyntaxError: Invalid left-hand side in assignment
+  // 因为它在计算的是：undefined = "John"
+  ```
+:::
+
+#### 可选函数调用`?.()`
+`?.()` 用于调用一个可能不存在的函数。
+```js
+let userAdmin = {
+  admin() {
+    alert("I am admin");
+  }
+};
+
+let userGuest = {};
+
+// ?.() 会检查它左边的部分：如果 admin 函数存在，那么就调用运行它（对于 userAdmin）。否则（对于 userGuest）运算停止，没有报错。
+userAdmin.admin?.(); // I am admin
+userGuest.admin?.(); // 啥都没发生（没有这样的方法）
+console.log( userGuest.admin?.() ); // undefined
+```
+
+#### 另一种语法`?.[]`
+`?.[]` 用于从一个可能不存在的对象上安全地读取属性。
+```js
+let key = "firstName";
+
+let user1 = {
+  firstName: "John"
+};
+
+let user2 = null;
+
+// 如果 obj 存在则返回 obj[prop]，否则返回 undefined。
+alert( user1?.[key] ); // John
+alert( user2?.[key] ); // undefined
+```
+
+### `typeof` 运算符
+`typeof` 是一个操作符，不是一个函数。`typeof(x)` 与 `typeof x` 相同，但是这里的括号不是 `typeof` 的一部分，它是数学运算分组的括号。
+```jsx live
+function typeofDemo() {
+  function showResult() {
+    alert( typeof undefined );      // 'undefined'
+    alert( typeof 0 );              // 'number'
+    // console.log( typeof 10n );   // 'bigint'
+    alert( typeof true );           // 'boolean'
+    alert( typeof "foo" );          // 'string'
+    alert( typeof Symbol("id") );   // 'symbol'
+    alert( typeof Math );           // 'object'
+    alert( typeof null );           // 'object'
+    alert( typeof console.log );    // 'function'
+  }
+
+  return (
+    <div>
+      <p onClick={showResult}>查看执行结果</p>
+    </div>
+  );
+}
+```
+- `Math` 是一个提供数学运算的内建 object。
+
+- 在 JavaScript 语言中没有一个特别的 “function” 类型。函数隶属于 object 类型。但是 `typeof` 会对函数区分对待，并返回 "function"。这也是来自于 JavaScript 语言早期的问题。从技术上讲，这种行为是不正确的，但在实际编程中却非常方便。
+
+- `typeof null` 的结果为 "object"，这是官方承认的 `typeof` 的错误，这个问题来自于 JavaScript 语言的早期阶段，并为了兼容性而保留了下来。`null` 绝对不是一个 `object`。`null` 有自己的类型，它是一个特殊值。
+  ![typeof null](img/typeofnull.jpeg)
+
+## 循环
+循环体的单次执行叫作 一次迭代。
+### `for` 循环
+```js
+for (begin; condition; step) {
+  // ……循环体……
+}
+
+// 变量 i 是在循环中声明的，这叫做“内联”变量声明
+for (let i = 0; i < 3; i++) { // 结果为 0、1、2
+  alert(i);
+}
+```
+- `for` 循环的任何语句段都可以被省略。
+```js
+let i = 0; // 我们已经声明了 i 并对它进行了赋值
+
+for (; i < 3; i++) { // 不再需要 "begin" 语句段
+  alert( i ); // 0, 1, 2
+}
+for (; i < 3;) {
+  alert( i++ );
+}
+for (;;) {
+  // 无限循环
+}
+```
+
+### 使用 `break` 指令跳出循环
+```js
+let sum = 0;
+
+while (true) {
+
+  let value = +prompt("Enter a number", '');
+
+  if (!value) break; // 执行后立刻终止循环，将控制权传递给循环后的第一行，即alert( 'Sum: ' + sum );
+
+  sum += value;
+
+}
+alert( 'Sum: ' + sum );
+```
+
+### 使用 `continue` 指令继续下一次迭代
+`continue` 不会停掉整个循环，而是停止当前这一次迭代，并强制启动新一轮循环（如果条件允许的话）。
+<CodeRun>
+{`
+for (let i = 0; i < 10; i++) {
+  //如果为真，跳过循环体的剩余部分。
+  if (i % 2 == 0) continue;
+  console.log(i); // 1，然后 3，5，7，9
+}
+`}
+</CodeRun>
+
+### break/continue 标签
+- 用于一次从多层嵌套的循环中跳出来或跳转到标记循环的下一次迭代
+- 标签 是在循环之前带有冒号的标识符
+  ```js
+  labelName: for (...) {
+    ...
+  }
+  ```
+- `break <labelName>` 语句跳出循环至标签处
+  ```js
+  outer: for (let i = 0; i < 3; i++) {
+
+    for (let j = 0; j < 3; j++) {
+
+      let input = prompt(`Value at coords (${i},${j})`, '');
+
+      // 如果是空字符串或被取消，则中断并跳出这两个循环。
+      if (!input) break outer; // 执行后 向上寻找名为 outer 的标签并跳出当前循环，控制权转至 alert('Done!')。
+
+      // 用得到的值做些事……
+    }
+  }
+
+  alert('Done!');
+  ```
+- `continue` 指令也可以与标签一起使用。在这种情况下，执行跳转到标记循环的下一次迭代。
+
+## `switch` 语句
+```js
+switch(x) {
+  case 'value1':  // if (x === 'value1')
+    ...
+    [break]
+
+  case 'value2':  // if (x === 'value2')
+    ...
+    [break]
+
+  default:
+    ...
+    [break]
+}
+```
+- 比较 `x` 值与第一个 `case`（也就是 `value1`）**是否严格相等(被比较的值必须是相同的类型才能进行匹配)**，然后比较第二个 `case`（`value2`）以此类推。
+- 如果相等，`switch` 语句就执行相应 `case` 下的代码块，直到遇到最靠近的 `break` 语句（或者直到 `switch` 语句末尾）。
+- 如果没有符合的 `case`，则执行 `default` 代码块（如果 `default` 存在）。
+
+- 如果没有 `break`，程序将不经过任何检查就会继续执行下一个 `case`。
+  <CodeRun>
+  {`
+  let a = 2 + 2;
+  switch (a) {
+    case 3:
+      console.log( 'Too small' );
+    case 4:
+      console.log( 'Exactly!' );
+    case 5:
+      console.log( 'Too big' );
+    default:
+      console.log( "I don't know such values" );
+  }
+  `}
+  </CodeRun>
+
+- `switch` 和 `case` 都允许任意表达式。
+  <CodeRun>
+  {`
+  let a = "1";
+  let b = 0;
+  switch (+a) {
+    case b + 1:
+      console.log("this runs, because +a is 1, exactly equals b+1");
+      break;
+    default:
+      console.log("this doesn't run");
+  }
+  `}
+  </CodeRun>
+
+- 共享同一段代码的几个 `case` 分支可以被分为一组
+  <CodeRun>
+  {`
+  let a = 3;
+  switch (a) {
+    case 4:
+      console.log('Right!');
+      break;
+    case 3: // (*) 下面这两个 case 被分在一组
+    case 5:
+      console.log('Wrong!');
+      console.log("Why don't you take a math class?");
+      break;
+    default:
+      console.log('The result is strange. Really.');
+  }
+  `}
+  </CodeRun>
 
 ## 异步
 ```jsx live
