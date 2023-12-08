@@ -84,6 +84,20 @@ const config = {
           src: 'https://s0.lgstatic.com/i/image/M00/41/92/CgpEMllU3hWAFygCAAZ9z9H7nhk224.jpg',
         },
         items: [
+          {
+            label: 'AI工具',
+            position : 'right',
+            items: [
+              {
+                label: 'devv_',
+                href: 'https://devv.ai/',
+              },
+              {
+                label: 'perplexity',
+                href: 'https://www.perplexity.ai/',
+              },
+            ]
+          },
           {label: 'developer-roadmap', position: 'right', href: 'https://roadmap.sh/'},
           {
             type: 'doc',

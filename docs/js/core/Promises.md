@@ -282,61 +282,50 @@ generateNumber(10)
 ```
 
 例子：
-```jsx live
-function liveRender() {
-  // begin
-  function getUser(userId) {
-    return new Promise((resolve, reject) => {
-      alert('Get the user from the database.');
-      setTimeout(() => {
-        resolve({
-          userId: userId,
-          username: 'admin'
-        });
-      }, 1000);
-    })
-  }
-
-  function getServices(user) {
-    return new Promise((resolve, reject) => {
-      alert(`Get the services of ${user.username} from the API.`);
-      setTimeout(() => {
-        resolve(['Email', 'VPN', 'CDN']);
-      }, 3 * 1000);
-    });
-  }
-
-  function getServiceCost(services) {
-    return new Promise((resolve, reject) => {
-      alert(`Calculate the service cost of ${services}.`);
-      setTimeout(() => {
-        resolve(services.length * 100);
-      }, 2 * 1000);
-    });
-  }
-  // end
-
-  function showResult() {
-    getUser(100)
-      .then(getServices)
-      .then(getServiceCost)
-      .then(alert);
-  }
-  return <button onClick={showResult}>查看结果</button>
+<CodeRun>{`
+function getUser(userId) {
+  return new Promise((resolve, reject) => {
+    console.log('Get the user from the database.');
+    setTimeout(() => {
+      resolve({
+        userId: userId,
+        username: 'admin'
+      });
+    }, 1000);
+  })
 }
-```
+function getServices(user) {
+  return new Promise((resolve, reject) => {
+    console.log('Get the services of ' + user.username + 'from the API.');
+    setTimeout(() => {
+      resolve(['Email', 'VPN', 'CDN']);
+    }, 3 * 1000);
+  });
+}
+function getServiceCost(services) {
+  return new Promise((resolve, reject) => {
+    console.log('Calculate the service cost of ' + 'services.');
+    setTimeout(() => {
+      resolve(services.length * 100);
+    }, 2 * 1000);
+  });
+}
+getUser(100)
+  .then(getServices)
+  .then(getServiceCost)
+  .then(console.log);
+`}</CodeRun>
 
 ### [Promise Error Handling](https://www.javascripttutorial.net/es6/promise-error-handling/)
 #### Errors outside the Promises
 When you raise an exception outside the promise, you must catch it with try/catch. 当您在promise之外引发异常时，您必须使用 try/catch 捕获它。
-```jsx live
-function liveRender() {
-  // begin
+
+- promise之外的error不会被`.catch()`捕获
+  <CodeRun>{`
   function getUserById(id) {
     if (typeof id !== 'number' || id <= 0) {
       throw new Error('Invalid id argument');
     }
-
     return new Promise((resolve, reject) => {
       resolve({
         id: id,
@@ -344,72 +333,78 @@ function liveRender() {
       });
     });
   }
-  // end
+  getUserById('a')
+    .then(user => console.log(user.username))
+    .catch(err => console.log(err)); // 发现并没有执行该catch，而是在控制台抛出异常了: Uncaught Error: Invalid id argument
+  `}</CodeRun>
 
-  function showResult() {
-    getUserById('a')
-      .then(user => alert(user.username))
-      .catch(err => alert(err)); // 发现并没有执行该catch，而是在控制台抛出异常了: Uncaught Error: Invalid id argument
-  }
-  function showResult2() {
-    try {
-      getUserById('a')
-        .then(user => alert(user.username))
-        .catch(err => alert(`Caught by .catch ${error}`));
-    } catch (error) {
-      alert(`Caught by try/catch ${error}`);
+- promise之外的error会被`try/catch`捕获
+  <CodeRun>{`
+  function getUserById(id) {
+    if (typeof id !== 'number' || id <= 0) {
+      throw new Error('Invalid id argument');
     }
+    return new Promise((resolve, reject) => {
+      resolve({
+        id: id,
+        username: 'admin'
+      });
+    });
   }
-  return <div>
-    <button onClick={showResult}>查看结果promise-catch</button>
-    <button onClick={showResult2}>查看结果try-catch</button>
-  </div>
-}
-```
+  try {
+    getUserById('a')
+      .then(user => console.log(user.username))
+      .catch(err => console.log('Caught by .catch ' + error));
+  } catch (error) {
+    console.log('Caught by try/catch ' + error);
+  }
+  `}</CodeRun>
 
 #### Errors inside the Promises
 :::tip
 If you throw an error inside the promise, the `catch()` method will catch it, not the `try/catch`.
 :::
-```jsx live
-function liveRender() {
-  // begin
+- promise内部的error能被`.catch()`捕获
+  <CodeRun>{`
   let authorized = false;
-
   function getUserById(id) {
     return new Promise((resolve, reject) => {
       if (!authorized) {
         throw new Error('Unauthorized access to the user data');
       }
-
       resolve({
         id: id,
         username: 'admin'
       });
     });
   }
-  // end
+  getUserById(10)
+    .then(user => console.log(user.username))
+    .catch(err => console.log('Caught by .catch ' + err));
+  `}</CodeRun>
 
-  function showResult() {
+- promise内部的error不会被`try/catch`捕获
+  <CodeRun>{`
+  let authorized = false;
+  function getUserById(id) {
+    return new Promise((resolve, reject) => {
+      if (!authorized) {
+        throw new Error('Unauthorized access to the user data');
+      }
+      resolve({
+        id: id,
+        username: 'admin'
+      });
+    });
+  }
+  try {
     getUserById(10)
-      .then(user => alert(user.username))
-      .catch(err => alert(`Caught by .catch ${err}`));
+      .then(user => console.log(user.username))
+      .catch(err => console.log('Caught by .catch ' + err));
+  } catch (error) {
+    console.log('Caught by try/catch ' + error); // 不会执行
   }
-  function showResult2() {
-    try {
-      getUserById(10)
-        .then(user => alert(user.username))
-        .catch(err => alert(`Caught by .catch ${err}`));
-    } catch (error) {
-      alert(`Caught by try/catch ${error}`);
-    }
-  }
-  return <div>
-    <button onClick={showResult}>查看结果promise-catch</button>
-    <button onClick={showResult2}>查看结果try-catch</button>
-  </div>
-}
-```
+  `}</CodeRun>
 
 :::info
 对于Errors inside the Promises，If you chain promises, the `catch()` method will catch errors that occurred in any promise.
@@ -422,99 +417,68 @@ promise1
 ```
 In this example, if any error in the promise1, promise2, or promise4, the `catch()` method will handle it.
 
-```jsx live
-function liveRender() {
-  // begin
-  function queryInitInfo() {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve({name: 'LBJ'});
-      }, 500);
-    });
-  }
-  // end
-
-  function showResult() {
-    try {
-      queryInitInfo().then(res => {
-        b.c = 1;
-      }).catch(reason => {
-        console.log('reason::', reason) // reason:: ReferenceError: b is not defined
-      })
-    } catch (error) {
-      console.log('error::', error)
-    }
-  }
-
-  return <div>
-    <button onClick={showResult}>控制台查看哪个catch有效</button>
-  </div>
+<CodeRun>{`
+function queryInitInfo() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({name: 'LBJ'});
+    }, 500);
+  });
 }
-```
+try {
+  queryInitInfo().then(res => {
+    b.c = 1;
+  }).catch(reason => {
+    console.log('reason:: ' + reason) // reason:: ReferenceError: b is not defined
+  })
+} catch (error) {
+  console.log('error::', error) // 不执行
+}
+`}</CodeRun>
 :::
 
-#### Calling reject() function
-在下面例子中，我们没有在 promise 中抛出错误，而是显式调用了 reject()，catch() 方法也处理这种情况下的错误。
-```jsx live
-function liveRender() {
-  // begin
-  let authorized = false;
-
-  function getUserById(id) {
-    return new Promise((resolve, reject) => {
-      if (!authorized) {
-        reject('Unauthorized access to the user data');
-      }
-
-      resolve({
-        id: id,
-        username: 'admin'
-      });
-    });
-  }
-  // end
-
-  function showResult() {
-    try { // 实际不用try-catch，promise-catch就能处理
-      getUserById(10)
-        .then(user => alert(user.username))
-        .catch(err => alert(`Caught by .catch ${err}`));
-    } catch (error) {
-      alert(`Caught by try/catch ${error}`);
+#### Calling `reject()` function
+在下面例子中，我们没有在 promise 中抛出错误，而是显式调用了 `reject()`，`catch()` 方法也处理这种情况下的错误。
+<CodeRun>{`
+let authorized = false;
+function getUserById(id) {
+  return new Promise((resolve, reject) => {
+    if (!authorized) {
+      reject('Unauthorized access to the user data');
     }
-  }
-
-  return <button onClick={showResult}>查看结果</button>
-}
-```
-
-```jsx live
-function liveRender() {
-  // begin
-  function getUserById(id) {
-    return new Promise((resolve, reject) => {
-      if (!authorized) {
-        reject('Unauthorized access to the user data');
-      }
-      resolve({
-        id: id,
-        username: 'admin'
-      });
+    resolve({
+      id: id,
+      username: 'admin'
     });
-  }
-
-  function showResult() {
-    try {
-      getUserById(10)
-        .then(user => console.log(user.username));
-      // the following code will not execute
-      alert('next');
-    } catch (error) {
-      alert(`Caught by try/catch ${error}`);
-    }
-  }
-  // end
-
-  return <button onClick={showResult}>查看结果</button>
+  });
 }
-```
+// 实际不用try-catch，promise-catch就能处理
+try {
+  getUserById(10)
+    .then(user => console.log(user.username))
+    .catch(err => console.log('Caught by .catch ' + err)); // "Caught by .catch Unauthorized access to the user data"
+} catch (error) {
+  console.log('Caught by try/catch ' + error); // 不执行
+}
+`}</CodeRun>
+
+<CodeRun>{`
+function getUserById(id) {
+  return new Promise((resolve, reject) => {
+    if (!authorized) {
+      reject('Unauthorized access to the user data');
+    }
+    resolve({
+      id: id,
+      username: 'admin'
+    });
+  });
+}
+try {
+  getUserById(10)
+    .then(user => console.log(user.username));
+  console.log('next'); // 还会执行
+} catch (error) {
+  console.log('Caught by try/catch ' + error); // 不执行
+}
+`}</CodeRun>

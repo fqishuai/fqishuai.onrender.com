@@ -39,7 +39,7 @@ alert(num); // 5
 num = 5; // 错误：num 未定义
 ```
 
-## 数据类型
+## 数据类型-概述
 在 JavaScript 中有 8 种基本的数据类型（7 种原始类型和 1 种引用类型）：
 1. 七种原始数据类型：
 - "number" 用于任何类型的数字：整数或浮点数，在 ±(2^53-1) 范围内的整数。
@@ -53,7 +53,7 @@ num = 5; // 错误：num 未定义
 2. 一种非原始数据类型：
 - "object" 用于更复杂的数据结构。
 
-### Number 类型
+## 数据类型-Number类型
 Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（special numeric values）”：`Infinity`、`-Infinity` 和 `NaN`。
 - `Infinity` 代表数学概念中的 无穷大 ，是一个比任何数字都大的特殊值。`alert( 1 / 0 ); // Infinity` `alert( 1e500 ); // Infinity`
 
@@ -121,7 +121,7 @@ Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（s
 
 - 存在两个零：0 和 -0。这是因为在存储时，使用一位来存储符号（64位存储一个数字：其中 52位被用于存储这些数字，11位用于存储小数点的位置，1位用于符号），因此对于包括零在内的任何数字，可以设置这一位或者不设置。
 
-#### `toString(base)`
+### `toString(base)`
 方法 `toString(base)` 返回给定 `base` 进制 的字符串表示形式。`base` 的范围可以从 2 到 36。默认情况下是 10。
 - base=16 用于十六进制颜色，字符编码等，数字可以是 0..9 或 A..F。
 - base=2 主要用于调试按位操作，数字可以是 0 或 1。
@@ -140,7 +140,7 @@ Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（s
 如果我们想直接在一个数字上调用一个方法，比如上面例子中的 toString，那么我们需要在它后面放置两个点 `..`。如果我们放置一个点：`123456.toString(36)`，那么就会出现一个 error，因为 JavaScript 语法隐含了第一个点之后的部分为小数部分。如果我们再放一个点，那么 JavaScript 就知道小数部分为空，现在使用该方法。也可以写成 `(123456).toString(36)`。
 :::
 
-#### 舍入
+### 舍入
 对数字进行舍入的内建函数:
 - `Math.floor` 向下舍入
 - `Math.ceil` 向上舍入
@@ -149,7 +149,7 @@ Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（s
 
 ![舍入函数](img/math.jpeg)
 
-##### 将数字舍入到小数点后 n 位
+#### 将数字舍入到小数点后 n 位
 有两种方式:
 1. 乘除法。例如，要将数字舍入到小数点后两位，我们可以将数字乘以 100，调用舍入函数，然后再将其除回。
    ```js
@@ -171,7 +171,7 @@ Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（s
    alert( num.toFixed(5) ); // "12.34000"，在结尾添加了 0，以达到小数点后五位
    ```
 
-#### 精度损失
+### 精度损失
 - 在十进制数字系统中，可以保证以 10 的整数次幂作为除数能够正常工作，但是以 3 作为除数则不能（1/3 是无限循环小数 0.33333(3)）。同样的原因，在二进制数字系统中，可以保证以 2 的整数次幂作为除数时能够正常工作，但 1/10（0.1）就变成了一个无限循环的二进制小数（0.0 0011 0011 0011(0011) 0011无限循环）。在内部，数字是以 64 位格式 IEEE-754 表示的，所以正好有 64 位可以存储一个数字：其中 52 位被用于存储这些数字，其中 11 位用于存储小数点的位置，而 1 位用于符号。无限循环小数超出64位，会被截断处理，就会损失精度。
   ```js
   alert( 0.1 + 0.2 == 0.3 ); // false
@@ -219,7 +219,7 @@ Number 类型，包括整数和浮点数，还包括所谓的“特殊数值（s
 
 - 由于精度损失的问题存在，所以在处理小数时应避免相等性检查。
 
-#### `parseInt` 和 `parseFloat`
+### `parseInt` 和 `parseFloat`
 `parseInt` 和 `parseFloat` 可以从字符串中“读取”数字，直到无法读取为止。如果发生 error，则返回收集到的数字。函数 `parseInt` 返回一个整数，而 `parseFloat` 返回一个浮点数
 <CodeRun>{`
 console.log( parseInt('100px') );    // 100
@@ -241,7 +241,7 @@ console.log( parseFloat('12.3.4') ); // 12.3，在第二个点处停止了读取
   console.log( parseInt('2n9c', 36) ); // 123456
   `}</CodeRun>
 
-#### 其他数学函数
+### 其他数学函数
 JavaScript 有一个内建的 Math 对象，它包含了一个小型的数学函数和常量库。
 - `Math.random()` 返回一个从 0 到 1 的随机数（不包括 1）
 - `Math.max(a, b, c...)` 从任意数量的参数中返回最大值
@@ -249,7 +249,7 @@ JavaScript 有一个内建的 Math 对象，它包含了一个小型的数学函
 - `Math.pow(n, power)` 返回 n 的给定（power）次幂
 - ...等等
 
-### BigInt 类型
+## 数据类型-BigInt类型
 - 在 JavaScript 中，Number 类型超出安全整数范围 ±(2^53-1) 会出现精度问题，因为并非所有数字都适合固定的 64 位存储。因此，可能存储的是“近似值”。如下两个数字（正好超出了安全整数范围）是相同的：
 <CodeRun>
 {
@@ -267,7 +267,7 @@ JavaScript 有一个内建的 Math 对象，它包含了一个小型的数学函
   ```
 
 
-### String 类型
+## 数据类型-String类型
 - 字符串的内部使用 UTF-16 编码(即：每个字符都有对应的数字代码)，它不依赖于页面编码。
 - 单引号和双引号基本相同。反引号允许我们通过 `${…}` 将任何表达式嵌入到字符串中。使用反引号的另一个优点是它们允许字符串跨行。
 - 反引号还允许我们在第一个反引号之前指定一个“模版函数”。语法是：
@@ -305,7 +305,7 @@ JavaScript 有一个内建的 Math 对象，它包含了一个小型的数学函
   alert( 'Interface'[0].toLowerCase() ); // 'i'
   ```
 
-#### 特殊字符
+### 特殊字符
 - 所有的特殊字符都以反斜杠字符 `\` 开始。它也被称为“转义字符”。
 ![特殊字符列表](img/special_characters.jpeg)
 
@@ -329,14 +329,14 @@ alert( "\u{20331}" ); // 佫，罕见的中国象形文字（长 Unicode）
 alert( "\u{1F60D}" ); // 😍，笑脸符号（另一个长 Unicode）
 ```
 
-#### `length`属性
+### `length`属性
 `length`属性表示字符串长度。请注意 `length` 是一个属性，而不是函数，后面不需要添加括号。
 ```js
 alert( `My\n`.length ); // 3 注意 \n 是一个单独的“特殊”字符
 ```
 
-#### 查找子字符串
-##### `indexOf(substr, pos)` 和 `lastIndexOf(substr, position)`
+### 查找子字符串
+#### `indexOf(substr, pos)` 和 `lastIndexOf(substr, position)`
 `indexOf(substr, pos)` 从给定位置 `pos`(可选参数) 开始，在 str 中查找 substr，如果没有找到，则返回 -1，否则返回匹配成功的位置。检索是大小写敏感的。
 ```js
 let str = 'Widget with id';
@@ -362,7 +362,7 @@ while ((pos = str.indexOf(target, pos + 1)) != -1) {
 
 `lastIndexOf(substr, position)` 从字符串的末尾开始搜索到开头。
 
-##### Bitwise NOT (`~`) 按位取反
+#### Bitwise NOT (`~`) 按位取反
 - `~` 将数字转换为 32-bit 整数（如果存在小数部分，则删除小数部分），然后对其二进制表示形式中的所有位均取反。
 - 对于 32-bit 整数，`~n` 等于 `-(n+1)`。
   ```js
@@ -380,7 +380,7 @@ while ((pos = str.indexOf(target, pos + 1)) != -1) {
   }
   ```
 
-##### includes，startsWith，endsWith
+#### includes，startsWith，endsWith
 `str.includes(substr, pos)` 根据 str 中是否包含 substr 来返回 true/false。第二个可选参数是开始搜索的起始位置。
 ```js
 alert( "Widget".includes("id") );    // true
@@ -391,10 +391,10 @@ alert( "Widget".startsWith("Wid") ); // true，"Widget" 以 "Wid" 开始
 alert( "Widget".endsWith("get") );   // true，"Widget" 以 "get" 结束
 ```
 
-#### 获取子字符串
+### 获取子字符串
 JavaScript 中有三种获取字符串的方法：substring、substr 和 slice。
 ![获取子字符串](img/substring.jpeg)
-##### `str.slice(start [, end])`
+#### `str.slice(start [, end])`
 返回字符串从 start 到（但不包括）end 的部分。如果没有第二个参数，slice 会一直运行到字符串末尾。不影响原字符串。
 ```js
 let str = "stringify";
@@ -411,7 +411,7 @@ let str = "stringify";
 alert( str.slice(-4, -1) ); // 'gif'
 ```
 
-##### `str.substring(start [, end])`
+#### `str.substring(start [, end])`
 返回字符串从 start 到（但不包括）end 的部分。与 `slice` 的区别是，`substring` 允许 start 大于 end；`substring` 不支持负参数（负参数被视为 0）。
 ```js
 let str = "stringify";
@@ -425,7 +425,7 @@ alert( str.slice(2, 6) ); // "ring"（一样）
 alert( str.slice(6, 2) ); // ""（空字符串）
 ```
 
-##### `str.substr(start [, length])`
+#### `str.substr(start [, length])`
 返回字符串从 start 开始的给定 length 的部分。第一个参数可能是负数，表示从结尾算起。
 ```js
 let str = "stringify";
@@ -436,16 +436,16 @@ alert( str.substr(-4, 2) ); // 'gi'，从第 4 位获取 2 个字符
 `substr` 有一个小缺点：它不是在 JavaScript 核心规范中描述的，而是在附录 B 中。附录 B 的内容主要是描述因历史原因而遗留下来的仅浏览器特性。因此，理论上非浏览器环境可能无法支持 `substr`，但实际上它在别的地方也都能用。
 :::
 
-### Boolean 类型
+## 数据类型-Boolean类型
 Boolean类型仅包含两个值：true 和 false。
 
-### null
+## 数据类型-null
 JavaScript 中的 `null` 仅仅是一个代表“无”、“空”或“值未知”的特殊值。
 
-### undefined
+## 数据类型-undefined
 `undefined` 的含义是 未被赋值。如果一个变量已被声明，但未被赋值，那么它的值就是 `undefined`。从技术上讲，可以显式地将 `undefined` 赋值给变量，但是不建议这样做。**通常，使用 `null` 将一个“空”或者“未知”的值写入变量中，而 `undefined` 则保留作为未进行初始化的事物的默认初始值。**
 
-### Symbol 类型
+## 数据类型-Symbol类型
 - 可以使用 `Symbol()` 来创建这种类型的值，Symbol 类型的值表示唯一的标识符。
   ```js
   let id = Symbol();
@@ -528,7 +528,7 @@ JavaScript 中的 `null` 仅仅是一个代表“无”、“空”或“值未�
   console.log( clone[id] ); // 123
   `}</CodeRun>
 
-#### 全局symbol
+### 全局symbol
 - 通常所有的 symbol 都是不同的，即使它们有相同的名字。但有时我们想要名字相同的 symbol 具有相同的实体。
 
 - 使用 `Symbol.for(key)` 可以检查全局symbol注册表，如果有一个描述为 `key` 的 symbol，则返回该 symbol，否则将创建一个新 symbol（`Symbol(key)`），并通过给定的 `key` 将其存储在注册表中。注册表内的 symbol 被称为 全局symbol。使用 `Symbol.for(key)` 多次调用 `key` 相同的 symbol 时，返回的就是同一个 symbol。
@@ -562,7 +562,7 @@ JavaScript 中的 `null` 仅仅是一个代表“无”、“空”或“值未�
   console.log( localSymbol.description );     // "name"，可以使用description属性获取symbol名字
   `}</CodeRun>
 
-#### 系统symbol
+### 系统symbol
 JavaScript 内部有很多“系统” symbol，我们可以使用它们来改变一些内建行为。它们都被列在了 [众所周知的 symbol](https://tc39.es/ecma262/#sec-well-known-symbols) 中:
 - `Symbol.hasInstance`
 - `Symbol.isConcatSpreadable`
@@ -570,7 +570,7 @@ JavaScript 内部有很多“系统” symbol，我们可以使用它们来改�
 - `Symbol.toPrimitive`
 - ……等等。
 
-### Object 类型
+## 数据类型-Object类型
 - 创建对象的2种语法: 构造函数、字面量(object literal)。
   ```js
   let user = new Object(); // “构造函数” 的语法
@@ -627,7 +627,7 @@ JavaScript 内部有很多“系统” symbol，我们可以使用它们来改�
   };
   ```
 
-#### 对象方法中的`this`
+### 对象方法中的`this`
 ```js
 let user = {
   name: "John",
@@ -674,7 +674,7 @@ user.sayHi(); // John
   admin.sayHi();
   `}</CodeRun>
 
-#### 计算属性
+### 计算属性
 当创建一个对象时，我们可以在对象字面量中使用方括号。这叫做 计算属性。
 ```js
 let fruit = prompt("Which fruit to buy?", "apple");
@@ -695,7 +695,7 @@ console.log( bag.appleComputers )
 `}
 </CodeRun>
 
-#### `in`操作符
+### `in`操作符
 - JavaScript 的对象有一个需要注意的特性：能够被访问任何属性。即使属性不存在也不会报错！读取不存在的属性只会得到 `undefined`。
   ```js
   let user = {};
@@ -727,56 +727,7 @@ console.log( bag.appleComputers )
 
 - 通常情况下不应该给对象属性赋值 `undefined`。我们通常会用 `null` 来表示未知的或者空的值。
 
-#### `for..in` 循环
-为了遍历一个对象的所有键（`key`），可以使用一个特殊形式的循环：`for..in`。注意，所有的 “for” 结构体都允许我们在循环中定义变量，像如下的 `let prop`。
-<CodeRun>
-{`
-let user = {
-  name: "John",
-  age: 30,
-  isAdmin: true
-};
-for (let prop in user) {
-  // keys
-  console.log( prop );  // name, age, isAdmin
-  // 属性键的值
-  console.log( user[prop] ); // John, 30, true
-}
-`}
-</CodeRun>
-
-遍历一个对象时，整数属性会被进行排序，其他属性则按照创建的顺序显示。
-> 这里的“整数属性”指的是一个可以在不做任何更改的情况下与一个整数进行相互转换的字符串。例如："49" 是一个整数属性名（因为我们把它转换成整数，再转换回来，它还是一样的。），但是 “+49” 和 “1.2” 就不是。
-
-<CodeRun>
-{`
-let codes = {
-  "49": "Germany",
-  "41": "Switzerland",
-  "44": "Great Britain",
-  // ..,
-  "1": "USA"
-};
-for(let code in codes) {
-  console.log(code); // "1", "41", "44", "49"
-}
-`}
-</CodeRun>
-<CodeRun>
-{`
-let user = {
-  name: "John",
-  surname: "Smith"
-};
-user.age = 25; // 增加一个
-// 非整数属性是按照创建的顺序来排列的
-for (let prop in user) {
-  console.log( prop ); // "name", "surname", "age"
-}
-`}
-</CodeRun>
-
-#### 对象引用和复制
+### 对象引用和复制
 - 原始类型的复制
   ```js
   let message = "Hello!";
@@ -822,7 +773,7 @@ for (let prop in user) {
   `}
   </CodeRun>
 
-#### 对象的克隆与合并
+### 对象的克隆与合并
 - 克隆对象 可以创建一个新对象，通过遍历已有对象的属性，并在原始类型值的层面复制它们，以实现对已有对象结构的复制。
   <CodeRun>
   {`
@@ -880,7 +831,7 @@ for (let prop in user) {
   console.log( clone );
   `}</CodeRun>
 
-#### 深层克隆对象
+### 深层克隆对象
 对象的属性可以是对其他对象的引用，这时简单的克隆对象后，该属性的值会以引用形式被拷贝。
 <CodeRun>{`
 let user = {
@@ -899,7 +850,7 @@ console.log(clone.sizes.width);            // 51，能从另外一个获取到�
 
 为了解决这个问题，并让 `user` 和 `clone` 成为两个真正独立的对象，我们应该使用一个拷贝循环来检查 `user[key]` 的每个值，如果它是一个对象，那么也复制它的结构。这就是所谓的“深拷贝”。我们可以使用递归来实现它。或者为了不重复造轮子，采用现有的实现，例如 [lodash](https://lodash.com/) 库的 [`_.cloneDeep(obj)`](https://lodash.com/docs#cloneDeep)。
 
-#### 对象的属性标志
+### 对象的属性标志
 - 使用 `const` 声明的对象也是可以被修改的。如下使用`const`声明的变量`user`的值是一个常量，它必须始终引用同一个对象，但该对象的属性可以被自由修改。
   <CodeRun>{`
   const user = {
@@ -909,9 +860,9 @@ console.log(clone.sizes.width);            // 51，能从另外一个获取到�
   console.log(user.name); // Pete
   `}</CodeRun>
 
-#### 对象到原始值的转换
+### 对象到原始值的转换
 对于类似 `obj1 > obj2` 的比较，或者跟一个原始类型值的比较 `obj == 5`，对象都会被转换为原始值。
-##### hint
+#### hint
 JavaScript 是通过 hint 决定对象转换为哪种原始值的，如[规范](https://tc39.github.io/ecma262/#sec-toprimitive)所述，有3种hint：
 1. "string"
    当我们对期望一个字符串的对象执行操作时，如 `alert(obj)` `anotherObj[obj]`(将对象作为属性键)，对象转换为字符串。
@@ -944,7 +895,7 @@ JavaScript 是通过 hint 决定对象转换为哪种原始值的，如[规范](
 像 `<` 和 `>` 这样的小于/大于比较运算符，也可以同时用于字符串和数字。不过，它们使用 “number” hint，而不是 “default” hint。这是历史原因。
 :::
 
-##### 转换规则
+#### 转换规则
 为了进行转换，JavaScript 尝试查找并调用三个对象方法：
 1. 如果对象有 `[Symbol.toPrimitive](hint)` 方法的话，调用该方法（这个方法是带有 symbol 键 `Symbol.toPrimitive`（系统 symbol）的方法），
 2. 如果对象没有 `[Symbol.toPrimitive](hint)` 方法，那么 JavaScript 将尝试寻找 `toString` 和 `valueOf` 方法：
@@ -1053,7 +1004,7 @@ console.log( user + 500 );         // valueOf -> "1000500"
 `}</CodeRun>
 :::
 
-##### 进一步的转换
+#### 进一步的转换
 如果对象作为操作数参与运算，则会出现两个运算阶段：
 1. 对象被转换为原始值。
 2. 如果还需要进一步计算，则生成的原始值会被进一步转换。
@@ -1076,7 +1027,7 @@ let obj = {
 console.log( obj + 2 ); // 22（"2" + 2）被转换为原始值字符串
 `}</CodeRun>
 
-#### 其他对象
+### 其他对象
 有时候大家会说“Array 类型”或“Date 类型”，但其实它们并不是自身所属的类型，而是属于一个对象类型即 “object”。它们以不同的方式对 “object” 做了一些扩展。
 - Function（函数）
 - Array 用于存储有序数据集合
@@ -2163,6 +2114,10 @@ JavaScript 中的数组既可以用作队列(First-In-First-Out)，也可以用�
   ![pop](img/pop.jpeg)
 
 ### splice/slice 方法
+:::warning
+splice 方法 修改的是数组本身。
+:::
+
 - 如何从数组中删除元素？数组是对象，所以我们可以尝试使用 `delete`，如下发现元素被删除了，但数组仍然有 3 个元素。这是因为 `delete obj.key` 是通过 `key` 来移除对应的值。对于普通对象来说是可以的。但是对于数组来说，我们通常希望剩下的元素能够移动并占据被释放的位置。
 <CodeRun>{`
 let arr = ["I", "go", "home"];
@@ -2220,7 +2175,24 @@ cosole.log( arr.length ); // 3
   alert( arr ); // 1,2,3,4,5
   ```
 
-- `arr.slice([start], [end])` 会返回一个新数组，将所有从索引 `start` 到 `end`（不包括 `end`）的数组项复制到一个新的数组。`start` 和 `end` 都可以是负数，在这种情况下，从末尾计算索引。我们也可以不带参数地调用它：`arr.slice()` 会创建一个 `arr` 的副本。其通常用于获取副本，以进行不影响原始数组的进一步转换。
+  <CodeRun>{`
+  // 若a ≤ arr[i] ≤ b 则保留，否则删除
+  function filterRangeInPlace(arr, a, b) {
+    for (let i = 0; i < arr.length; i++) {
+      let val = arr[i];
+      // 如果超出范围，则删除
+      if (val < a || val > b) {
+        arr.splice(i, 1);
+        i--;
+      }
+    }
+  }
+  let arr = [5, 3, 8, 1];
+  filterRangeInPlace(arr, 1, 4);
+  console.log( arr ); // [3, 1]
+  `}</CodeRun>
+
+- `arr.slice([start], [end])` 创建一个新数组，将所有从索引 `start` 到 `end`（不包括 `end`）的数组项复制到一个新的数组。`start` 和 `end` 都可以是负数，在这种情况下，从末尾计算索引。我们也可以不带参数地调用它：`arr.slice()` 会创建一个 `arr` 的副本。其通常用于获取副本，以进行不影响原始数组的进一步转换。
   ```js
   let arr = ["t", "e", "s", "t"];
 
@@ -2228,6 +2200,16 @@ cosole.log( arr.length ); // 3
 
   alert( arr.slice(-2) );   // s,t（复制从位置 -2 到尾端的元素）
   ```
+  <CodeRun>{`
+  // 对字符串数组arr进行排序，但保持 arr 不变。
+  function copySorted(arr) {
+    return arr.slice().sort(); // 使用 slice() 来创建一个副本并对其进行排序
+  }
+  let arr = ["HTML", "JavaScript", "CSS"];
+  let sorted = copySorted(arr);
+  console.log( sorted );
+  console.log( arr );
+  `}</CodeRun>
 
 ### concat 方法
 - `arr.concat(arg1, arg2...)` 创建一个新数组，其中包含来自于 `arr`，然后是 `arg1`，`arg2` 的元素。它接受任意数量的参数(数组或值都可以，如果参数是一个数组，那么其中的所有元素都会被复制，否则，将复制参数本身)。
@@ -2339,11 +2321,24 @@ let users = [
   {id: 3, name: "Mary"}
 ];
 
-// 返回前两个用户的数组
+// 返回前两个用户的数组，回调函数使用箭头函数
 let someUsers = users.filter(item => item.id < 3);
 
 alert(someUsers.length); // 2
 ```
+<CodeRun>{`
+let users = [
+  {id: 1, name: "John"},
+  {id: 2, name: "Pete"},
+  {id: 3, name: "Mary"}
+];
+// 返回前两个用户的数组
+let someUsers = users.filter(callbackFn);
+function callbackFn(user) {
+  return user.id < 3;
+}
+console.log( someUsers ); // [ { id: 1, name: 'John' }, { id: 2, name: 'Pete' } ]
+`}</CodeRun>
 
 ### map 方法
 对数组的每个元素都调用函数，并返回结果数组。
@@ -2351,13 +2346,40 @@ alert(someUsers.length); // 2
 let lengths = ["Bilbo", "Gandalf", "Nazgul"].map(item => item.length);
 alert(lengths); // 5,7,6
 ```
+```js
+let john = { name: "John", surname: "Smith", id: 1 };
+let pete = { name: "Pete", surname: "Hunt", id: 2 };
+let mary = { name: "Mary", surname: "Key", id: 3 };
+
+let users = [ john, pete, mary ];
+
+let usersMapped = users.map(user => ({ // 把要返回的对象直接包在括号里，这样可以省略写return
+  fullName: `${user.name} ${user.surname}`,
+  id: user.id
+}));
+
+/*
+usersMapped = [
+  { fullName: "John Smith", id: 1 },
+  { fullName: "Pete Hunt", id: 2 },
+  { fullName: "Mary Key", id: 3 }
+]
+*/
+
+alert( usersMapped[0].id ); // 1
+alert( usersMapped[0].fullName ); // John Smith
+```
 
 ### sort 方法
+:::warning
+sort 方法 修改的是数组本身。
+:::
+
 - 对数组进行 原位（in-place，是指在此数组内，而非生成一个新数组）排序，更改元素的顺序(**默认情况下按字符串进行排序**)。
 <CodeRun>{`
 let arr = [ 1, 2, 15 ];
 arr.sort(); // 该方法重新排列 arr 的内容，所有元素都被转换为字符串，然后进行比较，"2" > "15"
-console.log( arr.toString() );  // 1, 15, 2
+console.log( arr.toString() );  // "1,15,2"
 `}</CodeRun>
 
 - 要使用我们自己的排序顺序，我们需要提供一个函数作为 `sort()` 的参数。
@@ -2376,42 +2398,236 @@ console.log( arr.toString() );  // 1, 15, 2
   <CodeRun>{`
   let arr = [ 1, 15, 2 ];
   arr.sort(function(a, b) { return a - b; });
-  alert(arr);  // [1, 2, 15]
+  console.log( arr );  // [1, 2, 15]
   `}</CodeRun>
   <CodeRun>{`
   let arr = [ 1, 15, 2 ];
   arr.sort( (a, b) => a - b );
-  alert(arr);  // [1, 2, 15]
+  console.log( arr );  // [1, 2, 15]
+  `}</CodeRun>
+  <CodeRun>{`
+  function sortByAge(arr) {
+    arr.sort((a, b) => a.age - b.age);
+  }
+  let john = { name: "John", age: 25 };
+  let pete = { name: "Pete", age: 30 };
+  let mary = { name: "Mary", age: 28 };
+  let arr = [ pete, john, mary ];
+  sortByAge(arr);
+  // 排序后的数组为：[john, mary, pete]
+  console.log(arr[0].name); // "John"
+  console.log(arr[1].name); // "Mary"
+  console.log(arr[2].name); // "Pete"
   `}</CodeRun>
 
-### 遍历数组
-- `for` 运行得最快，可兼容旧版本浏览器。
+- 对于许多字母，最好使用 `localeCompare` 方法正确地对字母进行排序
   ```js
-  let arr = ["Apple", "Orange", "Pear"];
+  let countries = ['Österreich', 'Andorra', 'Vietnam'];
 
-  for (let i = 0; i < arr.length; i++) {
-    alert( arr[i] );
+  alert( countries.sort( (a, b) => a > b ? 1 : -1) ); // Andorra, Vietnam, Österreich（错的）
+
+  alert( countries.sort( (a, b) => a.localeCompare(b) ) ); // Andorra,Österreich,Vietnam（对的！）
+  ```
+
+### reverse 方法
+:::warning
+reverse 方法 修改的是数组本身。
+:::
+
+`reverse()` 方法就地反转数组中的元素，并返回同一数组的引用。要在不改变原始数组的情况下反转数组中的元素，使用 `toReversed()`。
+```js
+const array1 = ['one', 'two', 'three'];
+const reversed = array1.reverse();
+console.log('reversed:', reversed); // "reversed:" Array ["three", "two", "one"]
+console.log('array1:', array1);     // "array1:" Array ["three", "two", "one"]
+```
+
+### split 和 join
+- `split(delim)` 方法通过给定的分隔符 `delim` 将字符串分割成一个数组。`split` 方法有一个可选的第二个数字参数用于对数组长度进行限制。如果提供了，那么额外的元素会被忽略。若`split`方法参数为空字符串，则会将字符串拆分为字母数组。
+  ```js
+  let names = 'Bilbo, Gandalf, Nazgul';
+
+  let arr = names.split(', ');
+
+  for (let name of arr) {
+    alert( `A message to ${name}.` ); // A message to Bilbo（和其他名字）
   }
+
+  // 限制数组长度
+  let arr2 = 'Bilbo, Gandalf, Nazgul, Saruman'.split(', ', 2);
+  console.log( arr2 ); // ['Bilbo', 'Gandalf']
+
+  // 参数为空字符串，会将字符串拆分为字母数组
+  let str = "test";
+  alert( str.split('') ); // t,e,s,t
   ```
 
-- `for..of` 现代语法，只能访问 items。
+- join() 方法将一个数组（或一个类数组对象）的所有元素连接成一个字符串并返回这个字符串，用逗号（默认）或指定的分隔符分隔。如果数组只有一个元素，那么将返回该元素而不使用分隔符。
   ```js
-  let fruits = ["Apple", "Orange", "Plum"];
+  const elements = ['Fire', 'Air', 'Water'];
 
-  // 遍历数组元素
-  for (let fruit of fruits) {
-    alert( fruit );
+  console.log(elements.join());   // "Fire,Air,Water"
+  console.log(elements.join('')); // "FireAirWater"
+  ```
+
+### reduce/reduceRight
+- `reduce`方法 第一个参数本质上是累加器，用于存储所有先前执行的组合结果。
+  ```js
+  let value = array.reduce(function(accumulator, item, index, array) {
+    // ...
+  }, [initial]);
+  /*
+  accumulator —— 是上一个函数调用的结果，第一次等于 initial（如果提供了 initial 的话）。
+  item —— 当前的数组元素。
+  index —— 当前索引。
+  array —— 数组本身。
+  */
+  ```
+  <CodeRun>{`
+  let arr = [1, 2, 3, 4, 5];
+  let result = arr.reduce((sum, current) => sum + current, 0);
+  console.log( result ); // 15
+  `}</CodeRun>
+
+  ![reduce计算流程](img/reduce.jpeg)
+
+- 如果没有初始值，那么 `reduce` 会将数组的第一个元素作为初始值，并从第二个元素开始迭代。
+  <CodeRun>{`
+  let arr = [1, 2, 3, 4, 5];
+  let result = arr.reduce((sum, current) => sum + current);
+  console.log( result ); // 15
+  `}</CodeRun>
+
+- 如果初始值存在，空数组的reduce运算结果为该初始值；否则报错
+  <CodeRun>{`
+  let arr = [];
+  let result = arr.reduce((sum, current) => sum + current, 0);
+  console.log( result ); // 0
+  `}</CodeRun>
+  <CodeRun>{`
+  let arr = [];
+  arr.reduce((sum, current) => sum + current); // TypeError: Reduce of empty array with no initial value
+  `}</CodeRun>
+
+- `reduceRight` 和 `reduce` 方法的功能一样，只是遍历为从右到左。
+  <CodeRun>{`
+  let users = [
+    {id: 'john', name: "John Smith", age: 20},
+    {id: 'ann', name: "Ann Smith", age: 24},
+    {id: 'pete', name: "Pete Peterson", age: 31},
+  ];
+  let usersById = groupById(users);
+  // 创建一个函数 groupById(arr) 从该数组创建对象，以 id 为键（key），数组项为值。
+  function groupById(array) {
+    return array.reduceRight((obj, value) => {
+      obj[value.id] = value;
+      return obj;
+    }, {})
   }
-  ```
+  console.log( usersById )
+  /*
+  {
+    pete: { id: 'pete', name: 'Pete Peterson', age: 31 },
+    ann: { id: 'ann', name: 'Ann Smith', age: 24 },
+    john: { id: 'john', name: 'John Smith', age: 20 }
+  }
+  */
+  `}</CodeRun>
 
-- 技术上来讲，因为数组也是对象，所以使用 `for..in` 也是可以的，但是会有一些潜在问题存在：1. `for..in`循环会遍历所有属性(不仅仅是数组的数字属性)，如果使用`for..in`遍历类数组对象(类数组对象看似是数组，也就是说，它们有 length 和索引属性，但是也可能有其它的非数字的属性和方法)，非数字的属性也会被遍历；2. `for..in` 循环适用于普通对象，并且做了对应的优化。但是不适用于数组，因此速度要慢 10-100 倍(当然即使是这样也依然非常快,只有在遇到瓶颈时可能会有问题)。通常来说，我们不应该用 `for..in` 来处理数组。
+### some 和 every
+- `some(callbackFn, [thisArg])` 是一个迭代方法。它为数组中的每个元素调用一次指定的 `callbackFn` 函数，直到 `callbackFn` 返回一个真值。如果找到这样的元素，`some` 方法将会立即返回 true 并停止遍历数组。否则，如果 `callbackFn` 对所有元素都返回假值，`some` 就会返回 false。
 
-- `Array.prototype.forEach()` 允许为数组的每个元素都运行一个函数(该函数的结果（如果它有返回）会被抛弃和忽略)。
+- `every(callbackFn, [thisArg])` 是一个迭代方法。它为数组中的每个元素调用一次指定的 `callbackFn` 函数，直到 `callbackFn` 返回一个假值。如果找到这样的元素，`every` 方法将会立即返回 false 并停止遍历数组。否则，如果 `callbackFn` 为每个元素返回一个真值，`every` 就会返回 true。
   ```js
-  ["Bilbo", "Gandalf", "Nazgul"].forEach((item, index, array) => {
-    alert(`${item} is at index ${index} in ${array}`);
-  });
+  // 可以使用every方法比较简单数组
+  function arraysEqual(arr1, arr2) {
+    return arr1.length === arr2.length && arr1.every((value, index) => value === arr2[index]);
+  }
+
+  alert( arraysEqual([1, 2], [1, 2])); // true
   ```
+
+### fill
+`fill(value, [start], [end])` 用一个固定值填充一个数组中从start（默认为 0）到end（默认为 array.length）内的全部元素。返回修改后的数组。
+
+### copyWithin
+`copyWithin(target, [start], [end])` 浅复制数组的一部分到同一数组中的另一个位置，并返回它，**不会改变原数组的长度**。copyWithin 将会拷贝到该位置，但不包括 end 这个位置的元素。
+<CodeRun>{`
+const array1 = ['a', 'b', 'c', 'd', 'e'];
+// 从索引3复制到索引4，不包含索引4(总共复制了1个元素)，然后赋值给索引0
+console.log(array1.copyWithin(0, 3, 4));
+console.log(array1)
+// 从索引3复制到最后(总共复制了2个元素)，然后赋值给索引1开始的2个元素，不会改变原数组的长度
+console.log(array1.copyWithin(1, 3));
+console.log(array1)
+`}</CodeRun>
+
+### flat/flatMap
+从多维数组创建一个新的扁平数组
+
+### forEach
+`Array.prototype.forEach()` 允许为数组的每个元素都运行一个函数(该函数的结果（如果它有返回）会被抛弃和忽略)。
+```js
+["Bilbo", "Gandalf", "Nazgul"].forEach((item, index, array) => {
+  alert(`${item} is at index ${index} in ${array}`);
+});
+```
+
+### `Array.isArray`
+`Array.isArray(value)` 如果 `value` 是一个数组，则返回 true；否则返回 false。
+```js
+alert(Array.isArray({})); // false
+alert(Array.isArray([])); // true
+
+alert(typeof {}); // object
+alert(typeof []); // object（相同）
+```
+
+### `Array.of`
+`Array.of(element0, element1, /* … ,*/ elementN)` 通过可变数量的参数创建一个新的 Array 实例，而不考虑参数的数量或类型。
+```js
+console.log( Array.of('foo', 2, 'bar', true) ); // ["foo", 2, "bar", true]
+
+console.log( Array.of() ); // []
+```
+
+### `Array.from`
+`Array.from(arrayLike, [mapFn], [thisArg])` 从可迭代或类数组对象创建一个新的浅拷贝的数组实例。
+```js
+console.log(Array.from('foo')); // ["f", "o", "o"]
+
+console.log(Array.from([1, 2, 3], (x) => x + x)); // [2, 4, 6]
+```
+
+### 数组方法的`thisArg`参数
+- 许多数组方法接受`thisArg`作为可选的最后一个参数，例如`find(callbackFn, thisArg)`，`filter(callbackFn, thisArg)`，`map(callbackFn, thisArg)`等
+
+- `thisArg` 参数（默认为 `undefined`）将在调用 `callbackFn` 时用作 `this` 值。对于使用 箭头函数 定义的任何 `callbackFn` 来说，`thisArg` 参数都是无关紧要的，因为箭头函数没有自己的 `this` 绑定。
+  <CodeRun>{`
+  let army = {
+    minAge: 18,
+    maxAge: 27,
+    canJoin(user) {
+      console.log( this );
+      if (this) return user.age >= this.minAge && user.age < this.maxAge;
+    }
+  };
+  let users = [
+    {age: 16},
+    {age: 20},
+    {age: 23},
+    {age: 30}
+  ];
+  // 找到 army.canJoin 返回 true 的 user
+  let soldiers = users.filter(army.canJoin, army);
+  console.log( soldiers ) // [ {age: 20}, {age: 23} ]
+  // 没传thisArg，则army.canJoin 将被作为独立函数调用，并且这时 this为globalThis(严格模式为undefined)
+  let soldiers1 = users.filter(army.canJoin);
+  console.log( soldiers1 ) // []
+  // 使用箭头函数
+  let soldiers2 = users.filter(user => army.canJoin(user));
+  console.log( soldiers2 ) // [ {age: 20}, {age: 23} ]
+  `}</CodeRun>
 
 ### 数组的转换
 - **数组没有 `Symbol.toPrimitive`，也没有 `valueOf`，它们只能执行 `toString` 进行转换。** 数组的 `toString` 方法，会返回以逗号隔开的元素列表。
@@ -2736,6 +2952,74 @@ for (;;) {
   // 无限循环
 }
 ```
+
+### `for..of`
+`for..of` 语句在可迭代对象（包括 `Array`，`Map`，`Set`，`String`，`TypedArray`，`arguments`，DOM 元素集合(比如一个`NodeList`对象) 等等）上创建一个迭代循环，调用自定义迭代钩子，并为每个不同属性的值执行语句
+```js
+let fruits = ["Apple", "Orange", "Plum"];
+
+// 遍历数组元素
+for (let fruit of fruits) {
+  alert( fruit );
+}
+```
+:::tip
+对于`for...of`的循环，可以由 `break`, `throw` 或 `return` 终止。
+:::
+
+### `for..in`
+- 为了遍历一个对象的所有键（`key`），可以使用一个特殊形式的循环：`for..in`。注意，所有的 “for” 结构体都允许我们在循环中定义变量，像如下的 `let prop`。
+<CodeRun>
+{`
+let user = {
+  name: "John",
+  age: 30,
+  isAdmin: true
+};
+for (let prop in user) {
+  // keys
+  console.log( prop );  // name, age, isAdmin
+  // 属性键的值
+  console.log( user[prop] ); // John, 30, true
+}
+`}
+</CodeRun>
+
+- 遍历一个对象时，整数属性会被进行排序，其他属性则按照创建的顺序显示。
+  > 这里的“整数属性”指的是一个可以在不做任何更改的情况下与一个整数进行相互转换的字符串。例如："49" 是一个整数属性名（因为我们把它转换成整数，再转换回来，它还是一样的。），但是 “+49” 和 “1.2” 就不是。
+
+  <CodeRun>
+  {`
+  let codes = {
+    "49": "Germany",
+    "41": "Switzerland",
+    "44": "Great Britain",
+    // ..,
+    "1": "USA"
+  };
+  for(let code in codes) {
+    console.log(code); // "1", "41", "44", "49"
+  }
+  `}
+  </CodeRun>
+  <CodeRun>
+  {`
+  let user = {
+    name: "John",
+    surname: "Smith"
+  };
+  user.age = 25; // 增加一个
+  // 非整数属性是按照创建的顺序来排列的
+  for (let prop in user) {
+    console.log( prop ); // "name", "surname", "age"
+  }
+  `}
+  </CodeRun>
+
+- 技术上来讲，因为数组也是对象，所以使用 `for..in` 也是可以的，但是会有一些潜在问题存在：
+  1. `for..in`循环会遍历所有属性(不仅仅是数组的数字属性)，如果使用`for..in`遍历类数组对象(类数组对象看似是数组，也就是说，它们有 length 和索引属性，但是也可能有其它的非数字的属性和方法)，非数字的属性也会被遍历；
+
+  2. `for..in` 循环适用于普通对象，并且做了对应的优化。但是不适用于数组，因此速度要慢 10-100 倍(当然即使是这样也依然非常快,只有在遇到瓶颈时可能会有问题)。**通常来说，我们不应该用 `for..in` 来处理数组。**
 
 ### 使用 `break` 指令跳出循环
 ```js

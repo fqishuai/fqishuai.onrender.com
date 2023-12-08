@@ -278,3 +278,29 @@ const aaValue = searchParams.get('aa');
 
 ## JSX中使用`&&`的注意点
 [Stop using && in React Conditional Rendering](https://www.crocoder.dev/blog/react-conditional-rendering/)
+
+## 遇到的报错
+### 1. A component is changing a controlled input to be uncontrolled.
+```jsx
+export default function AddressBook() {
+  const [detailAddress, setDetailAddress] = useState<string | undefined>(undefined);
+
+  return <>
+    <input type="text" value={detailAddress} onChange={(e) => setDetailAddress(e.target.value)}></input>
+  </>
+}
+```
+如上写法会报错：Warning: A component is changing a controlled input to be uncontrolled. This is likely caused by the value changing from a defined to undefined, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+
+报错原因：首次渲染出的input是这样的`<input type="text" value=undefined/>`，因此react就判定这是一个非受控组件。而一旦开始输入，触发了`onChange`回调，就会给`detailAddress`赋值，这时input就成为了受控的input。
+
+解决方案：定义时初始值赋值为空字符串 `const [detailAddress, setDetailAddress] = useState<string>('');` 或者 给input的value属性一个初始值
+```jsx
+export default function AddressBook() {
+  const [detailAddress, setDetailAddress] = useState<string | undefined>(undefined);
+
+  return <>
+    <input type="text" value={detailAddress ?? ''} onChange={(e) => setDetailAddress(e.target.value)}></input>
+  </>
+}
+```

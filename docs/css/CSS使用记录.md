@@ -59,6 +59,7 @@ tags: [css, 记录]
   - [44. `:root`](#44-root)
   - [45. 吸底](#45-吸底)
   - [46. flex-grow](#46-flex-grow)
+  - [47. input样式美化](#47-input样式美化)
 
 ## 一、[CSS Modules](http://www.ruanyifeng.com/blog/2016/06/css_modules.html)
 
@@ -674,3 +675,16 @@ html {
 ### 46. flex-grow
 如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍。
 ![flex-grow](img/flex_grow.jpeg)
+
+### 47. input样式美化
+```css
+input {
+  /* input样式美化 */
+  box-shadow: none; /* 去除阴影 */
+  outline: none; /* 聚焦input的蓝色边框 */
+  resize: none; /* textarea 禁止拖拽 */
+  border: none; /* 去除边框 */
+  -webkit-appearance: none; /* 常用于IOS下移除原生样式 */
+  -webkit-tap-highlight-color: rgba(0,0,0,0); /* 点击高亮的颜色 */
+}
+```
