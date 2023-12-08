@@ -175,3 +175,67 @@ console.log(obj[key]);
 // 使用类型断言来解决错误
 console.log(obj[key as keyof typeof obj]);
 ```
+
+### 13. Property 'X' does not exist on type 'Y'
+> 参考：[Property 'X' does not exist on type 'Y'](https://www.totaltypescript.com/concepts/property-does-not-exist-on-type)
+```ts
+const requestParam = {
+  userName,
+  phoneNumber: phone,
+};
+
+if (addressIdValue) requestParam.userAddressId = addressIdValue; // Property 'userAddressId' does not exist on type '{ userName: string; phoneNumber: string; }'.
+```
+
+使用 `Record` 解决上述问题：
+```ts
+const requestParam: Record<string, string | null | undefined> = {
+  userName,
+  phoneNumber: phone,
+};
+
+if (addressIdValue) requestParam.userAddressId = addressIdValue;
+```
+
+### 14. 自定义样式属性导致类型不匹配
+```ts
+<Switch  
+  style={{ '--nutui-switch-open-background-color': '#FF6300' }} // ts报错：Type '{ '--nutui-switch-open-background-color': string; }' is not assignable to type 'Properties<string | number, string & {}>'.
+  checked={defaultAddressFlag}
+  onChange={(value) => setDefaultAddressFlag(value)}
+/>
+```
+解决方案有3种：
+1. 使用类型断言
+   ```ts
+   <Switch
+     style={{ '--nutui-switch-open-background-color': '#FF6300' } as React.CSSProperties}
+     checked={defaultAddressFlag}
+     onChange={(value) => setDefaultAddressFlag(value)}
+   />
+   ```
+
+2. 使用模块合并（module merging）的方式来扩展类型定义，以便让 TypeScript 正确识别自定义样式属性。
+   ```ts
+   import 'react';
+
+   declare module 'react' {
+      interface CSSProperties {
+        '--nutui-switch-open-background-color': string;
+      }
+   }
+   ```
+
+3. 使用接口继承或交叉类型来扩展类型定义。
+   ```ts
+   // 接口继承
+   interface CustomCSSProperties extends React.CSSProperties {
+     '--nutui-switch-open-background-color': string;
+   }
+   ```
+   ```ts
+   // 交叉类型
+   type CustomCSSProperties = React.CSSProperties & {
+     '--nutui-switch-open-background-color': string;
+   };
+   ```
