@@ -1966,8 +1966,165 @@ function len(x:any[]|string):number {
   myUser.name = "Cynthia"; // 报错 Cannot assign to 'name' because it is a read-only property.
   ```
   :::tip
-  上面的`as const`属于 TypeScript 的类型推断，如果变量明确地声明了类型，那么 TypeScript 会以声明的类型为准。
+  上面的`as const`属于 TypeScript 的类型推断，如果变量明确地声明了类型，那么 TypeScript 会以声明的类型为准。如下，根据变量`myUser`的类型声明看出`name`不是只读属性，但是赋值时又使用只读断言`as const`，这时会以声明的类型为准，即`name`属性是可以修改的。
   ```ts
-  
+  const myUser:{ name: string } = {
+    name: "Sabrina",
+  } as const;
+
+  myUser.name = "Cynthia"; // 正确
   ```
   :::
+
+### 属性名的索引类型
+如果对象的属性非常多，一个个声明类型就很麻烦，而且有些时候，无法事前知道对象会有多少属性，比如外部 API 返回的对象。这时可以采用属性名表达式的写法来描述类型，称为“属性名的索引类型”。
+```ts
+type MyObj = {
+  [property: string]: string
+};
+
+const obj:MyObj = {
+  foo: 'a',
+  bar: 'b',
+  baz: 'c',
+};
+```
+- 上述`[property: string]`的`property`表示属性名，这个是可以随便起的，它的类型是string，即属性名类型为string。也就是说，不管这个对象有多少属性，只要属性名为字符串，且属性值也是字符串，就符合这个类型声明。
+
+- JavaScript 对象的属性名（即上例的property）的类型有三种可能，除了上例的string，还有number和symbol。
+  ```ts
+  type T1 = {
+    [property: number]: string
+  };
+
+  type T2 = {
+    [property: symbol]: string
+  };
+  ```
+  ```ts
+  type MyArr = {
+    [n:number]: number;
+  };
+
+  const arr:MyArr = [1, 2, 3];
+  // 或者
+  const arr:MyArr = {
+    0: 1,
+    1: 2,
+    2: 3,
+  };
+  ```
+
+- 属性的索引类型写法，建议谨慎使用，因为属性名的声明太宽泛，约束太少。
+
+- 对象可以同时有多种类型的属性名索引，比如同时有数值索引和字符串索引。但是，数值索引不能与字符串索引发生冲突，必须服从后者，这是因为在 JavaScript 语言内部，所有的数值属性名都会自动转为字符串属性名。
+  ```ts
+  // 由于字符属性名的值类型是string，数值属性名的值类型只有同样为string，才不会报错。
+  type MyType = {
+    [x: number]: boolean; // 报错 'number' index type 'boolean' is not assignable to 'string' index type 'string'.
+    [x: string]: string;
+  }
+  ```
+
+- 可以既声明属性名索引，也声明具体的单个属性名。如果单个属性名符合属性名索引的范围，两者不能有冲突，否则报错。
+  ```ts
+  // 属性名foo符合属性名的字符串索引，但是两者的属性值类型不一样，所以报错了。
+  type MyType = {
+    foo: boolean; // 报错 Property 'foo' of type 'boolean' is not assignable to 'string' index type 'string'.
+    [x: string]: string;
+  }
+  ```
+
+- 属性名的数值索引不宜用来声明数组，因为采用这种方式声明数组，就不能使用各种数组方法以及length属性，因为类型里面没有定义这些东西。
+  ```ts
+  type MyArr = {
+    [n:number]: number;
+  };
+
+  const arr:MyArr = [1, 2, 3];
+  arr.length // 报错 Property 'length' does not exist on type 'MyArr'.
+  ```
+
+### 解构赋值的类型声明
+解构赋值用于直接从对象中提取属性。
+```js
+const {id, name, price} = product; // 从对象product提取了三个属性，并声明属性名的同名变量。
+```
+
+- 对象解构里面的冒号是为这个属性指定新的变量名。
+  ```js
+  let { x: foo, y: bar } = obj;
+
+  // 等同于
+  let foo = obj.x;
+  let bar = obj.y;
+
+  // 上面示例中，冒号不是表示属性x和y的类型，而是为这两个属性指定新的变量名。如果要为x和y指定类型，不得不写成下面这样。
+  let { x: foo, y: bar }
+    : { x: string; y: number } = obj;
+  ```
+
+- 解构赋值的类型写法如下:
+  ```ts
+  const {id, name, price}:{
+    id: string;
+    name: string;
+    price: number
+  } = product;
+  ```
+
+### 结构类型原则
+只要对象 B 满足 对象 A 的结构特征，TypeScript 就认为对象 B 兼容对象 A 的类型，这称为“结构类型”原则（structural typing）。
+```ts
+type A = {
+  x: number;
+};
+
+type B = {
+  x: number;
+  y: number;
+};
+
+// 对象A只有一个属性x，类型为number。对象B满足这个特征，因此兼容对象A，只要可以使用A的地方，就可以使用B。
+const B = {
+  x: 1,
+  y: 1
+};
+
+const A:{ x: number } = B; // 正确
+```
+
+:::tip
+根据“结构类型”原则，TypeScript 检查某个值是否符合指定类型时，并不是检查这个值的类型名（即“名义类型”），而是检查这个值的结构是否符合要求（即“结构类型”）。
+:::
+
+- 如果类型 B 可以赋值给类型 A，TypeScript 就认为 B 是 A 的子类型（subtyping），A 是 B 的父类型。子类型满足父类型的所有结构特征，同时还具有自己的特征。凡是可以使用父类型的地方，都可以使用子类型，即子类型兼容父类型。这种设计有时会导致令人惊讶的结果。
+  ```ts
+  type myObj = {
+    x: number,
+    y: number,
+  };
+
+  function getSum(obj:myObj) {
+    let sum = 0;
+
+    for (const n of Object.keys(obj)) {
+      const v = obj[n]; // 报错 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'myObj'.
+      sum += Math.abs(v);
+    }
+
+    return sum;
+  }
+
+  // 函数getSum()要求传入参数的类型是myObj，但是实际上所有与myObj兼容的对象都可以传入。这会导致const v = obj[n]这一行报错，原因是obj[n]取出的属性值不一定是数值（number），使得变量v的类型被推断为any。如果项目设置为不允许变量类型推断为any，代码就会报错。
+
+  type MyObj = {
+    x: number,
+    y: number,
+  };
+
+  function getSum(obj:MyObj) {
+    return Math.abs(obj.x) + Math.abs(obj.y);
+  }
+  
+  ```
