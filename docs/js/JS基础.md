@@ -566,7 +566,19 @@ JavaScript 中的 `null` 仅仅是一个代表“无”、“空”或“值未�
 JavaScript 内部有很多“系统” symbol，我们可以使用它们来改变一些内建行为。它们都被列在了 [众所周知的 symbol](https://tc39.es/ecma262/#sec-well-known-symbols) 中:
 - `Symbol.hasInstance`
 - `Symbol.isConcatSpreadable`
-- `Symbol.iterator`
+- `Symbol.iterator` 可以用作对象的属性为对象定义默认的迭代器。
+  <CodeRun>{`
+  const iterable1 = {};
+  iterable1[Symbol.iterator] = function* () {
+    yield 1;
+    yield 2;
+    yield 3;
+  };
+  console.log( [...iterable1] ); // [1, 2, 3]
+  for(let item of iterable1) {
+    console.log( item );
+  }
+  `}</CodeRun>
 - `Symbol.toPrimitive`
 - ……等等。
 
@@ -2076,6 +2088,45 @@ let fruits = ["Apple", "Orange", "Plum"];
 alert( fruits.at(-1) ); // Plum
 ```
 
+### `Array.prototype[@@iterator]()`
+:::info
+[在 ECMAScript 2015（ES6）规范中，使用 `@@iterator` 来引用 `Symbol.iterator`。实际上，`@@iterator` 并不存在，无法直接使用，它只是在规范中用来表示特定符号的标记。如果你想在代码中使用这个符号，比如访问数组的迭代器，你需要使用 `Symbol.iterator`。这是 Symbol 类的一个属性，初始值为 `@@iterator`。总的来说，`@@iterator` 和 `Symbol.iterator` 是等价的，只是在不同的规范和文档中使用了不同的表示方式。在实际编码中，你应该使用 `Symbol.iterator` 来访问迭代器，因为 `@@iterator` 并不是一个有效的标识符。](https://devv.ai/zh/search?threadId=d63rqbvp5eyo)
+:::
+:::warning
+数组迭代器对象应该是一次性使用的对象。不要重复使用它。
+:::
+- Array 实例的 `[@@iterator]()` 方法实现了迭代协议，允许数组被大多数期望可迭代对象的语法所使用，例如 展开语法(spread syntax ) 和 for..of 循环。它返回一个数组迭代器对象，该对象会产生数组中每个索引的值。
+
+- 实际使用语法：`array[Symbol.iterator]()`。请注意，你很少需要直接调用此方法。`@@iterator` 方法的存在使数组可迭代，并且像 for..of 循环这样的迭代语法会自动调用此方法以获得要遍历的迭代器。
+  <CodeRun>{`
+  const array1 = ['a', 'b', 'c'];
+  const iterator1 = array1[Symbol.iterator]();
+  for (const value of iterator1) {
+    console.log(value);
+  }
+  `}</CodeRun>
+
+- 如果你需要更多的控制迭代过程，你可以手动调用返回的迭代器对象的 `next()` 方法。
+  <CodeRun>{`
+  const arr = ["a", "b", "c", "d", "e"];
+  const arrIter = arr[Symbol.iterator]();
+  console.log(arrIter.next().value); // "a"
+  console.log(arrIter.next().value); // "b"
+  console.log(arrIter.next().value); // "c"
+  console.log(arrIter.next().value); // "d"
+  console.log(arrIter.next().value); // "e"
+  `}</CodeRun>
+
+### values 方法
+- `values` 方法返回一个新的数组迭代器对象，该对象迭代数组中每个元素的值。
+
+- `Array.prototype.values()` 是 `Array.prototype[@@iterator]()` 的默认实现。
+  <CodeRun>{`
+  Array.prototype.values === Array.prototype[Symbol.iterator]; // true
+  `}</CodeRun>
+
+- `values`方法返回的可迭代对象是不可重复使用的。
+
 ### pop/push, shift/unshift 方法
 JavaScript 中的数组既可以用作队列(First-In-First-Out)，也可以用作栈(Last-In-First-Out)。它们允许你从首端/末端来添加/删除元素。[双端队列](https://wangtunan.github.io/blog/books/javascript/algorithm.html#%E5%8F%8C%E7%AB%AF%E9%98%9F%E5%88%97%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
 - `pop` 取出并返回数组的最后一个元素
@@ -2954,7 +3005,15 @@ for (;;) {
 ```
 
 ### `for..of`
-`for..of` 语句在可迭代对象（包括 `Array`，`Map`，`Set`，`String`，`TypedArray`，`arguments`，DOM 元素集合(比如一个`NodeList`对象) 等等）上创建一个迭代循环，调用自定义迭代钩子，并为每个不同属性的值执行语句
+`for..of` 语句在**可迭代对象**（包括 `Array`，`Map`，`Set`，`String`，`TypedArray`，`arguments`，DOM 元素集合(比如一个`NodeList`对象) 等等）上创建一个迭代循环，调用自定义迭代钩子，并为每个不同属性的值执行语句。
+:::info
+一些内置类型拥有默认的迭代器行为，其他类型（如 Object）则没有。拥有默认的 `@@iterator` 方法的内置类型是：
+- `Array.prototype[@@iterator]()`
+- `TypedArray.prototype[@@iterator]()`
+- `String.prototype[@@iterator]()`
+- `Map.prototype[@@iterator]()`
+- `Set.prototype[@@iterator]()`
+:::
 ```js
 let fruits = ["Apple", "Orange", "Plum"];
 
@@ -2964,7 +3023,7 @@ for (let fruit of fruits) {
 }
 ```
 :::tip
-对于`for...of`的循环，可以由 `break`, `throw` 或 `return` 终止。
+对于`for..of`的循环，可以由 `break`, `throw` 或 `return` 终止。
 :::
 
 ### `for..in`
