@@ -59,7 +59,9 @@ tags: [css, 记录]
   - [44. `:root`](#44-root)
   - [45. 吸底](#45-吸底)
   - [46. flex-grow](#46-flex-grow)
-  - [47. input样式美化](#47-input样式美化)
+  - [47. input/textarea 样式美化](#47-inputtextarea-样式美化)
+  - [48. 输入框中文字自动换行](#48-输入框中文字自动换行)
+  - [49. 移动端1px细线解决方案](#49-移动端1px细线解决方案)
 
 ## 一、[CSS Modules](http://www.ruanyifeng.com/blog/2016/06/css_modules.html)
 
@@ -175,8 +177,48 @@ div {
 ### 16. -webkit-overflow-scrolling: touch; 滚动丝滑
 
 ### 17. ios底部适配
-- padding-bottom: constant(safe-area-inset-bottom); /* 兼容 iOS < 11.2 */
-- padding-bottom: env(safe-area-inset-bottom); /* 兼容 iOS >= 11.2 */
+> 参考：[safe-area-inset-bottom](https://juejin.cn/post/7085627936048414733)；[safe-area-inset-bottom](https://devv.ai/zh/search?threadId=d6dntqm7n9q8)
+
+`env(safe-area-inset-bottom)` 是一个 CSS 环境变量，用于在 iPhone X 和 iOS 11 及更高版本的设备上设置底部安全区域的填充。这个功能可以确保内容不会被底部的横条遮挡。在 CSS 中使用这个功能时，需要注意一些细节:
+- 首先，要确保在 viewport meta 标签中添加 `viewport-fit=cover`，以启用 iPhone X 的全屏显示布局。这样，设备会使用全屏布局来显示内容区域（安全区域）。
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+      <title>Title</title>
+    </head>
+    <body>
+      <div id="root"></div>
+      <script type="module" src="/src/main.tsx"></script>
+    </body>
+  </html>
+  ```
+
+- `env(safe-area-inset-bottom)`在 iOS 11.2 及更高版本的设备上可用。如果您需要支持 iOS 11.0–11.2 的设备，可以使用 `constant(safe-area-inset-bottom)` 函数来设置底部填充。
+  ```css
+  .footer {
+    position: fixed;
+    bottom: 0;
+    padding-bottom: constant(safe-area-inset-bottom); /* 兼容 iOS < 11.2 */
+    padding-bottom: env(safe-area-inset-bottom); /* 兼容 iOS >= 11.2 */
+    width: 100%;
+    height: 200px;
+    background-color: #FFFFFF;
+  }
+  ```
+
+- 在使用 `env(safe-area-inset-bottom)` 时，需要注意以下几点：
+  - 有时候 `env()` 可能无法在 `calc()` 函数中正常工作。在这种情况下，可以使用 CSS 原生变量（Custom CSS Properties）来代替。
+  - 为了支持旧设备，可以使用回退属性值来处理部分支持 CSS 环境变量的浏览器和不支持 CSS 环境变量的旧浏览器。
+    ```css
+    .your-element {
+      padding-bottom: 20px; /* Fallback value for older devices */
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    ```
 
 ### 18.  user-select 控制用户能否选中文本。除了文本框内，它对被载入为 chrome 的内容没有影响。
 - user-select: none; 元素及其子元素的文本不可选中。
@@ -676,7 +718,7 @@ html {
 如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍。
 ![flex-grow](img/flex_grow.jpeg)
 
-### 47. input样式美化
+### 47. input/textarea 样式美化
 ```css
 input {
   /* input样式美化 */
@@ -684,7 +726,71 @@ input {
   outline: none; /* 聚焦input的蓝色边框 */
   resize: none; /* textarea 禁止拖拽 */
   border: none; /* 去除边框 */
+  padding: 0; /* 去除padding */
   -webkit-appearance: none; /* 常用于IOS下移除原生样式 */
   -webkit-tap-highlight-color: rgba(0,0,0,0); /* 点击高亮的颜色 */
 }
 ```
+
+### 48. 输入框中文字自动换行
+想要在输入框中实现文字自动换行的功能，需要使用`textarea`标签而不是`input`标签来创建文本输入框。`textarea`标签可以自动换行，而`input`标签则不行。
+```jsx
+<div className={`cell ${detailAddress && detailAddress.length>18 ? 'detail-address-row' : 'detail-address-cell'}`}>
+  <div className="label">详细地址</div>
+  <textarea
+    className="grow detail-address"
+    rows={detailAddress && detailAddress.length>18 ? 3 : 1}
+    value={detailAddress ?? ''}
+    onChange={(e) => setDetailAddress(e.target.value)}
+  ></textarea>
+</div>
+```
+```scss
+&.detail-address-row {
+  height: fit-content;
+  align-items: baseline;
+  padding-top: 28px;
+}
+&.detail-address-cell {
+  height: 96px;
+  &>.detail-address {
+    height: 40%;
+  }
+}
+&.detail-address-cell,&.detail-address-row {
+  /* textarea样式美化 */
+  &>.detail-address {
+    box-shadow:none; /* 去除阴影 */
+    outline: none; /* 聚焦input的蓝色边框 */
+    resize: none; /* textarea 禁止拖拽 */
+    border: none; /* 去除边框 */
+    -webkit-appearance: none; /* 常用于IOS下移除原生样式 */
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* 点击高亮的颜色 */
+    font-size: 28px;
+    color: #333333;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+}
+```
+
+### 49. 移动端1px细线解决方案
+1. 利用transform缩放方式
+  ```scss
+  .cell {
+    position: relative;
+    &::before {
+      content: " ";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 1px;
+      background-color: #E5E5E5;
+      -webkit-transform-origin: 0 0;
+      transform-origin: 0 0;
+      -webkit-transform: scaleY(0.6);
+      transform: scaleY(0.6);
+    }
+  }
+  ```
