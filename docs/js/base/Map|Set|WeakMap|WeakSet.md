@@ -1,5 +1,5 @@
 ---
-slug: mapset
+slug: map-set
 tags: [js-base]
 ---
 
@@ -111,6 +111,7 @@ for (let user of set) {
 `}</CodeRun>
 
 ## WeakMap
+:::info
 通常，当对象、数组之类的数据结构在内存中时，它们的子元素，如对象的属性、数组的元素都被认为是可达的。例如:
 - 如果把一个对象放入到数组中，那么只要这个数组存在，那么这个对象也就存在，即使没有其他对该对象的引用。
   <CodeRun>{`
@@ -129,11 +130,84 @@ for (let user of set) {
   let map = new Map();
   map.set(john, "...");
   john = null; // 覆盖引用
-  // john 被存储在了 map 中，
+  // john 被存储在了 map 中
+  console.log( map.has(john) ) // false
   // 我们可以使用 map.keys() 来获取它
   for (let key of map.keys()) {
     console.log( key ) // {name: "John"}
   }
   `}</CodeRun>
+:::
+
+### WeakMap的方法
+:::tip
+WeakMap 的键必须是对象，不能是原始值。
+
+```js
+let weakMap = new WeakMap();
+
+let obj = {};
+
+weakMap.set(obj, "ok"); // 正常工作（以对象作为键）
+
+// 不能使用字符串作为键
+weakMap.set("test", "Whoops"); // TypeError: Invalid value used as weak map key，因为 "test" 不是一个对象
+```
+:::
+
+- WeakMap 只有以下的方法：
+  - weakMap.get(key)
+  - weakMap.set(key, value)
+  - weakMap.delete(key)
+  - weakMap.has(key)
+
+- WeakMap **不支持迭代**以及 keys()，values() 和 entries() 方法。所以没有办法获取 WeakMap 的所有键或值。
+
+### WeakMap与垃圾回收
+- WeakMap 不会阻止垃圾回收机制对作为键的对象（key object）的回收。如果在 WeakMap 中使用一个对象作为键，并且没有其他对这个对象的引用，则该对象将会被从内存中自动清除。
+  <CodeRun>{`
+  let john = { name: "John" };
+  let weakMap = new WeakMap();
+  weakMap.set(john, "...");
+  john = null; // 覆盖引用
+  // john 被从内存中删除了！
+  console.log( weakMap.get(john) ) // undefined
+  `}</CodeRun>
+
+:::info
+如果一个对象丢失了其它所有引用，那么它就会被垃圾回收机制自动回收。但是不能准确知道 何时会被回收。这些都是由 JavaScript 引擎决定的。JavaScript 引擎可能会选择立即执行内存清理，如果现在正在发生很多删除操作，那么 JavaScript 引擎可能就会选择等一等，稍后再进行内存清理。
+:::
+
+### WeakMap的应用场景
+- WeakMap 的主要应用场景是 额外数据的存储。
+
+![使用WeakMap存储额外的数据](../img/WeakMap.png)
+
+- WeakMap 的另一个应用场景是缓存，存储（“缓存”）函数的结果，以便将来对同一个对象的调用可以重用这个结果。
+
+![使用WeakMap缓存结果](../img/WeakMap缓存.png)
 
 ## WeakSet
+- 只能向 WeakSet 添加对象（而不能是原始值）。
+
+- 对象只有在其它某个（些）地方能被访问的时候，才能留在 WeakSet 中。
+
+- WeakSet 支持 add，has 和 delete 方法，但不支持 size 和 keys()，并且**不可迭代**。
+
+<CodeRun>{`
+let visitedSet = new WeakSet();
+let john = { name: "John" };
+let pete = { name: "Pete" };
+let mary = { name: "Mary" };
+visitedSet.add(john); // John 访问了我们
+visitedSet.add(pete); // 然后是 Pete
+visitedSet.add(john); // John 再次访问
+// visitedSet 现在有两个用户了
+// 检查 John 是否来访过？
+console.log( visitedSet.has(john) ); // true
+// 检查 Mary 是否来访过？
+console.log(visitedSet.has(mary)); // false
+john = null;
+// visitedSet 将被自动清理(即自动清除其中已失效的值 john)
+console.log( visitedSet.has(john) ); // false
+`}</CodeRun>

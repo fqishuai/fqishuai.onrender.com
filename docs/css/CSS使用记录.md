@@ -705,12 +705,24 @@ html {
 ```
 
 ### 45. 吸底
-```css
-.footer {
-  width: 100%;
-  height: 112px;
-  position: fixed;
-  bottom: 0;
+```html
+<div class="wrapper">
+  <div></div>
+  <div></div>
+  <div class="footer"></div>
+</div>
+```
+```scss
+.wrapper {
+  padding-bottom: 1.5rem; /* 大于等于footer的高度，避免footer遮挡页面内容 */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 1.4rem;
+    background-color: #FFFFFF;
+    border-top: 1PX solid #EEEEEE;
+  }
 }
 ```
 
