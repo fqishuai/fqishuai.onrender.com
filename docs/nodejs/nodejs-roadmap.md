@@ -1,5 +1,5 @@
 ---
-slug: roadmap/nodejs
+slug: roadmap
 tags: [nodejs]
 ---
 

@@ -1,12 +1,16 @@
 ---
+slug: frameworks
 tags: [nodejs框架]
 ---
 
-## 1.目录结构约定
+Node.js框架是用于构建Web应用程序的工具集合，它们提供了一些功能和结构，使得开发人员能够更快速地构建应用程序。Node.js框架通常分为MVC框架、全栈MVC框架和REST API框架。
+
+## egg.js
+### 1.目录结构约定
 [目录结构](https://www.eggjs.org/zh-CN/basics/structure)
 ![目录结构](img/eggjs目录结构.jpeg)
 
-### 1.1 框架的扩展(`app/extend/**`)
+#### 1.1 框架的扩展(`app/extend/**`)
 > [框架扩展](https://www.eggjs.org/zh-CN/basics/extend)
 
 可以对如下对象进行自定义扩展，进一步加强框架的功能：
@@ -34,7 +38,7 @@ tags: [nodejs框架]
 :::
 
 
-### 1.2 Application实例的访问方式
+#### 1.2 Application实例的访问方式
 - `ctx.app`
 
 - Controller，Middleware，Helper，Service 中都可以通过 `this.app` 访问到 Application 对象，例如 this.app.config 访问配置对象。
@@ -47,14 +51,14 @@ module.exports = (app) => {
 };
 ```
 
-### 1.3 Context实例的访问方式
+#### 1.3 Context实例的访问方式
 - middleware 中 `this` 就是 `ctx`，例如 this.cookies.get('foo')。
 
 - controller 有两种写法，类的写法通过 `this.ctx`，方法的写法直接通过 ctx 入参。
 
 - helper，service 中的 this 指向 helper，service 对象本身，使用 `this.ctx` 访问 context 对象，例如 this.ctx.cookies.get('foo')。
 
-### 1.4 启动自定义(`app.js`)
+#### 1.4 启动自定义(`app.js`)
 > [启动自定义](https://www.eggjs.org/zh-CN/basics/app-start)
 提供了统一的入口文件（app.js）进行启动过程自定义，这个文件返回一个 Boot 类，我们可以通过定义 Boot 类中的生命周期方法(如下)来执行启动应用过程中的初始化工作。
 - configWillLoad。配置文件即将加载，这是最后动态修改配置的时机
@@ -65,7 +69,7 @@ module.exports = (app) => {
 - serverDidReady。应用启动完成
 - beforeClose。应用即将关闭
 
-### 1.5 ts目录结构
+#### 1.5 ts目录结构
 > [TypeScript](https://www.eggjs.org/zh-CN/tutorials/typescript)
 ```markdown
 mkdir showcase && cd showcase
@@ -86,7 +90,7 @@ declare module 'egg' {
 }
 ```
 
-## 2.自定义插件开发
+### 2.自定义插件开发
 ```js
 npm init egg --type=plugin
 // 或者 yarn create egg --type=plugin
@@ -96,8 +100,8 @@ npm init egg --type=plugin
 - 插件没有独立的 router 和 controller
 - 插件没有 plugin.js
 
-## 3.运行环境
-### 3.1 指定运行环境
+### 3.运行环境
+#### 3.1 指定运行环境
 - 1）通过  `config/env` 文件指定，该文件的内容就是运行环境，如 prod。
 ```markdown
 // config/env
@@ -106,36 +110,36 @@ prod
 
 - 2）通过 EGG_SERVER_ENV 环境变量指定运行环境更加方便，比如在生产环境启动应用：`EGG_SERVER_ENV=prod npm start`
 
-### 3.2 应用内获取运行环境
+#### 3.2 应用内获取运行环境
 app.config.env
 
-### 3.3 配置文件
+#### 3.3 配置文件
 - 不同的运行环境会对应不同的配置。`config.default.js` 为默认的配置文件，所有环境都会加载这个配置文件，一般也会作为开发环境的默认配置文件。
 
 - 当指定 env 时会同时加载默认配置和对应的配置(具名配置)文件，具名配置和默认配置将合并(使用[extend2](https://www.npmjs.com/package/extend2)深拷贝)成最终配置，具名配置项会覆盖默认配置文件的同名配置。如 prod 环境会加载 config.prod.js 和 config.default.js 文件，config.prod.js 会覆盖 config.default.js 的同名配置。
 
-### 3.4 线上环境
+#### 3.4 线上环境
 - **注意：如果项目需要在线上运行，请先使用 tsc 将 ts 编译成 js （ `npm run tsc` ）再运行 `npm start`**
 
 - 运行 npm start 不会加载 ts。npm start 运行的是 egg-scripts start，而我们只在 egg-bin 中集成了 ts-node，也就是只有在使用 egg-bin 的时候才允许直接运行 ts 。
 
 - prod环境不会在控制台输入log，而是写到项目的log目录下对应的文件中（项目目录下 `run/application_config.json` 的 config.logger定义了不同的log文件）
 
-## 4. 部署
-### 4.1 [Master进程](https://www.eggjs.org/zh-CN/core/cluster-and-ipc#master)
+### 4. 部署
+#### 4.1 [Master进程](https://www.eggjs.org/zh-CN/core/cluster-and-ipc#master)
 - 内置了 egg-cluster 来启动 Master 进程，Master 有足够的稳定性，不再需要使用 [pm2](https://github.com/Unitech/pm2) 等进程守护模块。
 
-### 4.2 [egg-scripts](https://github.com/eggjs/egg-scripts) 用于支持线上环境的运行和停止
+#### 4.2 [egg-scripts](https://github.com/eggjs/egg-scripts) 用于支持线上环境的运行和停止
 
-## 5. 路由
+### 5. 路由
 :::tip
 - Router 主要用来描述请求 URL 和具体承担执行动作的 Controller 的对应关系， 框架约定了 `app/router.js` 文件用于统一所有路由规则。
 - 在 Router 定义中， 可以支持多个 Middleware 串联执行
 :::
 
-## 6. 中间件
+### 6. 中间件
 
-### 6.1 编写中间件
+#### 6.1 编写中间件
 :::info
 约定一个中间件是一个放置在 app/middleware 目录下的单独文件，它需要 exports 一个普通的 function，接受两个参数：
 - options: 中间件的配置项，框架会将 `app.config[${middlewareName}]` 传递进来。
@@ -168,7 +172,7 @@ config.middleware = [
 // 注意：用于router的中间件，不需要在此配置，在router.ts中使用即可。
 ```
 
-### 6.2 使用中间件
+#### 6.2 使用中间件
 > 中间件的加载是有顺序的
 
 需要手动挂载中间件，支持以下方式：
@@ -237,7 +241,7 @@ export default (app: Application) => {
 };
 ```
 
-## 7. 日志
+### 7. 日志
 eggjs产生的日志有三类:
 - 业务日志
 ```plain
@@ -290,10 +294,10 @@ npm run start -- --stdout="/xx/master-stdout.log" --stderr="/xx/master-stderr.lo
 
 > [基于Egg框架的日志链路追踪实践](https://www.nodejs.red/#/nodejs/logger?id=%e5%9f%ba%e4%ba%8eegg%e6%a1%86%e6%9e%b6%e7%9a%84%e6%97%a5%e5%bf%97%e9%93%be%e8%b7%af%e8%bf%bd%e8%b8%aa%e5%ae%9e%e8%b7%b5)
 
-## 8. egg-ts-helper
+### 8. egg-ts-helper
 ets clean 支持清除包含同名 tsx 文件的 js 文件
 
-## 9. [eggjs处理jsonp请求](https://www.jianshu.com/p/afc0acc6206a)
+### 9. [eggjs处理jsonp请求](https://www.jianshu.com/p/afc0acc6206a)
 jsonp作为前端跨域的一种解决方案，优缺点如下：
 - 优点
   - 它不像`XMLHttpRequest`对象实现的`Ajax`请求那样受到同源策略的限制
@@ -405,3 +409,9 @@ document.body.appendChild(script)
 ```js
 /**/ typeof getList === 'function' && getList([{ "id": 1, "name": '天問'}, { "id": 2,"name": '天问'},{"id": 3, "name": 'Tiven'}]);
 ```
+
+## [hapi](https://hapi.dev/)
+优势之一：官方文档有中文
+
+
+## nestjs
