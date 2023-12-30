@@ -1,9 +1,9 @@
-# blog-fqishuai-note
+# Content of fqishuai - Write blog posts or take notes.
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+fqishuai's website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
-### search
+## search
 [@easyops-cn/docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) - Offline/local search for Docusaurus v2 (language of zh supported)
 
-### deploy
+## deploy
 Render/Netlify

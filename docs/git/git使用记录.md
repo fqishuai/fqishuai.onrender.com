@@ -435,9 +435,9 @@ git remote rm origin
 
 # 5. git remote add origin xxx （如：git remote add origin https://github.com/fqishuai/blog-fqishuai-note.git）
 
-# 6. 关联分支
-git branch --set-upstream-to=origin/main main
-
-# 7. 拉取
+# 6. 拉取
 git pull
+
+# 7. 关联分支
+git branch --set-upstream-to=origin/main main
 ```
