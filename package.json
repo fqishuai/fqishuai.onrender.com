@@ -1,6 +1,6 @@
 {
-  "name": "blog-fqishuai-note",
-  "version": "0.0.1",
+  "name": "fqishuai.onrender.com",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",

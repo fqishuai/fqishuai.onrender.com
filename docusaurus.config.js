@@ -8,7 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'fqishuai',
   tagline: '记录不仅仅是沉淀，也是个理解的过程，杜绝复制粘贴，更禁止只记录别人文章的跳转链接！',
-  url: 'https://blog-fqishuai.vercel.app',
+  url: 'https://fqishuai.onrender.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -17,7 +17,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'fqishuai', // Usually your GitHub org/user name.
-  projectName: 'blog', // Usually your repo name.
+  projectName: 'fqishuai.onrender.com', // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -43,13 +43,13 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/fqishuai/blog/tree/main/',
+            'https://github.com/fqishuai/fqishuai.onrender.com/tree/main/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/fqishuai/blog/tree/main/',
+          editUrl: 'https://github.com/fqishuai/fqishuai.onrender.com/tree/main/',
           blogSidebarTitle: 'All posts',
           blogSidebarCount: 'ALL',
         },
@@ -173,7 +173,7 @@ const config = {
               href: 'https://kaiwu.lagou.com/learn'
             },
           ]},
-          {label: 'GitHub', position: 'right', href: 'https://github.com/fqishuai/blog'},
+          {label: 'GitHub', position: 'right', href: 'https://github.com/fqishuai/fqishuai.onrender.com'},
         ],
       },
       footer: {
@@ -307,7 +307,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Blog - fqishuai, Inc. 学而不思则罔，思而不学则殆。`,
+        copyright: `Copyright © ${new Date().getFullYear()} Content of fqishuai, Inc. 学而不思则罔，思而不学则殆。`,
       },
       prism: {
         theme: lightCodeTheme,

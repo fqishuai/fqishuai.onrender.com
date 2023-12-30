@@ -433,7 +433,7 @@ git remote rm origin
 # 3. 在GitHub上操作rename仓库名
 # 4. 本地仓库文件夹重命名
 
-# 5. git remote add origin xxx （如：git remote add origin https://github.com/fqishuai/blog-fqishuai-note.git）
+# 5. git remote add origin xxx （如：git remote add origin https://github.com/fqishuai/fqishuai.onrender.com.git）
 
 # 6. 拉取
 git pull
