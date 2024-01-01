@@ -6,4 +6,5 @@ fqishuai's website is built using [Docusaurus 2](https://docusaurus.io/), a mode
 [@easyops-cn/docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) - Offline/local search for Docusaurus v2 (language of zh supported)
 
 ## deploy
-Render/Netlify
+- Render(https://fqishuai.onrender.com)
+- Netlify(https://fqishuai.netlify.app)
