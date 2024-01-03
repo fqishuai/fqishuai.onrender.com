@@ -298,6 +298,7 @@ import 'amfe-flexible';
 
 whistle功能很强大，如图：
 ![whistle](images/whistle2.png)
+常用命令：`w2 start` `w2 restart` `w2 stop`
 
 #### [spy-debugger](https://github.com/wuchangming/spy-debugger)
 1. 安装：`sudo npm install spy-debugger -g`
@@ -412,6 +413,81 @@ whistle功能很强大，如图：
     </>
   }
   ```
+
+### 浏览器模拟器造成 React中点击父元素会触发子元素的点击事件 的假象
+以下代码在浏览器模拟器上点击`img`标签或`agree-wrapper`元素的非`span`区域，会触发跳转页面。但是，在真机上不会有这种现象。
+```tsx
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+function App() {
+  const [agreeFlag, setAgreeFlag] = useState(false);
+
+  const navigate = useNavigate();
+
+  function handleChangeAgreeFlag() {
+    setAgreeFlag(!agreeFlag);
+  }
+  function linkAgreement(event: any) {
+    event.stopPropagation();
+    navigate('/agreement');
+  }
+
+  return <>
+    <div className="footer">
+      <div className="agree-wrapper" onClick={handleChangeAgreeFlag}>
+        <img src={agreeFlag ? checkedIcon : uncheckIcon} />
+        <div>请仔细阅读<span onClick={(event)=>linkAgreement(event)}>《操作说明》</span>，以便后续操作</div>
+      </div>
+      <div className="btn" onClick={handleSave}>确定</div>
+    </div>
+  </>
+}
+```
+```scss
+.footer {
+  position: fixed;
+  bottom: 0;
+  padding-bottom: constant(safe-area-inset-bottom); /* 兼容 iOS < 11.2 */
+  padding-bottom: env(safe-area-inset-bottom); /* 兼容 iOS >= 11.2 */
+  width: 100%;
+  height: 230px;
+  background-color: #FFFFFF;
+  .btn {
+    background-image: linear-gradient(90deg, #FF6B22 0%, #FF8727 100%);
+    border-radius: 45px;
+    width: 686px;
+    height: 90px;
+    margin: 0 auto;
+    font-size: 32px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
+    line-height: 44px;
+    font-weight: 600;
+    padding: 23px 0;
+    box-sizing: border-box;
+  }
+  .agree-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 24px 0 30px 30px;
+    &>img {
+      width: 30px;
+      height: 30px;
+    }
+    &>div {
+      font-size: 24px;
+      color: #222222;
+      letter-spacing: 0;
+      font-weight: 400;
+      margin-left: 10px;
+      &>span {
+        color: #ff6300;
+      }
+    }
+  }
+}
+```
 
 ## 小程序
 ### 支付宝小程序
