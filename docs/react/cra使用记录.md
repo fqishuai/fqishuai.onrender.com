@@ -152,3 +152,83 @@ import '@testing-library/jest-dom';
 ```ts
 /// <reference types="react-scripts" />
 ```
+项目的`tsconfig.json`配置了`"include": [ "src" ]`，所以默认会编译`src`目录下的`.ts`、`.tsx`和`.d.ts`文件。如果打开了`allowJs`，那么还会编译`.js`和`.jsx`。编译`src/react-app-env.d.ts`会添加 `react-scripts` 的类型库，没有单独的类型声明模块`@types/react-scripts`，则编译时实际添加的脚本是`react-scripts`模块指定的类型声明文件的路径`node_modules/react-scripts/lib/react-app.d.ts`。该文件内容如下：
+```ts title="node_modules/react-scripts/lib/react-app.d.ts"
+/// <reference types="node" />
+/// <reference types="react" />
+/// <reference types="react-dom" />
+
+declare namespace NodeJS {
+  interface ProcessEnv {
+    readonly NODE_ENV: 'development' | 'production' | 'test';
+    readonly PUBLIC_URL: string;
+  }
+}
+
+declare module '*.avif' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.bmp' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.gif' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.jpg' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.jpeg' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.png' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.webp' {
+    const src: string;
+    export default src;
+}
+
+declare module '*.svg' {
+  import * as React from 'react';
+
+  export const ReactComponent: React.FunctionComponent<React.SVGProps<
+    SVGSVGElement
+  > & { title?: string }>;
+
+  const src: string;
+  export default src;
+}
+
+declare module '*.module.css' {
+  const classes: { readonly [key: string]: string };
+  export default classes;
+}
+
+declare module '*.module.scss' {
+  const classes: { readonly [key: string]: string };
+  export default classes;
+}
+
+declare module '*.module.sass' {
+  const classes: { readonly [key: string]: string };
+  export default classes;
+}
+
+```
+可以看到，该文件声明了avif bmp gif jpg png webp格式的图片、svg、css、scss、sass的类型，这样在项目文件中引入这些类型的文件时不会ts报错（参考：[react-app-env.d.ts purpose](https://juejin.cn/s/react-app-env.d.ts%20purpose)）
+```ts
+import contentBg from "@assets/image/content-bg.png"
+import styles from './index.module.scss';
+```

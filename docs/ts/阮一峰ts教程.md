@@ -1894,3 +1894,292 @@ const A:{ x: number } = B; // 正确
   }
   
   ```
+
+## `declare` 关键字
+注意，`declare` 关键字只用来给出类型描述，是纯的类型代码，不允许设置变量的初始值，即不能涉及值。**类型声明文件里面，变量的类型描述必须使用`declare`命令，否则会报错，因为变量声明语句是值相关代码。**`interface` 类型有没有`declare`都可以，因为 `interface` 是完全的类型代码。
+```ts
+declare let foo:string; // 正确
+
+interface Foo {} // 正确
+declare interface Foo {} // 正确
+```
+
+## 类型声明文件
+- 单独使用的模块，一般会同时提供一个单独的类型声明文件（declaration file），把本模块的外部接口的所有类型都写在这个文件里面，便于模块使用者了解接口，也便于编译器检查使用者的用法是否正确。
+
+- 类型声明文件里面只有类型代码，没有具体的代码实现。它的文件名一般为`[模块名].d.ts`的形式，其中的d表示 declaration（声明）。
+
+### 写类型声明文件
+比如，有一个模块的代码如下：
+```js title="demo.js"
+const maxInterval = 12;
+
+function getArrayLength(arr) {
+  return arr.length;
+}
+
+module.exports = {
+  getArrayLength,
+  maxInterval,
+};
+```
+它的类型声明文件可以写成下面这样：
+```ts title="demo.d.ts"
+export function getArrayLength(arr: any[]): number;
+export const maxInterval: 12;
+```
+
+类型声明文件中，除了使用 `export` 输出，还可以使用 `export default` 或者 `export =`。比如：模块代码如下：
+```js title="demo.js"
+module.exports = 3.142;
+```
+它的类型声明文件可以写成下面这样：
+```ts title="demo.d.ts"
+declare const pi: number;
+export default pi;
+```
+或者
+```ts title="demo.d.ts"
+declare const pi: number;
+export = pi;
+```
+
+### 使用类型声明文件
+- 手动导入
+```ts title="types.d.ts"
+export interface Character {
+  catchphrase?: string;
+  name: string;
+}
+```
+```ts title="index.ts"
+import { Character } from "./types";
+
+export const character:Character = {
+  catchphrase: "Yee-haw!",
+  name: "Sandy Cheeks",
+};
+```
+
+- 配置在tsconfig.json 文件里。比如，moment 模块的类型声明文件是 `moment.d.ts`，使用 moment 模块的项目可以将其加入项目的 `tsconfig.json` 文件。这样的话，编译器打包项目时，会自动将类型声明文件加入编译，而不必在每个脚本里面加载类型声明文件。
+  ```json title="tsconfig.json"
+  {
+    "compilerOptions": {},
+    "files": [
+      "src/index.ts",
+      "typings/moment.d.ts"
+    ]
+  }
+  ```
+
+### `declare module` 用于类型声明文件
+我们可以为每个模块脚本，定义一个`.d.ts`文件，把该脚本用到的类型定义都放在这个文件里面。但是，更方便的做法是为整个项目，定义一个大的`.d.ts`文件，在这个文件里面使用`declare module`定义每个模块脚本的类型。如下，`url` 和 `path`都是单独的模块脚本，但是它们的类型都定义在`node.d.ts`这个文件里面:
+```ts title="node.d.ts"
+declare module "url" {
+  export interface Url {
+    protocol?: string;
+    hostname?: string;
+    pathname?: string;
+  }
+
+  export function parse(
+    urlStr: string,
+    parseQueryString?,
+    slashesDenoteHost?
+  ): Url;
+}
+
+declare module "path" {
+  export function normalize(p: string): string;
+  export function join(...paths: any[]): string;
+  export var sep: string;
+}
+```
+
+### 类型声明文件的来源
+类型声明文件主要有以下三种来源：
+- TypeScript编译器自动生成。
+- TypeScript内置的类型声明文件。
+- 外部模块的类型声明文件，需要自己安装。
+
+#### TypeScript编译器自动生成
+只要使用编译选项 `declaration`，编译器就会在编译时自动生成单独的类型声明文件。可以在配置文件里或者命令行打开这个选项。
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "declaration": true
+  }
+}
+```
+```bash
+tsc --declaration
+```
+
+#### TypeScript内置的类型声明文件
+TypeScript内置的类型声明文件主要是内置的全局对象（JavaScript语言接口 和 运行环境API）的类型声明。这些内置声明文件位于 TypeScript 语言安装目录的lib文件夹内（文件名统一为 `lib.[description].d.ts` 的形式，其中description部分描述了文件内容。比如，`lib.dom.d.ts`这个文件就描述了 DOM 结构的类型。），数量大概有几十个，下面是其中一些主要文件:
+- lib.d.ts
+- lib.dom.d.ts
+- lib.es2015.d.ts
+- lib.es2016.d.ts
+- lib.es2017.d.ts
+- lib.es2018.d.ts
+- lib.es2019.d.ts
+- lib.es2020.d.ts
+- lib.es5.d.ts
+- lib.es6.d.ts
+
+**TypeScript 编译器会自动根据编译目标`target`的值，加载对应的内置声明文件**，所以不需要特别的配置。但是，**可以使用编译选项`lib`，指定加载哪些内置声明文件**。
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "lib": ["dom", "es2021"] // lib选项指定加载dom和es2021这两个内置类型声明文件
+  }
+}
+```
+
+编译选项`noLib`会禁止加载任何内置声明文件。
+
+#### 外部模块的类型声明文件
+如果项目中使用了外部的某个第三方代码库，那么就需要这个库的类型声明文件。这时又分成三种情况。
+- 这个库自带了类型声明文件。
+  
+  一般来说，如果这个库的打包目录中包含了`[vendor].d.ts`文件，那么就自带了类型声明文件。其中的`vendor`表示这个库的名字，比如`jest`这个库就自带`jest.d.ts`。使用这个库可能需要单独加载它的类型声明文件。
+  ![自带](img/自带类型声明文件.png)
+
+- 这个库没有自带，但是可以找到社区制作的类型声明文件。
+  
+  第三方库如果没有提供类型声明文件，社区往往会提供。TypeScript 社区主要使用 [DefinitelyTyped 仓库](https://github.com/DefinitelyTyped/DefinitelyTyped)，各种类型声明文件都会提交到那里，已经包含了几千个第三方库。这些声明文件都会作为一个单独的库，发布到 npm 的 `@types` 名称空间之下。比如，jQuery 的类型声明文件就发布成 `@types/jquery` 这个库，使用时安装这个库就可以了。执行`npm install @types/jquery --save-dev`，`@types/jquery`这个库就安装到项目的`node_modules/@types/jquery`目录，里面的`index.d.ts`文件就是 jQuery 的类型声明文件。**如果类型声明文件不是`index.d.ts`，那么就需要在`package.json`的 `types` 或 `typings`字段，指定类型声明文件的文件名**。
+  :::info
+  TypeScript默认会自动加载`node_modules/@types`目录下的模块，但可以使用编译选项`typeRoots`改变这种行为。如下，TypeScript去跟`tsconfig.json`同级的 `typings`目录 和 `vendor/types`目录中加载类型模块，而不再加载`node_modules/@types`目录下的模块。
+  ```json title="tsconfig.json"
+  {
+    "compilerOptions": {
+      "typeRoots": ["./typings", "./vendor/types"]
+    }
+  }
+  ```
+  默认情况下，TypeScript会自动加载`typeRoots`目录里的所有模块，编译选项`types`可以指定加载哪些模块。`types`属性是一个数组，成员是所要加载的类型模块，要加载几个模块，这个数组就有几个成员，每个类型模块在`typeRoots`目录下都有一个自己的子目录。如下，TypeScript就会自动去jquery子目录，加载 jQuery 的类型声明文件：
+  ```json title="tsconfig.json"
+  {
+    "compilerOptions": {
+      "types" : ["jquery"]
+    }
+  }
+  ```
+  :::
+
+- 找不到类型声明文件，需要自己写。
+
+  有时实在没有第三方库的类型声明文件，又很难完整给出该库的类型描述，这时你可以告诉 TypeScript 相关对象的类型是`any`。比如，使用 jQuery 的脚本可以写成下面这样:
+  ```ts
+  declare var $:any
+
+  // 或者
+  declare type JQuery = any;
+  declare var $:JQuery;
+  ```
+  :::info
+  也可以采用下面的写法，将整个外部模块的类型声明为`any`:
+  ```ts
+  declare module '模块名';
+  ```
+  :::
+
+### 类型声明文件发布
+当前模块如果包含自己的类型声明文件，可以在 `package.json` 文件里面添加一个`types`字段 或 `typings`字段，指明类型声明文件的位置。
+```json title="package.json"
+{
+  "name": "awesome",
+  "author": "Vandelay Industries",
+  "version": "1.0.0",
+  "main": "./lib/main.js",
+  "types": "./lib/main.d.ts"
+}
+```
+:::tip
+注意，如果类型声明文件名为`index.d.ts`，且在项目的根目录中，那就不需要在`package.json`里面注明了。
+:::
+
+如果依赖的第三方包的类型声明文件单独发布成了一个 npm 模块，那么引入该依赖包的同时，也需要引入该依赖包的类型声明文件。比如，项目中使用`browserify`，则也需要引入`@types/browserify`：
+```json title="package.json"
+{
+  "name": "browserify-typescript-extension",
+  "author": "Vandelay Industries",
+  "version": "1.0.0",
+  "main": "./lib/main.js",
+  "types": "./lib/main.d.ts",
+  "dependencies": {
+    "browserify": "latest",
+    "@types/browserify": "latest",
+    "typescript": "next"
+  }
+}
+```
+
+### 三斜杠命令
+- 三斜杠命令（`///`）是一个 TypeScript 编译器命令，用来指定编译器行为。它只能用在文件的头部，如果用在其他地方，会被当作普通的注释。另外，若一个文件中使用了三斜线命令，那么在三斜线命令之前只允许使用单行注释、多行注释和其他三斜线命令，否则三斜杠命令也会被当作普通的注释。
+
+- 如果类型声明文件的内容非常多，可以拆分成多个文件，然后入口文件使用三斜杠命令，加载其他拆分后的文件。举例来说，入口文件是`main.d.ts`，里面的接口定义在`interfaces.d.ts`，函数定义在`functions.d.ts`。那么，`main.d.ts`里面可以用三斜杠命令，加载后面两个文件。
+  ```ts title="main.d.ts"
+  /// <reference path="./interfaces.d.ts" />
+  /// <reference path="./functions.d.ts" />
+  ```
+
+- 三斜杠命令主要包含三个参数，代表三种不同的命令。
+  - path
+  - types
+  - lib
+
+#### `/// <reference path="" />`
+- 编译器会在预处理阶段，找出所有三斜杠引用的文件，将其添加到编译列表中，然后一起编译。
+
+- `path`参数指定了所引入文件的路径。如果该路径是一个相对路径，则基于当前脚本的路径进行计算。
+  :::tip
+  - `path`参数必须指向一个存在的文件，若文件不存在会报错。
+  - `path`参数不允许指向当前文件。
+  :::
+
+- 默认情况下，每个三斜杠命令引入的脚本，都会编译成单独的 JS 文件。如果希望编译后只产出一个合并文件，可以使用编译选项`outFile`。但是，`outFile`编译选项不支持合并 CommonJS 模块和 ES 模块，只有当编译参数`module`的值设为 `None`、`System` 或 `AMD` 时，才能编译成一个文件。
+
+- 如果打开了编译参数`noResolve`，则忽略三斜杠指令。将其当作一般的注释，原样保留在编译产物中。
+
+#### `/// <reference types="" />`
+:::tip
+这个命令只应该用在`.d.ts`文件中
+:::
+
+`types` 参数用来告诉编译器当前脚本依赖某个类型声明文件。如果`types`的值对应有单独的类型声明模块，则编译时实际添加的脚本就是安装到`node_modules/@types`目录中对应的类型声明文件；如果`types`的值对应没有单独的类型声明模块，则编译时实际添加的脚本就是对应依赖的模块指定的类型声明文件的路径。举例如下：
+
+例1: 这个三斜杠命令表示编译时添加 `Node.js` 的类型库，有单独的类型声明模块`@types/node`，所以编译时实际添加的脚本是`node_modules/@types/node/index.d.ts`。
+```ts
+/// <reference types="node" />
+```
+
+例2: 这个三斜杠命令表示编译时添加 `react-scripts` 的类型库，没有单独的类型声明模块`@types/react-scripts`，则编译时实际添加的脚本是`react-scripts`模块指定的类型声明文件的路径`node_modules/react-scripts/lib/react-app.d.ts`。
+```ts title="src/react-app-env.d.ts"
+/// <reference types="react-scripts" />
+```
+![react-scripts](img/react-scripts.png)
+
+#### `/// <reference lib="" />`
+这个命令允许脚本文件显式包含内置 lib 库，等同于在`tsconfig.json`文件里面使用lib属性指定 lib 库。如下，指定加载内置的`lib.es2017.string.d.ts`
+```ts
+/// <reference lib="es2017.string" />
+```
+
+## `tsconfig.json`配置项
+### `include`
+- `include`属性指定所要编译的文件列表，既支持逐一列出文件，也支持通配符。文件位置相对于当前配置文件而定。
+
+- 如果不指定文件后缀名，默认包括`.ts`、`.tsx`和`.d.ts`文件。如果打开了`allowJs`，那么还包括`.js`和`.jsx`。
+
+- `include`属性支持三种通配符:
+  - `?`：指代单个字符
+  - `*`：指代任意字符，不含路径分隔符
+  - `**`：指定任意目录层级。
+
+```json
+{
+  "include": ["src/**/*", "tests/**/*"]
+}
+```
