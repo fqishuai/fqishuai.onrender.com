@@ -62,6 +62,7 @@ tags: [git, 记录]
 - [45. 查询本地所有操作记录](#45-查询本地所有操作记录)
 - [46. 创建新分支](#46-创建新分支)
 - [47. 本地远程同步修改仓库名](#47-本地远程同步修改仓库名)
+- [48. `git pull`时报错fatal: refusing to merge unrelated histories](#48-git-pull时报错fatal-refusing-to-merge-unrelated-histories)
 
 
 ## 1. 使用git rebase合并分支
@@ -441,3 +442,6 @@ git pull
 # 7. 关联分支
 git branch --set-upstream-to=origin/main main
 ```
+
+## 48. `git pull`时报错fatal: refusing to merge unrelated histories
+解决：`git pull --allow-unrelated-histories`

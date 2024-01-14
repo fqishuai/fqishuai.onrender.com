@@ -233,3 +233,15 @@ type B = Merge<A, {
   favorite?: boolean;
 }>;
 ```
+
+## `paths`
+配置别名：
+```json title="tsconfig.json"
+"compilerOptions": {
+  "baseUrl": "./",
+  "paths":{
+    "@/*": ["src/*"],
+    "@pages/*": ["src/pages/*"],
+  },
+}
+```

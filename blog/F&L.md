@@ -3,7 +3,6 @@
 
 移动端：
 - [电商家居购物小程序](https://js.design/community?category=detail&type=resource&id=62c69466928443d7c7981481)
-- [电商家居类小程序设计](https://js.design/community?category=detail&type=resource&id=6145bfa54eb22792005f7929)
 - [家居商城小程序UI设计](https://js.design/community?category=detail&type=resource&id=62e8c7f80dee15624361d160)
 - [万豪家居电商类App界面](https://js.design/community?category=detail&type=resource&id=622952430b96c773da594d90)
 - [电商家居APP](https://js.design/community?category=detail&type=resource&id=62c92cecc1e8d2aa50075bad)
@@ -13,7 +12,6 @@
 
 - [家居类app设计](https://pixso.cn/community/file/r5fLCv4VuNX3noC8uQjsjQ)
 
-- [家居购物APP](https://mastergo.com/community/resource/290?from=card)
 
 
 PC端：

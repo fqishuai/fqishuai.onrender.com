@@ -227,8 +227,131 @@ declare module '*.module.sass' {
 }
 
 ```
-可以看到，该文件声明了avif bmp gif jpg png webp格式的图片、svg、css、scss、sass的类型，这样在项目文件中引入这些类型的文件时不会ts报错（参考：[react-app-env.d.ts purpose](https://juejin.cn/s/react-app-env.d.ts%20purpose)）
+可以看到，该文件声明了avif bmp gif jpg png webp格式的图片、svg、css、scss、sass的类型，这样在项目文件中引入这些类型的文件时不会ts报错（参考：[react-app-env.d.ts的作用以及如何生成的？](https://segmentfault.com/a/1190000038874526)）
 ```ts
 import contentBg from "@assets/image/content-bg.png"
 import styles from './index.module.scss';
 ```
+
+### `PUBLIC_URL`
+如果将文件放入 `public` 文件夹中，webpack 不会处理该文件。相反，它将原封不动地复制到构建文件夹中。要引用公共文件夹中的资源，您需要使用名为 `PUBLIC_URL` 的环境变量。
+
+在`index.html`中可以如下使用，当您运行 `npm run build` 时，Create React App 会将 `%PUBLIC_URL%` 替换为正确的绝对路径，这样即使您使用客户端路由或将其托管在非根 URL 上，您的项目也能正常运行。
+```html
+<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+```
+
+在 JavaScript 代码中，您可以使用 `process.env.PUBLIC_URL` 实现类似目的：
+```js
+render() {
+  // Note: this is an escape hatch and should be used sparingly!
+  // Normally we recommend using `import` for getting asset URLs
+  // as described in “Adding Images and Fonts” above this section.
+  return <img src={process.env.PUBLIC_URL + '/img/logo.png'} />;
+}
+```
+
+### webpack配置
+查看`react-scripts`依赖包中`config/webpack.config.js`：
+1. 设置了别名`src`对应为根目录下的src目录，所以导入Home组件时可以使用`src/pages/home/Home`
+
+## [eject的替代方案](https://auth0.com/blog/how-to-configure-create-react-app/)
+1. fork create-react-app 仓库
+2. 在`packages/react-scripts/scripts/init.js`中的增加log来验证后续使用的是自定义的react-scripts
+   ```js title="packages/react-scripts/scripts/init.js"
+   console.log(`Success! Created ${appName} at ${appPath}`);
+   console.log('scripts version is @rawlinsfeng/react-scripts.')
+   ```
+3. 查看`packages/react-scripts/scripts/build.js`发现webpack的配置文件目录为`packages/react-scripts/config/webpack.config.js`
+4. cd 到 `packages/react-scripts` 执行 `yarn add postcss-px-to-viewport`
+5. 在`packages/react-scripts/config/webpack.config.js`中的`postcss-loader`配置项中配置`postcss-px-to-viewport`
+   ```js title="packages/react-scripts/config/webpack.config.js"
+    const loaders = [
+      isEnvDevelopment && require.resolve('style-loader'),
+      isEnvProduction && {
+        loader: MiniCssExtractPlugin.loader,
+        // css is located in `static/css`, use '../../' to locate index.html folder
+        // in production `paths.publicUrlOrPath` can be a relative path
+        options: paths.publicUrlOrPath.startsWith('.')
+          ? { publicPath: '../../' }
+          : {},
+      },
+      {
+        loader: require.resolve('css-loader'),
+        options: cssOptions,
+      },
+      {
+        // Options for PostCSS as we reference these options twice
+        // Adds vendor prefixing based on your specified browser support in
+        // package.json
+        loader: require.resolve('postcss-loader'),
+        options: {
+          postcssOptions: {
+            // Necessary for external CSS imports to work
+            // https://github.com/facebook/create-react-app/issues/2677
+            ident: 'postcss',
+            config: false,
+            plugins: !useTailwind
+              ? [
+                  'postcss-flexbugs-fixes',
+                  [
+                    'postcss-preset-env',
+                    {
+                      autoprefixer: {
+                        flexbox: 'no-2009',
+                      },
+                      stage: 3,
+                    },
+                  ],
+                  // Adds PostCSS Normalize as the reset css with default options,
+                  // so that it honors browserslist config in package.json
+                  // which in turn let's users customize the target behavior as per their needs.
+                  'postcss-normalize',
+                  // Adds postcss-px-to-viewport
+                  [
+                    'postcss-px-to-viewport',
+                    {
+                      viewportWidth: 750,
+                      exclude: [/node_modules/],
+                    },
+                  ]
+                ]
+              : [
+                  'tailwindcss',
+                  'postcss-flexbugs-fixes',
+                  [
+                    'postcss-preset-env',
+                    {
+                      autoprefixer: {
+                        flexbox: 'no-2009',
+                      },
+                      stage: 3,
+                    },
+                  ],
+                ],
+          },
+          sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
+        },
+      },
+    ].filter(Boolean);
+   ```
+
+6. 更改`packages/react-scripts/package.json`的name、description、repository url为自己的
+7. cd到`packages/react-scripts`目录，登录npm，发布npm包
+8. 使用：
+   ```bash
+   # npx
+   npx create-react-app my-app --scripts-version @rawlinsfeng/react-scripts
+   # yarn
+   yarn create react-app my-app --scripts-version @rawlinsfeng/react-scripts
+   # pnpm
+   pnpm create react-app my-app --scripts-version @rawlinsfeng/react-scripts
+
+   # Creating a TypeScript app
+   # npx
+   npx create-react-app my-app --scripts-version @rawlinsfeng/react-scripts --template typescript
+   # yarn
+   yarn create react-app my-app --scripts-version @rawlinsfeng/react-scripts --template typescript
+   # pnpm
+   pnpm create react-app my-app --scripts-version @rawlinsfeng/react-scripts --template typescript
+   ```

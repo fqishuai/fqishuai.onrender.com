@@ -83,11 +83,13 @@ resolve: {
 },
 ```
 ```json title="tsconfig.json"
-"baseUrl": "./",
-"paths":{
-  "@/*": ["src/*"],
-  "@pages/*": ["src/pages/*"],
- },
+"compilerOptions": {
+  "baseUrl": "./",
+  "paths":{
+    "@/*": ["src/*"],
+    "@pages/*": ["src/pages/*"],
+  },
+}
 ```
 
 8. 如果项目在生产环境想共用已有域名，则可以配置nginx，并相应设置vite打包的`base`及react router的`basename`

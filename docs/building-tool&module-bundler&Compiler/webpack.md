@@ -62,7 +62,8 @@
   - [11. webpack执行流程及触发的钩子函数](#11-webpack执行流程及触发的钩子函数)
   - [12. 编译时报错：Missing semicolon](#12-编译时报错missing-semicolon)
 ## 文档
-- [官方文档](https://www.webpackjs.com)
+[官方文档](https://webpack.js.org/)
+> [中文文档](https://www.webpackjs.com)
 ## 参考资料
 - [深入浅出Webpack](https://webpack.wuhaolin.cn/)
 - [webpack入门进阶知识](https://juejin.cn/post/6991966321529815053)

@@ -17,24 +17,165 @@ tags: [react]
 
 Anytime your app throws an error while rendering, loading data, or performing data mutations, React Router will catch it and render an error screen. 任何时候您的应用程序在渲染、加载数据或执行数据突变时抛出错误，React Router 都会捕获它并渲染错误屏幕。
 
-### 1. `createBrowserRouter()`
-- path
-- element
-- errorElement
-- loader
-  - 与useLoaderData结合使用；
-  - URL Params会传递给loader, For example, our segment is named `:contactId` so the value will be passed as `params.contactId`.
-  - loader可以共享，但尽量每个route有自己的loader
-- action  loader和action都能接收request
-- children  与`<Outlet>`结合使用
-- index  为true时，默认匹配的路由
+## 选择使用哪个路由
+> [Picking a Router](https://reactrouter.com/en/main/routers/picking-a-router)
 
-### 2. `<RouterProvider>`
+6.4版本引入了以下路由以支持data APIs:
+- `createBrowserRouter` 建议所有 Web 项目都使用 `createBrowserRouter`
+- `createMemoryRouter`
+- `createHashRouter`
+- `createStaticRouter`
 
-### 3. `useRouteError()`
-provides the error that was thrown
+以下路由不支持data APIs:
+- `<BrowserRouter>`
+- `<MemoryRouter>`
+- `<HashRouter>`
+- `<NativeRouter>`
+- `<StaticRouter>`
 
-### 4. `<Form>`
+## Data APIs
+以下 API 是在 React Router 6.4 中引入的，并且仅在使用数据路由器时才有效:
+- `route.action`
+- `route.errorElement`
+- `route.lazy`
+- `route.loader`
+- `route.shouldRevalidate`
+- `route.handle`
+- `<Await>`
+- `<Form>`
+- `<ScrollRestoration>`
+- `useActionData`
+- `useAsyncError`
+- `useAsyncValue`
+- `useFetcher`
+- `useFetchers`
+- `useLoaderData`
+- `useMatches`
+- `useNavigation`
+- `useRevalidator`
+- `useRouteError`
+- `useRouteLoaderData`
+- `useSubmit`
+- `startViewTransition` support on `Link` and `useNavigate`
+
+## `createBrowserRouter()`
+这是所有 React Router Web 项目的推荐路由器。 它使用 DOM History API 来更新 URL 并管理历史堆栈。
+```tsx
+const routes = [
+  {
+    path: "/",
+    element: <Login />,
+  },
+];
+createBrowserRouter(routes, {
+  basename: "/app",
+});
+```
+basename适用于无法部署到域根目录而是子目录的情况:
+```tsx
+createBrowserRouter(routes, {
+  basename: "/app",
+});
+<Link to="/" />; // results in <a href="/app" />
+
+createBrowserRouter(routes, {
+  basename: "/app/",
+});
+<Link to="/" />; // results in <a href="/app/" />
+```
+
+### Route
+```tsx
+const router = createBrowserRouter([
+  {
+    // it renders this element
+    element: <Team />,
+
+    // when the URL matches this segment
+    path: "teams/:teamId",
+
+    // with this data loaded before rendering
+    loader: async ({ request, params }) => {
+      return fetch(
+        `/fake/api/teams/${params.teamId}.json`,
+        { signal: request.signal }
+      );
+    },
+
+    // performing this mutation when data is submitted to it
+    action: async ({ request }) => {
+      return updateFakeTeam(await request.formData());
+    },
+
+    // and renders this element in case something went wrong
+    errorElement: <ErrorBoundary />,
+  },
+]);
+```
+使用 `createRoutesFromElements`(用于构造JSX风格的路由) 的话，上面例子可以写成：
+```tsx
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route
+      element={<Team />}
+      path="teams/:teamId"
+      loader={async ({ params }) => {
+        return fetch(
+          `/fake/api/teams/${params.teamId}.json`
+        );
+      }}
+      action={async ({ request }) => {
+        return updateFakeTeam(await request.formData());
+      }}
+      errorElement={<ErrorBoundary />}
+    />
+  )
+);
+```
+
+#### `path`
+#### `element`
+#### `errorElement`
+#### `loader`
+`loader`会在路由渲染之前被调用
+```tsx
+<Route
+  path="/teams/:teamId"
+  loader={({ params }) => {
+    return fetchTeam(params.teamId);
+  }}
+/>;
+
+function Team() {
+  let team = useLoaderData();
+  // ...
+}
+```
+
+- 与`useLoaderData`结合使用，`useLoaderData`获取`loader`返回的数据；
+- URL Params会传递给`loader`, For example, our segment is named `:contactId` so the value will be passed as `params.contactId`.
+- `loader`可以共享，但尽量每个`route`有自己的`loader`
+
+#### `action`
+当 `<Form>`, `useFetcher`, 或 `useSubmit` 发送一个提交到该路由时，`action`被调用
+```tsx
+<Route
+  path="/teams/:teamId"
+  action={({ request }) => {
+    const formData = await request.formData();
+    return updateTeam(formData);
+  }}
+/>
+```
+
+- `loader` 和 `action` 都能接收`request`
+#### `children`
+与`<Outlet>`结合使用
+
+#### `index`
+为`true`时，默认匹配的路由
+
+## `<Form>`
 - `<Form>`与`<form>`的区别是，`<Form>` 阻止浏览器将请求发送到服务器，而是将其发送到您的route action(包括FormData)
 ```jsx
 <Form method="post">
@@ -89,17 +230,77 @@ export async function action({ request, params }: { request: any, params: any })
 
 - `<Form>` 的method为 GET 而不是 POST 时，React Router 不会调用action。提交 GET 表单与单击链接相同：只是 URL 发生了变化。
 
-### 5. `<Outlet>`
+## `useFetcher()`
+> It allows us to communicate with loaders and actions without causing a navigation. 允许我们在 不引起导航的情况下(URL 不会改变，历史堆栈不受影响) 与`loaders` 和 `actions` 进行通信。
 
-### 6. `<Link>`
+```jsx
+import { Form, useLoaderData, useFetcher } from "react-router-dom";
+
+function Favorite({ contact }: { contact: IContact }) {
+  const fetcher = useFetcher();
+
+  let favorite = contact.favorite;
+
+  return (
+    <fetcher.Form method="post">
+      <button
+        name="favorite" // 浏览器可以通过name属性来序列化表单
+        value={favorite ? "false" : "true"} // This form will send formData with a favorite key that's either "true" | "false".
+        aria-label={
+          favorite
+            ? "Remove from favorites"
+            : "Add to favorites"
+        }
+      >
+        {favorite ? "★" : "☆"}
+      </button>
+    </fetcher.Form>
+  );
+}
+```
+
+## `useSubmit()`
+```jsx
+import { useSubmit } from 'react-router-dom'
+
+export default function Root() {
+  const submit = useSubmit();
+
+  return (
+    <Form id="search-form" role="search">
+      <input
+        id="q"
+        aria-label="Search contacts"
+        placeholder="Search"
+        type="search"
+        name="q"
+        defaultValue={q}
+        onChange={(event) => {
+          console.log('input change::', event.currentTarget.form)
+          submit(event.currentTarget.form);
+        }}
+      />
+    </Form>
+  );
+}
+```
+
+## `<RouterProvider>`
+
+## `useRouteError()`
+provides the error that was thrown
+
+## `<Outlet>`
+
+## `<Link>`
 allows our app to update the URL without requesting another document from the server. 通过查看the network tab in the browser devtools可以看到`<Link to>`与`<a href>`的区别，`<Link to>`不需要requesting documents
 
-### 7. `useLoaderData()`
+## `useLoaderData()`
 接收loader指定的函数返回的值
 
-### 8. `redirect()`
+## `redirect()`
 
-### 9. `<NavLink>`
+## `<NavLink>`
 当用户位于 NavLink 中的 URL 时，isActive 将为真。当它即将激活（数据仍在加载）时，isPending 将为真。这使我们能够轻松地指示用户所在的位置，并对已单击但我们仍在等待数据加载的链接提供即时反馈。
 ```jsx
 <NavLink
@@ -114,7 +315,7 @@ allows our app to update the URL without requesting another document from the se
 ></NavLink>
 ```
 
-### 10. `useNavigation()`
+## `useNavigation()`
 add global pending UI, `useNavigation` returns the current navigation state: it can be one of "idle" | "submitting" | "loading".
 
 - navigation state
@@ -170,7 +371,7 @@ export default function Root() {
 }
 ```
 
-### 11. `useNavigate()`
+## `useNavigate()`
 ```jsx
 import { useNavigate } from "react-router-dom";
 
@@ -193,107 +394,12 @@ export default function EditContact() {
 }
 ```
 
-### 12. `useSubmit()`
-```jsx
-import { useSubmit } from 'react-router-dom'
-
-export default function Root() {
-  const submit = useSubmit();
-
-  return (
-    <Form id="search-form" role="search">
-      <input
-        id="q"
-        aria-label="Search contacts"
-        placeholder="Search"
-        type="search"
-        name="q"
-        defaultValue={q}
-        onChange={(event) => {
-          console.log('input change::', event.currentTarget.form)
-          submit(event.currentTarget.form);
-        }}
-      />
-    </Form>
-  );
-}
-```
-
-### 13. `useFetcher()`
-> It allows us to communicate with loaders and actions without causing a navigation. 允许我们在 不引起导航的情况下(URL 不会改变，历史堆栈不受影响) 与loaders 和 actions 进行通信。
-
-```jsx
-import { Form, useLoaderData, useFetcher } from "react-router-dom";
-
-function Favorite({ contact }: { contact: IContact }) {
-  const fetcher = useFetcher();
-
-  let favorite = contact.favorite;
-
-  return (
-    <fetcher.Form method="post">
-      <button
-        name="favorite" // 浏览器可以通过name属性来序列化表单
-        value={favorite ? "false" : "true"} // This form will send formData with a favorite key that's either "true" | "false".
-        aria-label={
-          favorite
-            ? "Remove from favorites"
-            : "Add to favorites"
-        }
-      >
-        {favorite ? "★" : "☆"}
-      </button>
-    </fetcher.Form>
-  );
-}
-```
-
-### 14. createRoutesFromElements
-用于构造JSX风格的路由
-
-```jsx
-import {
-  createRoutesFromElements,
-  createBrowserRouter,
-} from "react-router-dom";
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route
-      path="/"
-      element={<Root />}
-      loader={rootLoader}
-      action={rootAction}
-      errorElement={<ErrorPage />}
-    >
-      <Route errorElement={<ErrorPage />}>
-        <Route index element={<Index />} />
-        <Route
-          path="contacts/:contactId"
-          element={<Contact />}
-          loader={contactLoader}
-          action={contactAction}
-        />
-        <Route
-          path="contacts/:contactId/edit"
-          element={<EditContact />}
-          loader={contactLoader}
-          action={editAction}
-        />
-        <Route
-          path="contacts/:contactId/destroy"
-          action={destroyAction}
-        />
-      </Route>
-    </Route>
-  )
-);
-```
-
-### 15. 传参接参
+## 传参接参
 > [react-router 路由传参的三种方式](https://segmentfault.com/a/1190000041136562)
 
-#### 15.1 使用`<Link>`或`<NavLink>`(`useParams`、`useLocation`、`useSearchParams`)
+### 1. 使用`<Link>`或`<NavLink>`
+> `useParams`、`useLocation`、`useSearchParams`
+
 1. params参数
 ```jsx
 //路由链接(携带参数)：
@@ -351,7 +457,7 @@ const { state } = useLocation();
 //备注：刷新也可以保留住参数
 ```
 
-#### 15.2 手动跳转(`useNavigate`)
+### 2. 手动跳转(`useNavigate`)
 ```jsx
 import { useNavigate } from "react-router-dom";
 

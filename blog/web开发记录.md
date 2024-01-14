@@ -236,9 +236,11 @@ async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
 ### H5页面适配
 [移动端H5开发之页面适配篇](https://cloud.tencent.com/developer/article/2020264)
 
-[postcss-pxtorem 总是搭配 amfe-flexible 一起使用](https://juejin.cn/post/7204471780140466231)
-- [postcss-pxtorem](https://github.com/cuth/postcss-pxtorem)
-- [amfe-flexible](https://github.com/amfe/lib-flexible)
+#### [postcss-pxtorem 总是搭配 amfe-flexible 一起使用](https://juejin.cn/post/7204471780140466231)
+- [postcss-pxtorem](https://github.com/cuth/postcss-pxtorem): 将px单位转换成rem单位
+- [amfe-flexible](https://github.com/amfe/lib-flexible): 自动计算html根节点的字体大小
+
+两个库的搭配使用，将页面上的元素某些属性以相对于根元素的倍数来进行展示，从而适配不同的屏幕大小。
 ```bash
 pnpm add -D postcss-pxtorem
 pnpm add amfe-flexible
@@ -267,6 +269,72 @@ export default defineConfig({
 ```
 ```tsx title="main.tsx"
 import 'amfe-flexible';
+```
+
+rem是相对于html元素字体单位的一个相对单位，从本质上来说，它属于一个字体单位，用字体单位来布局，并不是太合适
+
+#### [postcss-px-to-viewport](https://github.com/evrone/postcss-px-to-viewport)
+将px单位转换为视口单位的 (vw, vh, vmin, vmax) 的 PostCSS 插件.
+
+安装：`yarn add -D postcss-px-to-viewport`
+
+vite项目中配置:
+```js title="vite.config.js"
+import { defineConfig } from 'vite' 
+import vue from '@vitejs/plugin-vue' 
+import postcsspxtoviewport from 'postcss-px-to-viewport' 
+export default defineConfig({ 
+  plugins: [ 
+    vue() 
+  ], 
+  css: { 
+    postcss: { 
+      plugins: [ 
+        postcsspxtoviewport({ 
+          unitToConvert: 'px', // 要转化的单位 
+          viewportWidth: 750, // UI设计稿的宽度 
+          unitPrecision: 6, // 转换后的精度，即小数点位数 
+          propList: ['*'], // 指定转换的css属性的单位，*代表全部css属性的单位都进行转换 
+          viewportUnit: 'vw', // 指定需要转换成的视窗单位，默认vw 
+          fontViewportUnit: 'vw', // 指定字体需要转换成的视窗单位，默认vw 
+          selectorBlackList: ['ignore-'], // 指定不转换为视窗单位的类名， 
+          minPixelValue: 1, // 默认值1，小于或等于1px则不进行转换 
+          mediaQuery: true, // 是否在媒体查询的css代码中也进行转换，默认false 
+          replace: true, // 是否转换后直接更换属性值 
+          exclude: [/node_modules/], // 设置忽略文件，用正则做目录名匹配 
+          landscape: false // 是否处理横屏情况 
+        }) 
+      ] 
+    } 
+  } 
+})
+```
+
+配置说明：
+- `propList`: 当有些属性的单位我们不希望转换的时候，可以添加在数组后面，并在前面加上!号，如`propList: ["*","!letter-spacing"]`,这表示：所有css属性的属性的单位都进行转化，除了`letter-spacing`的
+    
+- `selectorBlackList`：转换的黑名单，在黑名单里面的我们可以写入字符串，只要类名包含有这个字符串，就不会被匹配。比如`selectorBlackList: ['wrap']`,它表示形如`wrap`,`my-wrap`,`wrapper`这样的类名的单位，都不会被转换
+
+使用注释忽略转换：
+- `/* px-to-viewport-ignore-next */` 用在单独一行，防止下一行被转换
+- `/* px-to-viewport-ignore */ ` 用在属性后面，防止同一行被转换
+```css
+/* example input: */
+.class {
+  /* px-to-viewport-ignore-next */
+  width: 10px;
+  padding: 10px;
+  height: 10px; /* px-to-viewport-ignore */
+  border: solid 2px #000; /* px-to-viewport-ignore */
+}
+
+/* example output: */
+.class {
+  width: 10px;
+  padding: 3.125vw;
+  height: 10px;
+  border: solid 2px #000;
+}
 ```
 
 ### 抓包工具
