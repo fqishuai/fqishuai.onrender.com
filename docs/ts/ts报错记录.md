@@ -239,3 +239,44 @@ if (addressIdValue) requestParam.userAddressId = addressIdValue;
      '--nutui-switch-open-background-color': string;
    };
    ```
+
+### 15. change target library
+- 使用字符串的`startsWith`方法报错：Property `'startsWith'` does not exist on type `'Extract<keyof P, string>'`. Do you need to change your target library? Try changing the `'lib'` compiler option to `'es2015'` or later.
+
+- 使用`console`方法报错：Cannot find name `'console'`. Do you need to change your target library? Try changing the `'lib'` compiler option to include `'dom'`.
+
+### 16. 缺少类型声明
+`Cannot find module './index.less' or its corresponding type declarations.` 解决办法：在指定的类型声明文件中对`less`文件进行类型声明。
+
+在`tsconfig.json`文件中通过`compilerOptions.typeRoots`指定类型声明文件
+```json title="tsconfig.json"
+"compilerOptions": {
+  "typeRoots": ["./src/typings", "./node_modules/@types"],
+}
+```
+
+在`src/typings/index.d.ts`中对`less`文件进行类型声明
+```ts title="src/typings/index.d.ts"
+declare module '*.less' {
+  const value: {
+    [key: string]: string
+  }
+  export = value
+}
+```
+
+### 17. ts中使用CSS Modules
+> [Setting up CSS Modules in Typescript project](https://medium.com/@dimi_2011/setting-up-css-modules-in-typescript-project-52596526d19)
+
+1. `npm install --save-dev typescript-plugin-css-modules`
+
+2. 在指定的类型声明文件中对`.module.css`文件进行类型声明：`declare module "*.module.css";`
+
+3. 在`tsconfig.json`文件中配置plugins：
+   ```json title="tsconfig.json"
+   {
+     "compilerOptions": {
+       "plugins": [{ "name": "typescript-plugin-css-modules" }],
+     },
+   }
+   ```

@@ -7,6 +7,8 @@ tags: [ts]
 
 [TypeScript Playground](http://www.typescriptlang.org/play/) 是TypeScript在线编译页面
 
+[tsconfig](https://www.typescriptlang.org/tsconfig)
+
 ## [模块Modules](https://www.typescriptlang.org/docs/handbook/modules.html)
 > 从 ECMAScript 2015 开始，JavaScript 有了模块的概念。
 - TypeScript 也有这个概念。模块在自己的范围内执行，而不是在全局范围内执行；这意味着在模块中声明的变量、函数、类等在模块外部不可见，除非使用其中一种导出形式显式导出它们。相反，要使用从不同模块导出的变量、函数、类、接口等，必须使用其中一种导入形式导入。
