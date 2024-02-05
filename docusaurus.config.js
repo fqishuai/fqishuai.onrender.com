@@ -233,6 +233,7 @@ const config = {
               { label: '码力全开', href: 'https://maliquankai.com/' },
               { label: 'transform.tools', href: 'https://transform.tools/html-to-jsx' },
               { label: '脑图', href: 'https://naotu.baidu.com/home' },
+              { label: '免费IT资源', href: 'https://free-for.dev/#/' },
             ],
           },
           {
