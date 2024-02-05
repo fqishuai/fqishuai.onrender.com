@@ -20,3 +20,12 @@ PC端：
 
 
 - [室内插画](https://js.design/community?category=detail&type=resource&id=6284964200c8738c198d2e6a)
+
+
+组件库UI:
+使用[uView的色彩](https://www.uviewui.com/components/color.html)
+
+其他：
+- [TDesign 移动端750@2x重构组件库](https://js.design/f/BU8eEi?p=su_vsc&mode=design&linkelement=zz7MRKvgok)
+- [[全新] Aviala Design 组件库 V4](https://js.design/f/4k7OzG?p=nRDn5Bu5mt&mode=design&linkelement=AvyUJVAyeZALpqRIxe-eI)
+- [B端组件库](https://js.design/f/Hzuoox?p=BNO8ILENmV&mode=design)
