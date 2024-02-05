@@ -411,7 +411,8 @@ document.body.appendChild(script)
 ```
 
 ## [hapi](https://hapi.dev/)
-优势之一：官方文档有中文
+- 官方文档有中文
+- [Learn Hapi](https://github.com/dwyl/learn-hapi)
 
 安装：`npm install @hapi/hapi`
 
@@ -536,28 +537,6 @@ server.route({
 
 - `handler` 选项是一个接受两个参数 `request` 和 `h` 的函数。`request`是一个对象，其中包含有关最终用户请求的详细信息，例如路径参数、关联的负载(associated payload)、查询参数、身份验证信息、headers等。`h` 是响应工具包，是一个具有多种方法的对象，用于响应请求。
 
-- 除了`method` `path` `handler`之外，还可以为每个路由指定一个`options`参数。
-  ```js
-  server.route({
-    method: 'POST',
-    path: '/signup',
-    handler: function (request, h) {
-      const payload = request.payload;
-
-      return `Welcome ${payload.username}!`;
-    },
-    options: {
-      auth: false,
-      validate: {
-        payload: {
-          username: Joi.string().min(1).max(20),
-          password: Joi.string().min(7)
-        }
-      }
-    }
-  });
-  ```
-
 - 404处理。每当您的服务器找不到所请求的资源时，就会发生 404 错误。hapi 路由将首先匹配最具体的path，然后变得更广泛，直到找到匹配项。例如，`localhost:3000/login` 将转到 `/login` 路由，而不是 `/{any*}` 路由。
   ```js
   'use strict';
@@ -587,6 +566,45 @@ server.route({
 
   init();
   ```
+
+#### [Route options]((https://hapi.dev/api/?v=21.3.2#route-options))
+除了`method` `path` `handler`之外，还可以为每个路由指定一个`options`参数。
+```js
+server.route({
+  method: 'POST',
+  path: '/signup',
+  handler: function (request, h) {
+    const payload = request.payload;
+
+    return `Welcome ${payload.username}!`;
+  },
+  options: {
+    auth: false,
+    validate: {
+      payload: {
+        username: Joi.string().min(1).max(20),
+        password: Joi.string().min(7)
+      }
+    },
+    cors: true,
+  }
+});
+```
+##### route.options.cors
+跨源资源共享协议（[Cross-Origin Resource Sharing](https://www.w3.org/TR/cors/)）允许浏览器进行跨源API调用。`route.options.cors` 设为`true`或设为具有以下属性的对象 来允许跨域请求资源：
+- `origin`: 对应响应头`Access-Control-Allow-Origin`的值。其值为一个数组，该数组可以包含完全限定源以及包含通配符`*`字符的源字符串或单个`*`源字符串的任意组合。如果设置为“ignore”，则任何传入的 `Origin` 标头都将被忽略（存在或不存在），并且`Access-Control-Allow-Origin`标头将设置为`*`。默认为任何来源 `['*']`。
+
+- `maxAge`：对应响应头`Access-Control-Max-Age`的值，表示浏览器应缓存 CORS 响应的秒数。该值越大，浏览器检查策略更改所需的时间就越长。默认为 86400（一天）。
+
+- `headers`: 对应响应头`Access-Control-Allow-Headers`的值，表示允许的标头的字符串数组。默认为`['Accept', 'Authorization', 'Content-Type', 'If-None-Match']`
+
+- `additionalHeaders`: 附加标头的字符串数组。使用它来保留默认标头。
+
+- `exposedHeaders`: 对应响应头`Access-Control-Expose-Headers`的值，表示公开标头的字符串数组。默认为`['WWW-Authenticate', 'Server-Authorization']`
+
+- `credentials`: 如果为 true，则允许发送用户凭据（`Access-Control-Allow-Credentials`）。默认为 false。
+
+- `preflightStatusCode`: 用于 CORS 预检响应的状态代码，200 或 204。默认为 200。
 
 ### Cookies
 - 要使用 cookie，首先需要通过调用 `server.state(name, [options])` 来配置它，其中 name 是 cookie 的名称，options 是用于配置 cookie 的对象。
@@ -731,7 +749,7 @@ PBKDF2 是基于密码的密钥派生函数。在许多密码学的应用中，�
   ```
 
 
-### 身份验证/鉴权
+### 身份验证策略
 hapi 的身份认证基于两个概念：schemes 和 strategies。
 
 身份验证例子：
@@ -1134,5 +1152,381 @@ const server = Hapi.server({ port: 80 });
 
 server.log(['test', 'error'], 'Test event');
 ```
+
+### [JWT](https://hapi.dev/module/jwt/)
+JWT (JSON Web Token) 身份验证：`yarn add @hapi/jwt` 或 `npm install @hapi/jwt`:
+```js
+await server.register(require('@hapi/jwt'));
+
+server.auth.strategy('my_jwt_strategy', 'jwt', options)
+
+// options示例
+{
+  keys: 'some_shared_secret', // 包含用于 jwt 验证的关键方法的对象或对象数组。
+  verify: { // 确定如何在密钥签名之外验证密钥内容。设置为 false 不进行验证。
+    aud: 'urn:audience:test', // 与令牌受众匹配的字符串或正则表达式或字符串或正则表达式数组。设置为布尔值 false 不验证 aud。如果 verify 不为 false，则为必填项。
+    iss: 'urn:issuer:test', // 与令牌发行者匹配的字符串或字符串数​​组。设置为 boolean false 不验证 iss。如果 verify 不为 false，则为必填项。
+    sub: false, // 与令牌主题匹配的字符串或字符串数​​组。设置为布尔值 false 以不验证sub。如果 verify 不为 false，则为必填项。
+    nbf: true, // 布尔值，用于确定是否应验证令牌的“不早于”NumericDate。默认为 true。
+    exp: true, // 布尔值，用于确定是否应验证令牌的“到期时间”NumericDate。默认为 true。
+    maxAgeSec: 14400, // 4 hours 用于确定令牌的最长期限（以秒为单位）的整数。默认值为 0。这是使用“发布于”NumericDate (iat) 的时间验证。请注意，0 有效地禁用此验证，它不会使令牌的最大期限为 0 秒。此外，如果 maxAgeSec 不为 0 并且 exp 为 true，则两者都将被验证，如果其中一个验证失败，则令牌验证将失败。
+    timeSkewSec: 15 // 用于调整 exp 和 maxAgeSec 的整数，以考虑服务器时间漂移（以秒为单位）。默认值为 0。
+  },
+  /**
+   * 允许基于解码的有效负载进行额外验证并将特定凭据放入请求对象中的函数。如果不需要额外的验证，可以设置为 false。
+   * artifacts = { // 包含令牌信息的对象
+   *  token: xxx, // 发送的完整令牌
+   *  decoded: { // 包含已解码令牌的对象
+   *    header: { // 包含标头信息的对象
+   *      alg: xxx, // 用于签署令牌的算法
+   *      typ: 'JWT', // 令牌类型（如果存在，应为“JWT”）（可选）
+   *    },
+   *    payload: {}, // 包含有效负载的对象
+   *    signature: 'xxx', // 令牌的签名字符串
+   *  },
+   *  raw: {}, // 包含按标头、有效负载和签名细分的已发送令牌的对象
+   *  keys: [ // 有关用于身份验证的密钥的信息数组
+   *   {
+   *     key: 'xxx', // 密钥
+   *     algorithm: 'xxx', // 用于签署令牌的算法
+   *     kid: 'xxx', // 密钥 ID 标头。如果没有设置则为undefined。
+   *    }
+   *  ]
+   * }
+   */
+  validate: (artifacts, request, h) => {
+
+    return {
+      isValid: true,
+      credentials: { user: artifacts.decoded.payload.user }
+    };
+  },
+  headerName: 'authorization', // 告诉 jwt 插件从指定的标头中读取令牌。默认为“authorization”。
+  httpAuthScheme: 'Bearer', // 字符串表示身份验证方案。默认为“Bearer”。
+  headless: 'xxx', // 表示 base64 标头或用作无头令牌标头的对象的字符串。如果设置了此选项，包含标头部分的令牌将返回 401
+  unauthorizedAttributes: 'xxx', // 如果没有抛出自定义错误，则直接传递给 Boom.unauthorized 的字符串。对于在 WWW-Authenticate 标头中设置领域属性很有用。默认为undefined。
+}
+```
+
+其中keys选项有以下几种：
+```js
+// Single shared secret
+{
+  keys: 'some_shared_secret'
+}
+...
+
+// Single shared secret with algorithms and key ID header
+{
+  keys: {
+    key: 'some_shared_secret',
+    algorithms: ['HS256', 'HS512'],
+    kid: 'someKid'
+  }
+}
+...
+
+// Multiple shared secret
+{
+  keys: ['some_shared_secret_1', 'shared_secret_2', 'shared_secret_3']
+}
+...
+
+// Multiple shared secret with algorithm and key ID header
+{
+  keys: [
+    {
+      key: 'some_shared_secret'
+      algorithms: ['HS256', 'HS512'],
+      kid: 'someKid'
+    },
+    {
+      key: 'shared_secret2'
+      algorithms: ['HS512'],
+      kid: 'someKid2'
+    }
+  ]
+}
+...
+
+// Single Public Key
+{
+  keys: fs.readFileSync('public.pem')
+}
+...
+
+// Single EdDSA key with algorithms
+{
+  keys: {
+    key: Mock.pair('EdDSA', 'ed25519').public,
+    algorithms: ['EdDSA']
+  }
+}
+
+...
+// Single JWKS with headers and algorithms
+{
+  keys: {
+    uri: 'https://jwks-provider.com/.well-known/jwks.json',
+    headers: {'x-org-name': 'my_company'},
+    algorithms: ['RS256', 'RS512']
+  }
+}
+...
+
+// No algorithms
+{
+  keys: ['none']
+}
+...
+
+// Single custom function
+// This function accomplishes the same thing as Single shared secret
+{
+  keys: () => { return 'some_shared_secret'; }
+}
+```
+
+例子：
+```js
+'use strict';
+
+const Hapi = require('@hapi/hapi');
+const Bcrypt = require('bcrypt');
+const Dotenv = require('dotenv');
+const Jwt = require('@hapi/jwt');
+const Boom = require('@hapi/boom');
+
+Dotenv.config();
+
+// Simulate database for demo
+const users = [
+  {
+    id: 1,
+    name: 'john',
+    password: '$2a$10$iqJSHD.BGr0E2IxQwYgJmeP3NvhPrXAeLSaGCj6IR/XU5QtjVu5Tm',   // 'secret'
+  },
+];
+
+const corsOrigin = [process.env.CORS_ORIGIN];
+
+const init = async function () {
+  const server = Hapi.server({ host: process.env.HOST, port: process.env.PORT });
+
+  await server.register(Jwt);
+
+  /**
+   * 使用 jwt 方案声明身份验证策略
+   * keys: 使用共享密钥或 json Web 密钥集 uri
+   * verify: 确定如何在签名之外验证密钥内容
+   * 如果 verify 设置为 false，则不需要并忽略 keys 选项
+   * 如果 verify 未设置为 false，则需要 verify: { aud, iss, sub } 选项
+   * verify: { exp, nbf, timeSkewSec, maxAgeSec } 参数有默认值
+   * validate: 创建一个在令牌验证后调用的函数
+   */
+  server.auth.strategy('my_jwt_strategy', 'jwt', {
+    keys: process.env.JWT_KEYS,
+    verify: {
+      aud: process.env.JWT_AUD,
+      iss: process.env.JWT_ISS,
+      sub: false,
+      nbf: true,
+      exp: true,
+      maxAgeSec: +process.env.JWT_MAXAGESEC, // 4 hours
+      timeSkewSec: 15
+    },
+    validate: async (artifacts, request, h) => {
+      console.log('payload: ', artifacts.decoded.payload)
+      /*
+      payload: {
+        aud: 'render:audience:react',
+        iss: 'render:issuer:hapi',
+        user: 'john',
+        group: 'hapi_render',
+        iat: 1705394079,
+        exp: 1705408479
+      }
+      */
+
+      const headerAuthorization = request.headers['authorization'];
+      console.log('artifacts.token: ', artifacts.token) // 颁发的token. 会校验请求头是否包含设置的headerName(默认为'authorization')以及它的值是否以设置的httpAuthScheme(默认为'Bearer')开头
+
+      let isValid;
+      // 每次请求验证客户端请求头中的Authorization中的token
+      if (headerAuthorization) {
+        // const token = request.headers['authorization'].split('Bearer ').pop();
+        const token = artifacts.token;
+        const decodedToken = Jwt.token.decode(token);
+        console.log('decodedToken: ', decodedToken)
+        /*
+        decodedToken: {
+          token: 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJyZW5kZXI6YXVkaWVuY2U6cmVhY3QiLCJpc3MiOiJyZW5kZXI6aXNzdWVyOmhhcGkiLCJ1c2VyIjoiam9obiIsImdyb3VwIjoiaGFwaV9yZW5kZXIiLCJpYXQiOjE3MDUzOTQwNzksImV4cCI6MTcwNTQwODQ3OX0.y7eRNgdRUkHiix_tQWgQ2Gm7NkzwEebehKfqDztuKrYy2wwuGFizVvD5ykt9v_omX2qaIxKTOzIYEU6Ty-kFLA',
+          decoded: {
+            header: { alg: 'HS512', typ: 'JWT' },
+            payload: {
+              aud: 'render:audience:react',
+              iss: 'render:issuer:hapi',
+              user: 'john',
+              group: 'hapi_render',
+              iat: 1705394079,
+              exp: 1705408479
+            },
+            signature: 'y7eRNgdRUkHiix_tQWgQ2Gm7NkzwEebehKfqDztuKrYy2wwuGFizVvD5ykt9v_omX2qaIxKTOzIYEU6Ty-kFLA'
+          },
+          raw: {
+            header: 'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9',
+            payload: 'eyJhdWQiOiJyZW5kZXI6YXVkaWVuY2U6cmVhY3QiLCJpc3MiOiJyZW5kZXI6aXNzdWVyOmhhcGkiLCJ1c2VyIjoiam9obiIsImdyb3VwIjoiaGFwaV9yZW5kZXIiLCJpYXQiOjE3MDUzOTQwNzksImV4cCI6MTcwNTQwODQ3OX0',
+            signature: 'y7eRNgdRUkHiix_tQWgQ2Gm7NkzwEebehKfqDztuKrYy2wwuGFizVvD5ykt9v_omX2qaIxKTOzIYEU6Ty-kFLA'
+          }
+        }
+        */
+
+        try {
+          const validResult = Jwt.token.verify(decodedToken, process.env.JWT_KEYS);
+          console.log('validResult: ', validResult)
+          isValid = true;
+        } catch(error) {
+          // jwt token校验不通过的逻辑
+          console.log('verify token error: ', error.message)
+          isValid = false;
+        }
+      } else {
+        isValid = false;
+      }
+      
+      return {
+        isValid,
+        credentials: { user: artifacts.decoded.payload.user }
+      };
+    }
+  });
+
+  server.auth.default('my_jwt_strategy');
+
+  await server.register({
+    plugin: require('hapi-mongodb'),
+    options: {
+      url: process.env.DATABASE_URL,
+      settings: {
+        useUnifiedTopology: true
+      },
+      decorate: true
+    }
+  });
+
+  server.route([
+    {
+      method: '*', // 涵盖了所有可用的method
+      path: '/{any*}', // 这将捕获其他路由未捕获的任何路由。
+      handler: function (request, h) {
+        return Boom.notFound('missing');
+      },
+      options: {
+        cors: {
+          origin: corsOrigin,
+        },
+      }
+    },
+    {
+      method: 'POST',
+      path: '/login',
+      handler: async (request, h) => {
+        const { userName, password } = request.payload;
+        if (!userName || !password) {
+          return h.response({
+            data: null,
+            success: false,
+            message: '用户名或密码不能为空'
+          });
+        }
+
+        const account = users.find((user) => user.name === userName);
+        if (!account || !(await Bcrypt.compare(password, account.password))) {
+          return h.response({
+            data: null,
+            success: false,
+            message: '无效的用户名或密码'
+          });
+        }
+
+        // 用户名密码验证通过后生成JWT token并发送给客户端
+        const token = Jwt.token.generate(
+          { // payload
+            aud: process.env.JWT_AUD,
+            iss: process.env.JWT_ISS,
+            user: userName,
+            group: 'hapi_render'
+          },
+          { // secret
+            key: process.env.JWT_KEYS,
+            algorithm: 'HS512'
+          },
+          { // options
+            ttlSec: +process.env.JWT_MAXAGESEC // 4 hours
+          }
+        );
+
+        return h.response({
+          data: userName,
+          token: token,
+          success: true,
+        });
+      },
+      options: {
+        auth: { // 使用strategy则默认auth的值为{mode: 'required'}
+          mode: 'try' // 任何请求凭据都会尝试进行身份验证，但如果凭据无效，则无论身份验证错误如何，请求都会继续进行。
+        },
+        cors: {
+          origin: corsOrigin,
+        },
+      }
+    },
+    {
+      method: 'GET',
+      path: '/logout',
+      handler: (request, h) => {
+        request.cookieAuth.clear();
+        return h.redirect('/');
+      }
+    },
+    // 获取一个todo事项
+    {
+      method: 'GET',
+      path: '/todo',
+      handler: async (request, h) => {
+        const todo = await request.mongo.db.collection('todolists').findOne({})
+
+        return h.response(todo);
+      },
+      options: {
+        cors: {
+          origin: corsOrigin,
+        },
+      },
+    }
+  ]);
+
+  await server.start();
+  console.log(`Server started at: ${server.info.uri}`);
+};
+
+
+const start = async function () {
+  try {
+    await init();
+  }
+  catch (err) {
+    console.error(err.stack);
+    process.exit(1);
+  }
+};
+
+start();
+```
+
+### [Boom](https://hapi.dev/module/boom/)
+安装：`npm install @hapi/boom` 或 `yarn add @hapi/boom`。boom提供一组用于返回 HTTP 错误的工具包
+
+- `Boom.unauthorized([message], [scheme], [attributes])` 返回 401 未经授权错误
 
 ## nestjs
