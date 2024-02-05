@@ -1,69 +1,11 @@
-- [文档](#文档)
-- [参考资料](#参考资料)
-- [webpack知识图谱](#webpack知识图谱)
-- [使用层面](#使用层面)
-  - [一、执行](#一执行)
-  - [二、配置](#二配置)
-    - [1. entry](#1-entry)
-    - [2. output(缓存)](#2-output缓存)
-    - [3. 模式mode](#3-模式mode)
-    - [4. resolve](#4-resolve)
-    - [5. devServer](#5-devserver)
-  - [三、Modules](#三modules)
-  - [四、loader](#四loader)
-    - [1. loader的作用](#1-loader的作用)
-    - [2. loader是什么](#2-loader是什么)
-    - [3. file-loader 和 url-loader的区别](#3-file-loader-和-url-loader的区别)
-    - [4. 样式loader](#4-样式loader)
-    - [5. babel-loader](#5-babel-loader)
-    - [6. vue-loader](#6-vue-loader)
-    - [7. react hot loader](#7-react-hot-loader)
-    - [8. ts-loader](#8-ts-loader)
-  - [五、plugin](#五plugin)
-    - [1. html-webpack-plugin](#1-html-webpack-plugin)
-    - [2. mini-css-extract-plugin](#2-mini-css-extract-plugin)
-    - [3. copy-webpack-plugin](#3-copy-webpack-plugin)
-    - [4. DefinePlugin](#4-defineplugin)
-  - [六、webpack-dev-server](#六webpack-dev-server)
-  - [七、SourceMap](#七sourcemap)
-  - [八、webpack-chain](#八webpack-chain)
-    - [文档](#文档-1)
-    - [参考资料](#参考资料-1)
-    - [webpack-chain核心概念](#webpack-chain核心概念)
-      - [Chainable](#chainable)
-      - [ChainedMap---继承于 Chainable](#chainedmap---继承于-chainable)
-      - [ChainedSet---继承于 Chainable](#chainedset---继承于-chainable)
-- [原理层面](#原理层面)
-  - [tree-shaking](#tree-shaking)
-    - [1. tree-shaking的作用](#1-tree-shaking的作用)
-    - [2. 为什么需要tree-shaking](#2-为什么需要tree-shaking)
-    - [3. 什么是无用的代码](#3-什么是无用的代码)
-    - [4. 怎么消除无用代码](#4-怎么消除无用代码)
-    - [5. tree-shaking的实现流程](#5-tree-shaking的实现流程)
-- [实战层面](#实战层面)
-- [优化层面](#优化层面)
-- [webpack5](#webpack5)
-  - [webpack5系列](#webpack5系列)
-  - [Module Federation](#module-federation)
-  - [用webpack5封装项目遇到的问题](#用webpack5封装项目遇到的问题)
-- [手写一个webpack loader(Writing a Loader)](#手写一个webpack-loaderwriting-a-loader)
-  - [遇到的问题](#遇到的问题)
-- [手写一个webpack插件(自定义插件)](#手写一个webpack插件自定义插件)
-  - [1. webpack构建流程](#1-webpack构建流程)
-  - [2. Tapable(tapable；梳理tapable的九大钩子函数的使用及原理)](#2-tapabletapable梳理tapable的九大钩子函数的使用及原理)
-  - [3. 常用的生命周期钩子函数(compiler-hooks；compilation-hooks)](#3-常用的生命周期钩子函数compiler-hookscompilation-hooks)
-  - [4. 插件是由「具有 apply 方法的 prototype 对象」所实例化出来的](#4-插件是由具有-apply-方法的-prototype-对象所实例化出来的)
-  - [5. Compiler](#5-compiler)
-  - [6. Compilation](#6-compilation)
-  - [7. ContextModuleFactory](#7-contextmodulefactory)
-  - [8. NormalModuleFactory](#8-normalmodulefactory)
-  - [9. parser](#9-parser)
-  - [10. Resolvers 解析器](#10-resolvers-解析器)
-  - [11. webpack执行流程及触发的钩子函数](#11-webpack执行流程及触发的钩子函数)
-  - [12. 编译时报错：Missing semicolon](#12-编译时报错missing-semicolon)
+---
+tags: [Building tool]
+---
+
 ## 文档
 [官方文档](https://webpack.js.org/)
-> [中文文档](https://www.webpackjs.com)
+
+[中文文档](https://www.webpackjs.com)
 ## 参考资料
 - [深入浅出Webpack](https://webpack.wuhaolin.cn/)
 - [webpack入门进阶知识](https://juejin.cn/post/6991966321529815053)
@@ -88,7 +30,7 @@
 > Module parse failed: Unexpected character '' (1:0)
 > You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
 
-#### 1. entry
+#### entry
 - 不配置entry
   - 默认为src下的index.js
   - 若output设置filename: '[name].js',则打包后这个name为main，即index.js打包后为main.js
@@ -102,7 +44,7 @@
   },
   // main 即 index.js打包后为main.js
   ```
-#### 2. output(缓存)
+#### output(缓存)
 ```js
 output: {
   //如果把资源放在cdn下，则引入cdn
@@ -131,13 +73,13 @@ output: {
 
 - publicPath
 
-#### 3. [模式mode](https://www.webpackjs.com/concepts/mode)
+#### [模式mode](https://www.webpackjs.com/concepts/mode)
 - 如果没有设置，webpack 会将 mode 的默认值设置为 production
 
-#### 4. [resolve](https://www.webpackjs.com/configuration/resolve/)
+#### [resolve](https://www.webpackjs.com/configuration/resolve/)
 - 设置别名alias
 
-#### 5. devServer
+#### devServer
 - proxy
 ```js
 // 如下，对 /api/users 的请求会将请求代理到 http://localhost:3000/api/users
@@ -321,7 +263,7 @@ module.exports = {
 
 ### 五、[plugin](https://www.webpackjs.com/plugins/)
 > plugin可以运行在打包之前，也可以运行在打包的过程中，也可以运行在打包完成之后。
-#### 1. html-webpack-plugin
+#### html-webpack-plugin
 - 作用：直接为项目生成一个或多个HTML文件(HTML文件个数由插件实例的个数决定，即new HtmlWebpackPlugin()的个数)，并将webpack打包后输出的所有脚本文件自动添加到插件生成的HTML文件中。通过配置，可以将根目录下用户自定义的HTML文件作为插件生成HTML文件的模板。另外，还可以通过向插件传递参数来控制HTML文件的输出。
 - 参数有inject等（https://juejin.cn/post/6844903853708541959）
 - new HtmlWebpackPlugin() 若不传入任何参数，那么插件将生成默认的html文件，注意使用webpack-dev-server启动的话，生成的该html文件是放在内存中而不在项目目录下。默认生成的html文件如下：
@@ -380,9 +322,9 @@ module.exports = {
 
 - `<meta name="viewport" content="width=device-width, initial-scale=1.0">` 该meta标签的作用是让当前viewport的宽度等于设备的宽度，初始缩放比例为1。([viewport](https://www.cnblogs.com/yelongsan/p/7975580.html))
 
-#### 2. mini-css-extract-plugin
+#### mini-css-extract-plugin
 
-#### 3. [copy-webpack-plugin](https://runebook.dev/zh-CN/docs/webpack/plugins/copy-webpack-plugin)
+#### [copy-webpack-plugin](https://runebook.dev/zh-CN/docs/webpack/plugins/copy-webpack-plugin)
 - [webpack复制静态文件](https://www.imqianduan.com/webpack/100.html)
 > from路径是相对项目的根目录；to路径相对webpack配置的output路径
 
@@ -407,7 +349,7 @@ new copyWebpackPlugin({
 // 解决方案：public下不要只放index.html
 ```
 
-#### 4. [DefinePlugin](https://www.webpackjs.com/plugins/define-plugin/)
+#### [DefinePlugin](https://www.webpackjs.com/plugins/define-plugin/)
 
 ### 六、webpack-dev-server
 > 在每次编译代码时，手动运行 npm run build 会显得很麻烦。可以使用webpack --watch来实现每次修改完代码后自动监听。webpack 提供几种可选方式，帮助你在代码发生变化后自动编译代码(https://www.webpackjs.com/guides/development/)：

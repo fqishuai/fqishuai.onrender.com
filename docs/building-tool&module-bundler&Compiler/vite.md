@@ -2,6 +2,13 @@
 tags: [Building tool]
 ---
 
+:::info
+vite主要由两部分组成：
+- 一个开发服务器，它基于 原生 ES 模块 提供了 丰富的内建功能，如速度快到惊人的 模块热更新（HMR）。
+
+- 一套构建指令，它使用 Rollup 打包你的代码，并且它是预配置的，可输出用于生产环境的高度优化过的静态资源。
+:::
+
 ## 使用pnpm+vite搭建react+typescript工程
 ### 1.使用`pnpm create vite`
 选择React、TypeScript，SWC熟练的话可以选择TypeScript+SWC
@@ -224,3 +231,51 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     },
   }
   ```
+
+## 配置项
+- `root` 项目根目录（`index.html` 文件所在的位置）。可以是一个绝对路径，或者一个相对于该配置文件本身的相对路径。默认为`process.cwd()`
+
+- `mode` 默认为'development' 用于开发，'production' 用于构建
+
+- `logLevel` 调整控制台输出的级别，默认为 'info'。值可以是'info' | 'warn' | 'error' | 'silent'
+
+- `define` 定义全局常量替换方式。
+
+### [构建配置项](https://cn.vitejs.dev/config/build-options.html)
+- `build.cssTarget ` 此选项允许用户为 CSS 的压缩设置一个不同的浏览器 target，此处的 target 并非是用于 JavaScript 转写目标。默认值与 `build.target` 一致
+
+- `build.cssCodeSplit` 默认为`true`，即启用 CSS 代码拆分，在异步 chunk 中导入的 CSS 将内联到异步 chunk 本身，并在其被加载时一并获取。
+
+- `build.lib` 构建为库。`entry` 是必需的，因为库不能使用 HTML 作为入口。`name` 则是暴露的全局变量，并且在 `formats` 包含 'umd' 或 'iife' 时是必需的。默认 `formats` 是 `['es', 'umd']`，如果使用了多个配置入口，则是 `['es', 'cjs']`。`fileName` 是输出的包文件名，默认 `fileName` 是 `package.json` 的 `name` 选项
+  :::warning
+  如果指定了 `build.lib`，`build.cssCodeSplit` 会默认为 `false`，即禁用 CSS 代码拆分，则整个项目中的所有 CSS 将被提取到一个 CSS 文件中。
+  :::
+
+- `build.rollupOptions` 自定义底层的 Rollup 打包配置。这与从 Rollup 配置文件导出的选项相同，并将与 Vite 的内部 Rollup 选项合并。（在 build 阶段，Vite 是利用 Rollup 去完成构建，整个过程只需要调用 Rollup 提供的 JS API 即可，整个过程中，Vite 的工作只是在做配置的转换，把 Vite 的配置转换成 Rollup 的 input 和 output 配置。）
+  - `build.rollupOptions.external` 不想打包进你开发的库的依赖
+
+- `build.minify` 设置为 `false` 可以禁用最小化混淆，或是用来指定使用哪种混淆器。默认为 `Esbuild`，它比 `terser` 快 20-40 倍，压缩率只差 1%-2%。注意，在 `lib` 模式下使用 'es' 时，`build.minify` 选项不会缩减空格，因为会移除掉 `pure` 标注，导致破坏 tree-shaking。
+
+- `build.emptyOutDir` 若 `outDir` 在 root 目录(默认为`process.cwd()`)下，则 该值默认为`true`，Vite 会在构建时清空该目录，设为`false`则不清空。若 `outDir` 在根目录之外则会抛出一个警告避免意外删除掉重要的文件。可以设置该选项来关闭这个警告。
+
+## [JavaScript API](https://cn.vitejs.dev/guide/api-javascript.html#build)
+### `build`
+```js
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { build } from 'vite'
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+
+;(async () => {
+  await build({
+    root: path.resolve(__dirname, './project'),
+    base: '/foo/',
+    build: {
+      rollupOptions: {
+        // ...
+      },
+    },
+  })
+})()
+```
