@@ -1,5 +1,5 @@
 ---
-tags: [css]
+tags: [css extension]
 ---
 
 :::tip
