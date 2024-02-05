@@ -255,6 +255,27 @@ render() {
 查看`react-scripts`依赖包中`config/webpack.config.js`：
 1. 设置了别名`src`对应为根目录下的src目录，所以导入Home组件时可以使用`src/pages/home/Home`
 
+### 使用`.scss` 或 `.sass`
+```bash
+yarn add sass # 安装后就可以使用`.scss` 或 `.sass`文件
+```
+
+要在 Sass 文件之间共享变量，可以使用 Sass 的 `@use` 规则。例如，`src/App.scss`和其他组件样式文件可以包含`@use “./shared.scss”；`与变量定义。
+```scss
+@use 'styles/_colors.scss'; // 假设 src/ 下有一个 styles 目录，则可以这样使用
+```
+
+可以在路径前加上 `~` 前缀，如下所示，以解析 `node_modules` 中的模块:
+```scss
+@use '~nprogress/nprogress'; // loading a css file from the nprogress node module
+```
+
+注意：LibSass 以及构建在其之上的软件包（包括 Node Sass）已被弃用。如果您是 Node Sass 的用户，可以通过将 `package.json` 文件中的 `node-sass` 替换为 `sass` 或运行以下命令来迁移到 Dart Sass：
+```bash
+yarn remove node-sass
+yarn add sass
+```
+
 ## [eject的替代方案](https://auth0.com/blog/how-to-configure-create-react-app/)
 1. fork create-react-app 仓库
 2. 在`packages/react-scripts/scripts/init.js`中的增加log来验证后续使用的是自定义的react-scripts

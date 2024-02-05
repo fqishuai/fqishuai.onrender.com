@@ -13,85 +13,7 @@ tags: [react]
 [React JS Best Practices From The New Docs](https://sebastiancarlos.medium.com/react-js-best-practices-from-the-new-docs-1c65570e785d)
 :::
 
-- [一、创建React工程](#一创建react工程)
-  - [1. minimal toolchain---Create React App](#1-minimal-toolchain---create-react-app)
-  - [2. full-featured framework---Next.js](#2-full-featured-framework---nextjs)
-- [二、知识点](#二知识点)
-  - [1. 事件处理](#1-事件处理)
-    - [1.1 定义事件处理函数的3种方式](#11-定义事件处理函数的3种方式)
-    - [1.2 Passing event handlers as props](#12-passing-event-handlers-as-props)
-    - [1.3 Event propagation 事件传播(事件冒泡)](#13-event-propagation-事件传播事件冒泡)
-    - [1.4 Stopping propagation 阻止事件冒泡](#14-stopping-propagation-阻止事件冒泡)
-    - [1.5 Capture events 捕获事件](#15-capture-events-捕获事件)
-    - [1.6 Preventing default behavior 防止默认行为](#16-preventing-default-behavior-防止默认行为)
-  - [2. 组件](#2-组件)
-    - [2.1 JSX](#21-jsx)
-      - [2.1.1. JSX的规则：](#211-jsx的规则)
-      - [2.1.2. JSX的花括号中可以写任何JS表达式](#212-jsx的花括号中可以写任何js表达式)
-      - [2.1.3. JSX 元素不是“实例”(instances)，因为它们不保存任何内部状态，也不是真正的 DOM 节点。](#213-jsx-元素不是实例instances因为它们不保存任何内部状态也不是真正的-dom-节点)
-      - [2.1.4. React的JSX中表达式为false时不会渲染任何内容。React将 false 视为 JSX 树中的“漏洞”，就像 null 或 undefined 一样，并不会在其位置渲染任何内容。](#214-react的jsx中表达式为false时不会渲染任何内容react将-false-视为-jsx-树中的漏洞就像-null-或-undefined-一样并不会在其位置渲染任何内容)
-      - [2.1.5. JSX表达式中使用逻辑与操作符时，\&\&的左边不要放数字。JavaScript 自动将 \&\& 左侧转换为布尔值。如果左边是 0，那么整个表达式都会得到那个值 (0)，React 会渲染 0 而不是什么都没有。](#215-jsx表达式中使用逻辑与操作符时的左边不要放数字javascript-自动将--左侧转换为布尔值如果左边是-0那么整个表达式都会得到那个值-0react-会渲染-0-而不是什么都没有)
-    - [2.2 Keeping components pure](#22-keeping-components-pure)
-      - [2.2.1. 纯函数](#221-纯函数)
-      - [2.2.2. Strict Mode](#222-strict-mode)
-      - [2.2.3. side effects](#223-side-effects)
-    - [2.3 组件库](#23-组件库)
-    - [2.4 Props](#24-props)
-      - [2.4.1. 可以通过它们传递任何 JavaScript 值，包括对象、数组和函数。](#241-可以通过它们传递任何-javascript-值包括对象数组和函数)
-      - [2.4.2. React component functions accept a single argument, a `props` object.](#242-react-component-functions-accept-a-single-argument-a-props-object)
-      - [2.4.3. 通常你不需要整个 props 对象本身，所以可以将它解构(destructuring)](#243-通常你不需要整个-props-对象本身所以可以将它解构destructuring)
-      - [2.4.4. 给prop指定默认值](#244-给prop指定默认值)
-      - [2.4.5. 使用JSX spread syntax传递props](#245-使用jsx-spread-syntax传递props)
-      - [2.4.6. props的children](#246-props的children)
-      - [2.4.7. 子组件不要改变props](#247-子组件不要改变props)
-    - [2.5 Rendering Lists](#25-rendering-lists)
-      - [2.5.1. 箭头函数的隐式返回(implicitly return)及block body](#251-箭头函数的隐式返回implicitly-return及block-body)
-      - [2.5.2. map中的JSX必须得有key](#252-map中的jsx必须得有key)
-      - [2.5.3. React组件不接收key作为prop，key仅被React本身在其整个生命周期内识别对应的数组的项。](#253-react组件不接收key作为propkey仅被react本身在其整个生命周期内识别对应的数组的项)
-    - [2.6 The lifecycle of components](#26-the-lifecycle-of-components)
-  - [3. Render and Commit](#3-render-and-commit)
-    - [3.1 Triggering a render](#31-triggering-a-render)
-    - [3.2 React renders your components](#32-react-renders-your-components)
-    - [3.3 React commits changes to the DOM](#33-react-commits-changes-to-the-dom)
-  - [4. State](#4-state)
-    - [4.1 State as a Snapshot](#41-state-as-a-snapshot)
-    - [4.2 Queueing a series of state updates](#42-queueing-a-series-of-state-updates)
-      - [4.2.1 React batches state updates 批量状态更新](#421-react-batches-state-updates-批量状态更新)
-      - [4.2.2 Updating the same state variable multiple times before the next render](#422-updating-the-same-state-variable-multiple-times-before-the-next-render)
-      - [4.2.3 What happens if you update state after replacing it](#423-what-happens-if-you-update-state-after-replacing-it)
-      - [4.2.4 What happens if you replace state after updating it](#424-what-happens-if-you-replace-state-after-updating-it)
-    - [4.3 更改类型为对象或数组的state](#43-更改类型为对象或数组的state)
-    - [4.4 用 Immer 编写简洁的更新逻辑](#44-用-immer-编写简洁的更新逻辑)
-  - [5. Managing State](#5-managing-state)
-    - [5.1 Reacting to Input with State](#51-reacting-to-input-with-state)
-    - [5.2 Choosing the state structure](#52-choosing-the-state-structure)
-      - [5.2.1 Principles for structuring state](#521-principles-for-structuring-state)
-    - [5.3 Sharing state between components](#53-sharing-state-between-components)
-    - [5.4 Preserving and resetting state 保留/重置状态](#54-preserving-and-resetting-state-保留重置状态)
-    - [5.5 Extracting state logic into a reducer](#55-extracting-state-logic-into-a-reducer)
-    - [5.6 Passing data deeply with context](#56-passing-data-deeply-with-context)
-    - [5.7 Scaling up with reducer and context 使用 reducer 和 context 进行扩展](#57-scaling-up-with-reducer-and-context-使用-reducer-和-context-进行扩展)
-  - [6. Escape Hatches](#6-escape-hatches)
-    - [6.1 Referencing Values with Refs](#61-referencing-values-with-refs)
-    - [6.2 Manipulating the DOM with Refs](#62-manipulating-the-dom-with-refs)
-      - [6.2.1 使用`flushSync`可以同步更新state](#621-使用flushsync可以同步更新state)
-    - [6.3 Synchronizing with Effects](#63-synchronizing-with-effects)
-      - [6.3.1 如何使用Effect](#631-如何使用effect)
-      - [6.3.2 发请求获取数据的方案](#632-发请求获取数据的方案)
-      - [6.3.3 每个渲染都有自己的Effect](#633-每个渲染都有自己的effect)
-    - [6.4 You Might Not Need an Effect](#64-you-might-not-need-an-effect)
-    - [6.5 Lifecycle of Reactive Effects](#65-lifecycle-of-reactive-effects)
-- [三、Hooks](#三hooks)
-  - [1. useState](#1-usestate)
-    - [1.1 useState怎么区分不同的state？](#11-usestate怎么区分不同的state)
-- [四、Optimizing Performance](#四optimizing-performance)
-  - [1. Use the Production Build 使用生产版本](#1-use-the-production-build-使用生产版本)
-  - [2. Profiling Components with the DevTools Profiler 使用 DevTools Profiler 分析组件](#2-profiling-components-with-the-devtools-profiler-使用-devtools-profiler-分析组件)
-  - [3. Virtualize Long Lists 虚拟化长列表](#3-virtualize-long-lists-虚拟化长列表)
-  - [4. Avoid Reconciliation 避免调合](#4-avoid-reconciliation-避免调合)
-  - [5. shouldComponentUpdate In Action](#5-shouldcomponentupdate-in-action)
-
-## 一、创建React工程
+## 创建React工程
 ### 1. minimal toolchain---[Create React App](https://create-react-app.dev/)
 Popular alternatives:
 - [Vite](https://vitejs.dev/guide/)
@@ -138,13 +60,11 @@ Popular alternatives:
 - [Remix](https://remix.run/)
 - [Razzle](https://razzlejs.org/)
 
-## 二、知识点
-### 1. 事件处理
+## 定义事件处理函数的3种方式
 :::tip
-React lets you add event handlers to your JSX. Event handlers are your own functions that will be triggered in response to user interactions like clicking, hovering, focusing on form inputs, and so on.
+React 允许您向 JSX 添加事件处理程序。 事件处理程序是您自己的函数，将响应用户交互（例如单击、悬停、聚焦表单输入等）而触发。
 :::
 
-#### 1.1 定义事件处理函数的3种方式
 - 组件内部function handleXxx
 ```jsx
 function MyButton() {
@@ -213,7 +133,7 @@ function Button({ onClick, children }) {
 handleClick() 末尾的 () 在渲染期间立即触发该函数，无需任何点击。这是因为 JSX 花括号中的 JavaScript 会立即执行。
 :::
 
-#### 1.2 Passing event handlers as props
+## 将事件处理程序作为 props 传递
 父组件指定子组件的事件处理程序（[Everything you need to know about Design Systems](https://uxdesign.cc/everything-you-need-to-know-about-design-systems-54b109851969)）
 ```jsx
 function Button({ onClick, children }) {
@@ -255,7 +175,7 @@ export default function Toolbar() {
 ```
 [查看执行结果](https://code.juejin.cn/pen/7164647346758746148)
 
-#### 1.3 Event propagation 事件传播(事件冒泡)
+## 事件传播(事件冒泡)
 事件处理程序还将捕获来自您的组件可能拥有的任何子级的事件。
 ```jsx live
 // 如果单击任一按钮，其 onClick 将首先运行，然后是父 <div> 的 onClick。所以会出现两条消息。如果您单击工具栏本身，则只有父 <div> 的 onClick 会运行。
@@ -278,7 +198,7 @@ function Toolbar() {
 除了 onScroll ，所有事件都在 React 中传播。
 :::
 
-#### 1.4 Stopping propagation 阻止事件冒泡
+## 阻止事件冒泡
 - 事件处理程序接收一个事件对象作为其唯一参数。按照惯例，它通常被称为 `e`，代表“事件”。您可以使用此对象来读取有关事件的信息。
 - 该事件对象还允许您停止传播。如果你想阻止事件到达父组件，你需要像这个 Button 组件一样调用 `e.stopPropagation()`
 ```jsx
@@ -311,7 +231,7 @@ export default function Toolbar() {
 ```
 [查看执行结果](https://code.juejin.cn/pen/7164656358560628751)
 
-#### 1.5 Capture events 捕获事件
+## 捕获事件
 :::info
 捕获事件---在极少数情况下，您可能需要捕获子元素上的所有事件，即使它们停止传播。例如，您可能希望将每次点击记录到分析中，而不管传播逻辑如何。您可以通过在事件名称末尾添加 `Capture` 来做到这一点。
 ```jsx
@@ -322,7 +242,7 @@ export default function Toolbar() {
 ```
 :::
 
-#### 1.6 Preventing default behavior 防止默认行为
+## 防止默认行为
 **一些浏览器事件具有与之关联的默认行为。例如，`<form>` 提交事件，默认情况下会重新加载整个页面。**
 ```jsx
 function Signup() {
@@ -355,7 +275,7 @@ function Signup() {
 - [e.preventDefault()](https://developer.mozilla.org/zh-CN/docs/Web/API/Event/preventDefault) 用于阻止少数事件的默认浏览器行为
 :::
 
-### 2. 组件
+## 组件
 :::tip
 - 应遵循单一职责原则(single responsibility principle)，即一个组件在理想情况下应该只做一件事。如果它最终增长，它应该被分解成更小的子组件。
 - 单向数据流(one-way data flow): 数据从顶层组件向下流向树底部的组件。
@@ -436,12 +356,12 @@ function Item({ name, isPacked }) {
 ```
 :::
 
-#### 2.1 JSX
+### JSX
 :::tip
 JSX and React are two separate things. They’re often used together, but you can [use them independently](https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html#whats-a-jsx-transform) of each other. JSX is a syntax extension, while React is a JavaScript library.
 :::
 
-##### 2.1.1. JSX的规则：
+#### JSX的规则
 - (1) Return a single root element.
 > To return multiple elements from a component, wrap them with a single parent tag. For example, you can use a `<div>`, If you don’t want to add an extra `<div>` to your markup, you can write `<>`and `</>` instead. This empty tag is called a [Fragment](https://beta.reactjs.org/apis/react/Fragment).Fragments let you group things without leaving any trace in the browser HTML tree.
 ```jsx
@@ -488,7 +408,7 @@ HTML `<ul style="background-color: black">`，JSX `<ul style={{ backgroundColor:
 </>
 ```
 
-##### 2.1.2. JSX的花括号中可以写任何JS表达式
+#### JSX的花括号中可以写任何JS表达式
 > 包括函数调用，比如`{formatDate(new Date())}`；对象，比如`style={{backgroundColor: 'black',color: 'pink'}}`；花括号中也可以写JSX：
 ```jsx
 function Item({ name, importance }) {
@@ -525,11 +445,14 @@ export default function PackingList() {
 }
 ```
 
-##### 2.1.3. JSX 元素不是“实例”(instances)，因为它们不保存任何内部状态，也不是真正的 DOM 节点。
+#### JSX 元素不是“实例”(instances)
+JSX 元素不是“实例”(instances)，因为它们不保存任何内部状态，也不是真正的 DOM 节点。
 
-##### 2.1.4. React的JSX中表达式为false时不会渲染任何内容。React将 false 视为 JSX 树中的“漏洞”，就像 null 或 undefined 一样，并不会在其位置渲染任何内容。
+#### React的JSX中表达式为`false`时不会渲染任何内容
+React将 `false` 视为 JSX 树中的“漏洞”，就像 `null` 或 `undefined` 一样，并不会在其位置渲染任何内容。
 
-##### 2.1.5. JSX表达式中使用逻辑与操作符时，&&的左边不要放数字。JavaScript 自动将 && 左侧转换为布尔值。如果左边是 0，那么整个表达式都会得到那个值 (0)，React 会渲染 0 而不是什么都没有。
+#### JSX表达式中使用逻辑与操作符时，`&&`的左边不要放数字
+JavaScript 自动将 `&&` 左侧转换为布尔值。如果左边是 0，那么整个表达式都会得到那个值 (0)，React 会渲染 0 而不是什么都没有。
 ```jsx
 const list = [1,2];
 const emptyList = [];
@@ -544,8 +467,8 @@ const emptyList = [];
 ```
 [查看执行结果](https://code.juejin.cn/pen/7163629449186361352)
 
-#### 2.2 Keeping components pure
-##### 2.2.1. 纯函数
+### Keeping components pure
+#### 纯函数
 :::info
 纯函数：
 - Minds its own business. It does not change any objects or variables that existed before it was called. 不会改变 被调用前存在的 任何对象或变量
@@ -567,14 +490,14 @@ function double(number) {
 
 - 当您想要更改某些内容以响应用户输入时，您应该设置状态（set state）而不是写入变量。在渲染组件时，您永远不应该更改预先存在的变量或对象。
 
-##### 2.2.2. Strict Mode
+#### Strict Mode
 **注意：使用StrictMode和不使用StrictMode 渲染出的结果不一样，这是因为StrictMode时组件函数被调用了2次，而纯函数只计算，所以调用它们两次不会改变任何东西；不纯的函数则会产生不同的结果**
 > [不纯的组件](https://code.juejin.cn/pen/7163198918887637004)
 
 - React 提供了一种“严格模式”，它在开发过程中调用每个组件函数两次。通过调用组件函数两次，严格模式有助于找到违反这些规则的组件。
 - 严格模式在生产中没有任何影响，因此它不会为您的用户减慢应用程序的速度。要选择严格模式，您可以将根组件包装到 `<React.StrictMode>` 中，一些框架默认执行此操作。
 
-##### 2.2.3. side effects
+#### side effects
 - These changes—--updating the screen, starting an animation, changing the data—---are called side effects. They’re things that happen “on the side”, not during rendering. 不在渲染期间
 
 - In React, side effects usually belong inside event handlers. Event handlers are functions that React runs when you perform some action—for example, when you click a button. Even though event handlers are defined inside your component, they don’t run during rendering! So event handlers don’t need to be pure. 在 React 中，副作用通常属于事件处理程序。事件处理程序是 在您执行某些操作时 React 运行的函数——例如，当您单击按钮时。**即使在组件内部定义了事件处理程序，它们也不会在渲染期间运行！**所以事件处理程序不需要是纯粹的。
@@ -639,17 +562,17 @@ export default function StoryTray({ stories }) {
 ```
 [查看执行结果](https://codesandbox.io/s/d66eg9?file=/StoryTray.js:0-303&utm_medium=sandpack)
 
-#### 2.3 组件库
+### 组件库
 - [Chakra UI](https://chakra-ui.com/)
 - [Material UI](https://mui.com/core/)
 
-#### 2.4 Props
-##### 2.4.1. 可以通过它们传递任何 JavaScript 值，包括对象、数组和函数。
+### Props
+#### 可以通过它们传递任何 JavaScript 值，包括对象、数组和函数。
 
-##### 2.4.2. React component functions accept a single argument, a `props` object.
+#### React component functions accept a single argument, a `props` object.
 > 这里说的是React函数组件只接收一个入参，即props对象（但不应该还能接受ref这个入参吗？？）
 
-##### 2.4.3. 通常你不需要整个 props 对象本身，所以可以将它解构(destructuring)
+#### 通常你不需要整个 props 对象本身，所以可以将它解构(destructuring)
 > [解构](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Unpacking_fields_from_objects_passed_as_a_function_parameter)
 ```jsx
 function Avatar(props) {
@@ -661,7 +584,7 @@ function Avatar(props) {
 function Avatar({ person, size }) {}
 ```
 
-##### 2.4.4. 给prop指定默认值
+#### 给prop指定默认值
 > 以下面Avatar的prop为例，The default value is only used if the size prop is missing or if you pass `size={undefined}`. But **if you pass `size={null}` or `size={0}`, the default value will not be used**.
 ```jsx
 function Avatar({ person, size = 100 }) {
@@ -669,7 +592,7 @@ function Avatar({ person, size = 100 }) {
 }
 ```
 
-##### 2.4.5. 使用JSX spread syntax传递props
+#### 使用JSX spread syntax传递props
 > 适用于不直接使用任何props，仅仅是传递
 
 ```jsx
@@ -720,7 +643,7 @@ export default function PieDemo(props) {
 ```
 :::
 
-##### 2.4.6. props的children
+#### props的children
 > When you nest content inside a JSX tag, the parent component will receive that content in a prop called children.
 
 ```jsx
@@ -799,7 +722,7 @@ export default function Profile() {
 [查看执行结果](https://code.juejin.cn/pen/7163614463877185539)
 :::
 
-##### 2.4.7. 子组件不要改变props
+#### 子组件不要改变props
 > 当一个组件需要改变它的 props 时，应该要求父组件传递另外不同的 props(一个新的object)，旧的 props 将被丢弃，最终 JavaScript 引擎将回收它们占用的内存。
 
 :::tip
@@ -808,8 +731,8 @@ export default function Profile() {
 - 保证 React 单向数据流的设计模式，使状态可预测。如果允许子组件修改，那么一个父组件将状态传递给好几个子组件，这几个子组件随意修改，就完全不可预测，不知道在什么地方修改了状态。
 :::
 
-#### 2.5 Rendering Lists
-##### 2.5.1. 箭头函数的隐式返回(implicitly return)及[block body](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#function_body)
+### Rendering Lists
+#### 箭头函数的隐式返回(implicitly return)及[block body](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#function_body)
 ```js
 // concise body syntax, implied "return"
 const func = (x) => x * x;
@@ -821,7 +744,7 @@ const func2 = (x, y) => {
 ```
 ![箭头函数的返回](img/arrow_function_return.jpeg)
 
-##### 2.5.2. map中的JSX必须得有key
+#### map中的JSX必须得有key
 >- 如果使用 Fragment （`<>...</>`）,`<>`不允许传key，这时可以使用[`<Fragment>`](https://beta.reactjs.org/apis/react/Fragment#rendering-a-list-of-fragments)
 >- 不要即时生成key，例如`key={Math.random()}`，这将导致每次都重新创建所有组件和 DOM。这不仅速度慢，而且还会丢失列表项中的任何用户输入。
 
@@ -840,7 +763,8 @@ const listItems = people.map(person =>
 // 在DOM中<Fragment>本身将消失，最终渲染的是其包裹的内容
 ```
 
-##### 2.5.3. React组件不接收key作为prop，key仅被React本身在其整个生命周期内识别对应的数组的项。
+#### React组件不接收`key`作为prop
+`key`仅被React本身在其整个生命周期内识别对应的数组的项。
 >- set key on each component in a collection so React can keep track of each of them even if their position or data changes.
 >- 如果您的组件需要 key 对应的值，则必须将其作为单独的 prop 传递。Warning: Child: `key` is not a prop. Trying to access it will result in `undefined` being returned. If you need to access the same value within the child component, you should pass it as a different prop. (https://reactjs.org/link/special-props)
 ```jsx
@@ -855,20 +779,20 @@ function Parent() {
 ```
 [查看执行结果](https://code.juejin.cn/pen/7163925086418763813)
 
-#### 2.6 The lifecycle of components
+### The lifecycle of components
 每个React组件都经历相同的生命周期：
 - 挂载(mount)：当组件被添加到屏幕上时。
 - 更新(update)：当组件接收到新的props或state时(通常是作为对交互的响应)，它会更新。
 - 卸载(unmount)：当组件从屏幕中移除时。
 
-### 3. Render and Commit
+## Render and Commit
 :::tip
 1. Triggering a render
 2. Rendering the component
 3. Committing to the DOM
 :::
 
-#### 3.1 Triggering a render
+### Triggering a render
 :::info
 组件渲染的原因有2个：
 - 组件的初始渲染 initial render
@@ -888,7 +812,7 @@ root.render(<Image />);
 2. Re-renders when state updates
 更新组件的状态会自动对渲染进行排队。Updating your component’s state automatically queues a render. 
 
-#### 3.2 React renders your components
+### React renders your components
 :::tip
 “Rendering” means that React is calling your component, which is a function. 
 :::
@@ -930,7 +854,7 @@ function Image() {
 }
 ```
 
-#### 3.3 React commits changes to the DOM
+### React commits changes to the DOM
 :::tip
 React只在不同的渲染之间有差异时才会改变DOM节点。React only changes the DOM nodes if there’s a difference between renders. 比如这个例子：[时间变了input框的内容还在](https://codesandbox.io/s/7fc59g?file=/Clock.js&utm_medium=sandpack)
 ```jsx
@@ -953,7 +877,7 @@ function Clock({ time }) {
 
 - 渲染完成并且 React 更新 DOM(update the DOM tree) 后，浏览器将重新绘制屏幕repaint the screen。
 
-### 4. State
+## State
 :::tip
 - In React, data that changes over time is called state. 在 React 中，随时间变化的数据称为状态。
 - Unlike regular JavaScript variables, React state behaves more like a snapshot. Setting it does not change the state variable you already have, but instead triggers a re-render. 与常规的 JavaScript 变量不同，React 状态的行为更像是快照。设置它不会更改您已经拥有的状态变量，而是会触发重新渲染。对常规变量的更改不会触发渲染。
@@ -998,7 +922,7 @@ function Gallery() {
 - State is isolated and private, if you render the same component twice, each copy will have completely isolated state! Changing one of them will not affect the other.
 :::
 
-#### 4.1 State as a Snapshot
+### State as a Snapshot
 :::tip
 - state的行为更像是快照。设置它不会更改已有的state变量，而是会触发重新渲染。
 - 组件函数返回的 JSX 就像 UI 的及时快照，它的props、事件处理程序(event handlers，即使是异步的)和局部变量(local variables)都是**使用渲染时的state（用户与之交互时的状态快照a snapshot of the state）计算的**。Its value was “fixed” when React “took the snapshot” of the UI by calling your component.
@@ -1044,7 +968,7 @@ function Form() {
 }
 ```
 
-#### 4.2 Queueing a series of state updates
+### Queueing a series of state updates
 - 下面这个组件有问题：点击“+3”只会增加一次分数。
 ```jsx live
 function Counter() {
@@ -1093,14 +1017,14 @@ console.log(score);  // 0
 ```
 :::
 
-##### 4.2.1 React batches state updates 批量状态更新
+#### React batches state updates 批量状态更新
 :::tip
 - React waits until all code in the event handlers has run before processing your state updates. 在处理状态更新之前，React 会等到事件处理程序中的所有代码都已运行。这就是为什么重新渲染只发生在所有这些 setScore() 调用之后。
 - batching(批处理)：在您的事件处理程序及其中的任何代码完成之前，UI 不会更新。这使您可以更新多个state变量(甚至来自多个组件)，而不会触发太多重新渲染，可以让你的 React 应用程序运行得更快。
 - React does not batch across multiple intentional events like clicks—each click is handled separately. React 不会 跨事件 进行批处理，例如点击事件，每个点击事件都是单独处理的。例如，如果第一次单击按钮禁用了表单，则第二次单击不会再次提交它。
 :::
 
-##### 4.2.2 Updating the same state variable multiple times before the next render
+#### Updating the same state variable multiple times before the next render
 - 如果您想在下一次渲染之前多次更新同一个state变量，可以传递一个 基于队列中的前一个状态计算下一个状态 的函数，如 `setScore(s => s + 1)`。这是一种告诉 React “用状态值做某事”而不是仅仅替换它的方法。
 ```jsx live
 function Counter() {
@@ -1130,7 +1054,7 @@ function Counter() {
 :::
 ![updater function works](img/updater_function.jpeg)
 
-##### 4.2.3 What happens if you update state after replacing it
+#### What happens if you update state after replacing it
 ```jsx live
 function Counter() {
   const [number, setNumber] = useState(0);
@@ -1148,7 +1072,7 @@ function Counter() {
 ```
 ![how it works](img/state_queue.jpeg)
 
-##### 4.2.4 What happens if you replace state after updating it
+#### What happens if you replace state after updating it
 ```jsx live
 function Counter() {
   const [number, setNumber] = useState(0);
@@ -1182,7 +1106,7 @@ state setter:
 [搞懂这个例子](https://codesandbox.io/s/still-leftpad-e0gtx6?file=/App.js)
 :::
 
-#### 4.3 更改类型为对象或数组的state
+### 更改类型为对象或数组的state
 :::tip
 - treat state as read-only(immutable)
 - When you store objects in state, mutating them will not trigger renders and will change the state in previous render “snapshots”. 当您将对象存储在状态中时，改变它们不会触发渲染，并且会更改先前渲染“快照”中的状态。
@@ -1425,7 +1349,7 @@ setMyList(myList.map(artwork => {
 [数组的增删改(使用useImmer)](https://codesandbox.io/s/admiring-heyrovsky-2cii8l?file=/App.js)
 :::
 
-#### 4.4 用 Immer 编写简洁的更新逻辑
+### 用 Immer 编写简洁的更新逻辑
 :::tip
 Immer 提供的 draft 是一种特殊类型的对象，称为 [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)，它会“记录”你用它做了什么。Immer 计算出 draft 的哪些部分被更改了，并生成一个全新对象，所以可以随意修改 draft。
 :::
@@ -1518,10 +1442,10 @@ function Form() {
 
 [使用use-immer的数组state](https://codesandbox.io/s/mclx2n?file=/App.js&utm_medium=sandpack)
 
-### 5. Managing State
+## Managing State
 [以状态驱动的思维方式处理交互(approach interactions with a state-driven mindset)](https://codesandbox.io/s/xenodochial-golick-0645w2?file=/App.js)
 
-#### 5.1 Reacting to Input with State
+### Reacting to Input with State
 Remove non-essential state to avoid bugs and paradoxes. 删除非必要状态以避免错误和悖论。
 
 如果在两种情况下都返回了相似的 JSX 树，那么最好将它们写成一个 JSX 片段；如果两个不同的 JSX 块描述同一棵树，则它们的嵌套必须对齐，否则切换不同的JSX将重新创建整棵树并重置其状态。
@@ -1637,8 +1561,9 @@ function EditProfile() {
 
 React avoids touching the DOM for properties that have not changed since the last time they were set. React 避免触及 属性自上次设置后未更改的 DOM。
 
-#### 5.2 Choosing the state structure
-##### 5.2.1 Principles for structuring state
+### Choosing the state structure
+
+#### Principles for structuring state
 1. Group related state. 如果你总是同时更新两个或多个状态变量，请考虑将它们合并为一个状态变量。
 
 ```jsx
@@ -2093,18 +2018,18 @@ export default function MailClient() {
 ```
 :::
 
-#### 5.3 Sharing state between components
+### Sharing state between components
 :::tip
 Sometimes, you want the state of two components to always change together. To do it, remove state from both of them, move it to their closest common parent, and then pass it down to them via props. This is known as “lifting state up”, and it’s one of the most common things you will do writing React code.
 :::
 
-#### 5.4 Preserving and resetting state 保留/重置状态
+### Preserving and resetting state 保留/重置状态
 :::tip
 - When you re-render a component, React needs to decide which parts of the tree to keep (and update), and which parts to discard or re-create from scratch. In most cases, React’s automatic behavior works well enough. By default, React preserves the parts of the tree that “match up” with the previously rendered component tree. 当你重新渲染一个组件时，React 需要决定树的哪些部分要保留（和更新），哪些部分要丢弃或从头开始重新创建。在大多数情况下，React 的自动行为工作得很好。默认情况下，React 保留树中与先前渲染的组件树“匹配”的部分。
 - React 允许您覆盖默认行为，通过向组件传递不同的 `key` 来强制组件重置其状态，即从头开始重新创建该组件。
 :::
 
-#### 5.5 Extracting state logic into a reducer
+### Extracting state logic into a reducer
 - useReducer 是useState的替代方案，当有多个event handlers更新一个state时，使用useReducer更合适
 ```jsx
 // 使用useState
@@ -2150,20 +2075,19 @@ function Counter() {
 
 - To model the state more precisely, you can extract it into a reducer. Reducers let you unify multiple state variables into a single object and consolidate all the related logic! 为了更精确地对状态建模，您可以将其提取到reducer中。 Reducers 让您可以将多个状态变量统一到一个对象中，并整合所有相关逻辑！
 
-#### 5.6 Passing data deeply with context
+### Passing data deeply with context
 - createContext
 - useContext
 
 [查看示例](https://codesandbox.io/s/sbhymf?file=/Section.js&utm_medium=sandpack)
 
-#### 5.7 Scaling up with reducer and context 使用 reducer 和 context 进行扩展
+### 使用 reducer 和 context 进行扩展
 [reducer和context结合使用](https://codesandbox.io/s/rxg0dv?file=/TasksContext.js&utm_medium=sandpack)
 
-### 6. Escape Hatches
-#### 6.1 Referencing Values with Refs
+## 使用 Refs 引用值
 
-#### 6.2 Manipulating the DOM with Refs
-##### 6.2.1 使用`flushSync`可以同步更新state
+## 使用 Refs 操作 DOM
+### 使用`flushSync`可以同步更新state
 ```jsx
 setTodos([ ...todos, newTodo]);
 listRef.current.lastChild.scrollIntoView();
@@ -2185,13 +2109,13 @@ function handleAdd() {
 }
 ```
 
-#### 6.3 Synchronizing with Effects
+## 使用 Effects 将组件与 React 之外的某些系统同步
 :::tip
 Effects 通常用于“跳出”React 代码并与某些外部系统同步，这包括浏览器 API、第三方小部件、网络等。**如果不涉及外部系统（例如，如果您想在某些 props 或 state 更改时更新组件的state），则不需要 Effect。**
 :::
 
-##### 6.3.1 如何使用Effect
-1. 没有任何依赖的Effect：每次组件渲染时，React都会更新屏幕，然后运行useEffect内的代码。换句话说，useEffect会“延迟”一段代码的运行，直到该渲染在屏幕上反映出来。
+### 如何使用Effect
+- 没有任何依赖的Effect：每次组件渲染时，React都会更新屏幕，然后运行useEffect内的代码。换句话说，useEffect会“延迟”一段代码的运行，直到该渲染在屏幕上反映出来。
   ```jsx
   useEffect(() => {
     // Code here will run after *every* render
@@ -2246,7 +2170,7 @@ Effects 通常用于“跳出”React 代码并与某些外部系统同步，这
   });
   ```
 
-1. 有依赖的Effect：可以通过指定依赖项数组作为 `useEffect()` 的第二个参数来告诉 React 跳过不必要的 Effect运行。依赖数组可以包含多个依赖项。React使用 `Object.is()` 来比较依赖值。如果所有的依赖项都相同，则React会忽略本次渲染中的Effect。
+- 有依赖的Effect：可以通过指定依赖项数组作为 `useEffect()` 的第二个参数来告诉 React 跳过不必要的 Effect运行。依赖数组可以包含多个依赖项。React使用 `Object.is()` 来比较依赖值。如果所有的依赖项都相同，则React会忽略本次渲染中的Effect。
   ```jsx
   // 将 [isPlaying] 指定为依赖项数组告诉 React，如果 isPlaying 与上一次渲染时相同，它应该跳过重新运行您的 Effect。
   useEffect(() => {
@@ -2274,7 +2198,7 @@ Effects 通常用于“跳出”React 代码并与某些外部系统同步，这
   ```
   :::
 
-3. 需要时可以在`useEffect`中增加cleanup function。**React在每次Effect再次运行之前都会调用您的清理函数，并在组件卸载（被移除）时最后一次调用。** [Effect cleanup 示例](https://code.juejin.cn/pen/7294184776930426906)（示例中把`clearTimeout(timeoutId);`注掉看看啥效果）
+- 需要时可以在`useEffect`中增加cleanup function。**React在每次Effect再次运行之前都会调用您的清理函数，并在组件卸载（被移除）时最后一次调用。** [Effect cleanup 示例](https://code.juejin.cn/pen/7294184776930426906)（示例中把`clearTimeout(timeoutId);`注掉看看啥效果）
   ```jsx
   useEffect(() => {
     const connection = createConnection();
@@ -2313,7 +2237,7 @@ Effects 通常用于“跳出”React 代码并与某些外部系统同步，这
   }, [userId]); // 如果userId从'Alice'更改为'Bob'，清理函数确保即使'Alice'的响应在'Bob'的响应之后到达，也会忽略'Alice'的响应。
   ```
 
-##### 6.3.2 发请求获取数据的方案
+### 发请求获取数据的方案
 1. 在Effect中发请求获取数据，可行，但有以下缺点：
    - 不适用于SSR场景。Effects不在服务器上运行，这意味着初始服务器呈现的HTML是不带数据，客户端计算机将不得不下载所有JavaScript并渲染您的应用程序，然后发现需要加载数据。这不是非常有效的。
    - 在Effects中直接获取数据容易造成“网络瀑布”(“network waterfalls”)。您渲染父组件，它获取一些数据，然后渲染子组件，然后它们开始获取它们的数据。如果网络不是很快，这比并行获取所有数据要慢得多。
@@ -2361,10 +2285,10 @@ Effects 通常用于“跳出”React 代码并与某些外部系统同步，这
    ```
 4. 构建自己的解决方案，在这种情况下，你会使用Effects作为基础，然后添加逻辑来**去重请求、缓存响应并避免网络瀑布效应（通过预加载数据或提升数据要求到路由）**。
 
-##### 6.3.3 每个渲染都有自己的Effect
+### 每个渲染都有自己的Effect
 每个渲染的Effect都是相互隔离的。（闭包）
 
-#### 6.4 You Might Not Need an Effect
+## 你可能不需要 Effect
 :::info
 有两种常见情况不需要 Effects：
 - 您不需要 Effects 来转换数据以进行渲染(例如您想在显示列表之前对其进行过滤)。当你更新state时，React 将首先调用你的组件函数来计算屏幕上应该显示的内容，然后 React 会将这些更改“提交”(commit)到 DOM，从而更新屏幕，然后 React 将运行你的 Effects。如果您的 Effect 也立即更新state，这将从头开始重新启动整个过程！为了避免不必要的渲染过程，请在组件的顶层转换所有数据。每当您的 props 或 state 发生变化时，该代码都会自动重新运行。
@@ -2647,322 +2571,306 @@ Effects 通常用于“跳出”React 代码并与某些外部系统同步，这
   }
   ```
 
-#### 6.5 Lifecycle of Reactive Effects
+## Effect的生命周期
 
+## 通过自定义 Hook 重用逻辑
+即使不同的组件具有不同的视觉外观，您也想重用它们之间的逻辑，这时候可以考虑通过自定义hook来实现。当您将逻辑提取到自定义 Hook 中时，您可以隐藏如何处理某些外部系统或浏览器 API 的粗糙细节。**React中hook必须以`use`开头，后跟大写字母。hook可以返回任意值。只有Hooks和组件才能调用其他Hooks！不调用 Hook 的函数不需要是 Hook。**如果您的函数不调用任何 Hook，请避免使用 `use` 前缀。
 
-## 三、Hooks
-### 1. useState
-#### 1.1 useState怎么区分不同的state？
-调用useState时，只传了state的初始值，并没有传是哪个state的标识，它是怎么知道返回哪个state variables的？
-- 答案是：Hooks 在同一组件的每个渲染器上都依赖于稳定的调用顺序。Hooks rely on a stable call order on every render of the same component. 因为遵循“只在顶层调用 Hooks”的规则(而不是在某个函数内调用useState()等hooks)，那么Hooks 将总是以相同的顺序被调用。
-- 不在顶层调用Hooks会报错：Rendered fewer hooks than expected. This may be caused by an accidental early return statement. 必须无条件地且始终以相同的顺序调用 Hooks！
-```jsx live
-function FeedbackForm() {
-  const [isSent, setIsSent] = useState(false);
-  if (isSent) {
-    return <h1>Thank you!</h1>;
-  } else {
-    // eslint-disable-next-line
-    const [message, setMessage] = useState('');
-    return (
-      <form onSubmit={e => {
-        e.preventDefault();
-        alert(`Sending: "${message}"`);
-        setIsSent(true);
-      }}>
-        <textarea
-          placeholder="Message"
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-        />
-        <br />
-        <button type="submit">Send</button>
-      </form>
-    );
-  }
+例如，判断设备是否联网的重复逻辑：
+```jsx
+import { useState, useEffect } from 'react';
+
+export default function StatusBar() {
+  const [isOnline, setIsOnline] = useState(true);
+  useEffect(() => {
+    function handleOnline() {
+      setIsOnline(true);
+    }
+    function handleOffline() {
+      setIsOnline(false);
+    }
+    // 监听设备联网的状态
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  return <h1>{isOnline ? '✅ Online' : '❌ Disconnected'}</h1>;
 }
 ```
-- 在内部，React 为每个组件保存一个数组用来存放状态对。
-- 下面这个示例**简单阐述useState是怎么工作的**：
-```js
-let componentHooks = []; // 存放[state,setState]的数组,本例：[[0, setState],[false, setState]]
-let currentHookIndex = 0;
+将重复逻辑提取到自定义的hook中：
+```js title="useOnlineStatus.js"
+import { useState, useEffect } from 'react';
 
-// How useState works inside React (simplified).
-function useState(initialState) {
-  let pair = componentHooks[currentHookIndex];
-  if (pair) {
-    // This is not the first render, so the state pair already exists.
-    // Return it and prepare for next Hook call.
-    currentHookIndex++;
-    return pair;
-  }
-
-  // This is the first time we're rendering, so create a state pair and store it.
-  pair = [initialState, setState]; // 在堆内存中创建了一个数组，变量pair存储了该数组在堆内存中的地址
-
-  function setState(nextState) { // 是一个闭包。闭包是由函数以及声明该函数的词法环境组合而成的，该环境包含了这个闭包创建时作用域内的任何局部变量。
-    // When the user requests a state change, put the new value into the pair.
-    pair[0] = nextState;
-    updateDOM();
-  }
-
-  // Store the pair for future renders and prepare for the next Hook call.下次渲染时调用useState()
-  componentHooks[currentHookIndex] = pair; // componentHooks[currentHookIndex] 也存储了数组在堆内存中的地址
-  currentHookIndex++;
-  return pair;
+export function useOnlineStatus() {
+  const [isOnline, setIsOnline] = useState(true);
+  useEffect(() => {
+    function handleOnline() {
+      setIsOnline(true);
+    }
+    function handleOffline() {
+      setIsOnline(false);
+    }
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+  return isOnline;
 }
-
-function Gallery() {
-  // Each useState() call will get the next pair.
-  const [index, setIndex] = useState(0);
-  console.log(index) // setIndex会再次执行Gallery()，此时index（重新创建了变量index）是最新的，但是setIndex执行后立即log的index的值还是上次的（这里应该怎么理解？--->看下面的“close over”，还是闭包的影响）
-  const [showMore, setShowMore] = useState(false);
-  /**
-   * 1. 调用外层的updateDOM进行初次渲染，currentHookIndex置为0，然后调用Gallery()
-   * 2. 按顺序先执行useState(0)：创建pair变量（pair = componentHooks[0]），设置pair为 [0, setState]，componentHooks[0] = pair，currentHookIndex++，返回 [0, function setState(nextState) { pair[0]=nextState; updateDOM(); }]，将 0 赋值给index，将 function setState 赋值给setIndex
-   * 3. 然后执行useState(false)：创建pair变量（pair = componentHooks[1]），设置pair为 [false, setState]，componentHooks[1] = pair，currentHookIndex++，返回 [false, function setState(nextState) { pair[0]=nextState; updateDOM(); }]，将 false 赋值给showMore，将 function setState 赋值给setShowMore
-   * 
-   * componentHooks：[[0, setState], [false, setState]]
-   */
-
-  function handleNextClick() {
-    setIndex(index + 1);
-    /**
-     * 调用setState(1)
-     * 结果：
-     * 1. 改变pair的值为[1,setState]，这个pair与componentHooks[0]的指向一致，所以componentHooks[0]为[1,setState]
-     * 2. 调用updateDOM(); currentHookIndex置为0; 调用Gallery()
-     * 3. 按顺序调用useState(0)，此时componentHooks[0]有值，所以 currentHookIndex++，然后返回pair，即[1,setState]
-     * 4. 按顺序调用useState(false)，此时currentHookIndex为1，componentHooks[1]有值，所以 currentHookIndex++，然后返回pair，即[false,setState]
-     * 
-     * componentHooks：[[1,setState], [false,setState]]
-     */
-    console.log(index) // index的值还是上次的
-  }
-
-  function handleMoreClick() {
-    setShowMore(!showMore);
-    /**
-     * 调用setState(true)
-     * 结果：
-     * 1. 改变pair的值为[true,setState]，这个pair与componentHooks[1]的指向一致，所以componentHooks[1]为[true,setState]
-     * 2. 调用updateDOM(); currentHookIndex置为0; 调用Gallery()
-     * 3. 按顺序调用useState(0)，此时componentHooks[0]有值，所以 currentHookIndex++，然后返回pair，即[1,setState]
-     * 4. 按顺序调用useState(false)，此时currentHookIndex为1，componentHooks[1]有值，所以 currentHookIndex++，然后返回pair，即[true,setState]
-     * 
-     * componentHooks：[[1,setState], [true,setState]]
-     */
-  }
-
-  let sculpture = sculptureList[index];
-  // This example doesn't use React, so return an output object instead of JSX.
-  return {
-    onNextClick: handleNextClick,
-    onMoreClick: handleMoreClick,
-    header: `${sculpture.name} by ${sculpture.artist}`,
-    counter: `${index + 1} of ${sculptureList.length}`,
-    more: `${showMore ? 'Hide' : 'Show'} details`,
-    description: showMore ? sculpture.description : null,
-    imageSrc: sculpture.url,
-    imageAlt: sculpture.alt
-  };
-}
-
-function updateDOM() {
-  // Reset the current Hook index before rendering the component.
-  currentHookIndex = 0;
-  let output = Gallery();
-
-  // Update the DOM to match the output.
-  // This is the part React does for you.
-  nextButton.onclick = output.onNextClick;
-  header.textContent = output.header;
-  moreButton.onclick = output.onMoreClick;
-  moreButton.textContent = output.more;
-  image.src = output.imageSrc;
-  image.alt = output.imageAlt;
-  if (output.description !== null) {
-    description.textContent = output.description;
-    description.style.display = '';
-  } else {
-    description.style.display = 'none';
-  }
-}
-
-let nextButton = document.getElementById('nextButton');
-let header = document.getElementById('header');
-let moreButton = document.getElementById('moreButton');
-let description = document.getElementById('description');
-let image = document.getElementById('image');
-let sculptureList = [{
-  name: 'Homenaje a la Neurocirugía',
-  artist: 'Marta Colvin Andrade',
-  description: 'Although Colvin is predominantly known for abstract themes that allude to pre-Hispanic symbols, this gigantic sculpture, an homage to neurosurgery, is one of her most recognizable public art pieces.',
-  url: 'https://i.imgur.com/Mx7dA2Y.jpg',
-  alt: 'A bronze statue of two crossed hands delicately holding a human brain in their fingertips.'  
-}, {
-  name: 'Floralis Genérica',
-  artist: 'Eduardo Catalano',
-  description: 'This enormous (75 ft. or 23m) silver flower is located in Buenos Aires. It is designed to move, closing its petals in the evening or when strong winds blow and opening them in the morning.',
-  url: 'https://i.imgur.com/ZF6s192m.jpg',
-  alt: 'A gigantic metallic flower sculpture with reflective mirror-like petals and strong stamens.'
-}, {
-  name: 'Eternal Presence',
-  artist: 'John Woodrow Wilson',
-  description: 'Wilson was known for his preoccupation with equality, social justice, as well as the essential and spiritual qualities of humankind. This massive (7ft. or 2,13m) bronze represents what he described as "a symbolic Black presence infused with a sense of universal humanity."',
-  url: 'https://i.imgur.com/aTtVpES.jpg',
-  alt: 'The sculpture depicting a human head seems ever-present and solemn. It radiates calm and serenity.'
-}, {
-  name: 'Moai',
-  artist: 'Unknown Artist',
-  description: 'Located on the Easter Island, there are 1,000 moai, or extant monumental statues, created by the early Rapa Nui people, which some believe represented deified ancestors.',
-  url: 'https://i.imgur.com/RCwLEoQm.jpg',
-  alt: 'Three monumental stone busts with the heads that are disproportionately large with somber faces.'
-}, {
-  name: 'Blue Nana',
-  artist: 'Niki de Saint Phalle',
-  description: 'The Nanas are triumphant creatures, symbols of femininity and maternity. Initially, Saint Phalle used fabric and found objects for the Nanas, and later on introduced polyester to achieve a more vibrant effect.',
-  url: 'https://i.imgur.com/Sd1AgUOm.jpg',
-  alt: 'A large mosaic sculpture of a whimsical dancing female figure in a colorful costume emanating joy.'
-}, {
-  name: 'Ultimate Form',
-  artist: 'Barbara Hepworth',
-  description: 'This abstract bronze sculpture is a part of The Family of Man series located at Yorkshire Sculpture Park. Hepworth chose not to create literal representations of the world but developed abstract forms inspired by people and landscapes.',
-  url: 'https://i.imgur.com/2heNQDcm.jpg',
-  alt: 'A tall sculpture made of three elements stacked on each other reminding of a human figure.'
-}, {
-  name: 'Cavaliere',
-  artist: 'Lamidi Olonade Fakeye',
-  description: "Descended from four generations of woodcarvers, Fakeye's work blended traditional and contemporary Yoruba themes.",
-  url: 'https://i.imgur.com/wIdGuZwm.png',
-  alt: 'An intricate wood sculpture of a warrior with a focused face on a horse adorned with patterns.'
-}, {
-  name: 'Big Bellies',
-  artist: 'Alina Szapocznikow',
-  description: "Szapocznikow is known for her sculptures of the fragmented body as a metaphor for the fragility and impermanence of youth and beauty. This sculpture depicts two very realistic large bellies stacked on top of each other, each around five feet (1,5m) tall.",
-  url: 'https://i.imgur.com/AlHTAdDm.jpg',
-  alt: 'The sculpture reminds a cascade of folds, quite different from bellies in classical sculptures.'
-}, {
-  name: 'Terracotta Army',
-  artist: 'Unknown Artist',
-  description: 'The Terracotta Army is a collection of terracotta sculptures depicting the armies of Qin Shi Huang, the first Emperor of China. The army consisted of more than 8,000 soldiers, 130 chariots with 520 horses, and 150 cavalry horses.',
-  url: 'https://i.imgur.com/HMFmH6m.jpg',
-  alt: '12 terracotta sculptures of solemn warriors, each with a unique facial expression and armor.'
-}, {
-  name: 'Lunar Landscape',
-  artist: 'Louise Nevelson',
-  description: 'Nevelson was known for scavenging objects from New York City debris, which she would later assemble into monumental constructions. In this one, she used disparate parts like a bedpost, juggling pin, and seat fragment, nailing and gluing them into boxes that reflect the influence of Cubism’s geometric abstraction of space and form.',
-  url: 'https://i.imgur.com/rN7hY6om.jpg',
-  alt: 'A black matte sculpture where the individual elements are initially indistinguishable.'
-}, {
-  name: 'Aureole',
-  artist: 'Ranjani Shettar',
-  description: 'Shettar merges the traditional and the modern, the natural and the industrial. Her art focuses on the relationship between man and nature. Her work was described as compelling both abstractly and figuratively, gravity defying, and a "fine synthesis of unlikely materials."',
-  url: 'https://i.imgur.com/okTpbHhm.jpg',
-  alt: 'A pale wire-like sculpture mounted on concrete wall and descending on the floor. It appears light.'
-}, {
-  name: 'Hippos',
-  artist: 'Taipei Zoo',
-  description: 'The Taipei Zoo commissioned a Hippo Square featuring submerged hippos at play.',
-  url: 'https://i.imgur.com/6o5Vuyu.jpg',
-  alt: 'A group of bronze hippo sculptures emerging from the sett sidewalk as if they were swimming.'
-}];
-
-// Make UI match the initial state.
-updateDOM();
-
 ```
-[查看执行结果](https://codesandbox.io/s/stupefied-microservice-bdv0tp?file=/index.js)
-:::info
-- [只有1个state的例子](https://replit.com/@fqishuai/Jian-Yi-Ban-useState#script.js)
-- 对闭包的认识不够啊!
-> [闭包例子](https://replit.com/@fqishuai/Bi-Bao#script.js)
+使用该自定义hook:
+```jsx
+import { useOnlineStatus } from './useOnlineStatus.js';
 
-- setIndex会再次执行Gallery()，此时index（重新创建了变量index）是最新的，但是setIndex执行后立即log的index的值还是上次的，这是因为event handler functions “[close over](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures)” any variables declared while rendering.事件处理程序函数“关闭”了渲染时声明的任何变量。
-```jsx live
-// 可以在浏览器的控制台查看console.log
-function Form() {
-  let firstName = '';
-  let lastName = '';
+function StatusBar() {
+  const isOnline = useOnlineStatus();
+  return <h1>{isOnline ? '✅ Online' : '❌ Disconnected'}</h1>;
+}
+```
+
+### 自定义Hook共享状态逻辑
+自定义 Hook 允许您共享状态逻辑，但不能共享状态本身。**对 Hook 的每次调用完全独立于对同一 Hook 的所有其他调用。**
+
+例子:
+```jsx
+import { useState } from 'react';
+
+export default function Form() {
+  const [firstName, setFirstName] = useState('Mary');
+  const [lastName, setLastName] = useState('Poppins');
 
   function handleFirstNameChange(e) {
-    console.log('e.target.value::', e.target.value)
-    firstName = e.target.value;
-    console.log('firstName::', firstName)
-  }
-
-  function handleLastNameChange(e) {
-    lastName = e.target.value;
-  }
-
-  function handleReset() {
-    firstName = '';
-    lastName = '';
-  }
-
-  return (
-    <form onSubmit={e => e.preventDefault()}>
-      <input
-        placeholder="First name"
-        value={firstName}
-        onChange={handleFirstNameChange}
-      />
-      <input
-        placeholder="Last name"
-        value={lastName}
-        onChange={handleLastNameChange}
-      />
-      <h1>Hi, {firstName} {lastName}</h1>
-      <button onClick={handleReset}>Reset</button>
-    </form>
-  );
-}
-```
-```jsx live
-function Form() {
-  let [firstName,setFirstName] = useState('');
-  let [lastName,setLastName] = useState('');
-
-  function handleFirstNameChange(e) {
-    console.log('e.target.value::', e.target.value)
     setFirstName(e.target.value);
-    console.log('firstName::', firstName)
   }
 
   function handleLastNameChange(e) {
     setLastName(e.target.value);
   }
 
-  function handleReset() {
-    setFirstName('');
-    setLastName('');
-  }
-
   return (
-    <form onSubmit={e => e.preventDefault()}>
-      <input
-        placeholder="First name"
-        value={firstName}
-        onChange={handleFirstNameChange}
-      />
-      <input
-        placeholder="Last name"
-        value={lastName}
-        onChange={handleLastNameChange}
-      />
-      <h1>Hi, {firstName} {lastName}</h1>
-      <button onClick={handleReset}>Reset</button>
-    </form>
+    <>
+      <label>
+        First name:
+        <input value={firstName} onChange={handleFirstNameChange} />
+      </label>
+      <label>
+        Last name:
+        <input value={lastName} onChange={handleLastNameChange} />
+      </label>
+      <p><b>Good morning, {firstName} {lastName}.</b></p>
+    </>
   );
 }
 ```
-:::
+提取重复逻辑到自定义hook中：
+```js title="useFormInput.js"
+import { useState } from 'react';
 
-## 四、Optimizing Performance
+export function useFormInput(initialValue) {
+  const [value, setValue] = useState(initialValue);
+
+  function handleChange(e) {
+    setValue(e.target.value);
+  }
+
+  const inputProps = {
+    value: value,
+    onChange: handleChange
+  };
+
+  return inputProps;
+}
+```
+使用该自定义hook:
+```jsx
+import { useFormInput } from './useFormInput.js';
+
+export default function Form() {
+  const firstNameProps = useFormInput('Mary');
+  const lastNameProps = useFormInput('Poppins');
+
+  return (
+    <>
+      <label>
+        First name:
+        <input {...firstNameProps} />
+      </label>
+      <label>
+        Last name:
+        <input {...lastNameProps} />
+      </label>
+      <p><b>Good morning, {firstNameProps.value} {lastNameProps.value}.</b></p>
+    </>
+  );
+}
+```
+
+### 自定义Hook需要是纯粹的
+自定义 Hook 中的代码将在组件的每次重新渲染期间重新运行。这就是为什么像组件一样，自定义 Hook 需要是纯粹的。
+
+由于自定义 Hook 与您的组件一起重新渲染，因此它们始终会收到最新的 props 和 state。
+
+例子，每次您的 `ChatRoom` 组件重新渲染时，它都会将最新的 `roomId` 和 `serverUrl` 传递给您的 Hook `useChatRoom`。
+```js title="useChatRoom.js"
+export function useChatRoom({ serverUrl, roomId }) {
+  useEffect(() => {
+    const options = {
+      serverUrl: serverUrl,
+      roomId: roomId
+    };
+    const connection = createConnection(options);
+    connection.connect();
+    connection.on('message', (msg) => {
+      showNotification('New message: ' + msg);
+    });
+    return () => connection.disconnect();
+  }, [roomId, serverUrl]);
+}
+```
+```js
+export default function ChatRoom({ roomId }) {
+  const [serverUrl, setServerUrl] = useState('https://localhost:1234');
+
+  useChatRoom({
+    roomId: roomId,
+    serverUrl: serverUrl
+  });
+
+  return (
+    <>
+      <label>
+        Server URL:
+        <input value={serverUrl} onChange={e => setServerUrl(e.target.value)} />
+      </label>
+      <h1>Welcome to the {roomId} room!</h1>
+    </>
+  );
+}
+```
+
+### 将事件处理程序传递给自定义Hook
+
+### 何时使用自定义Hook
+您不需要为每一个小的重复代码提取自定义 Hook。但是，每当您编写 Effect 时，请考虑将其包装在自定义 Hook 中是否会更清晰。
+
+## Optimizing Performance
 > [Performance](https://reactjs.org/docs/optimizing-performance.html#gatsby-focus-wrapper)
-### 1. Use the Production Build 使用生产版本
-### 2. Profiling Components with the DevTools Profiler 使用 DevTools Profiler 分析组件
-### 3. Virtualize Long Lists 虚拟化长列表
-### 4. Avoid Reconciliation 避免调合
-### 5. shouldComponentUpdate In Action
+### Use the Production Build 使用生产版本
+### Profiling Components with the DevTools Profiler 使用 DevTools Profiler 分析组件
+### Virtualize Long Lists 虚拟化长列表
+### Avoid Reconciliation 避免调合
+### shouldComponentUpdate In Action
+
+## 旧版 React API
+不建议在新编写的代码中使用。
+
+### `Children`
+
+### `cloneElement`
+- `cloneElement` 允许您使用另一个元素作为起点创建一个新的 React 元素。`const clonedElement = cloneElement(element, props, ...children)`
+  ```jsx
+  import { cloneElement } from 'react';
+
+  // ...
+  const clonedElement = cloneElement(
+    <Row title="Cabbage">
+      Hello
+    </Row>,
+    { isHighlighted: true },
+    'Goodbye'
+  );
+
+  console.log(clonedElement); // <Row title="Cabbage" isHighlighted={true}>Goodbye</Row>
+  ```
+
+- `cloneElement` 返回一个带有以下属性的 React 元素对象：
+  - `type` 与 `element.type` 相同。
+  - `props` 将 `element.props` 与您传递的`props` 浅合并的结果。
+  - `ref` 原始 `element.ref`，除非它被 `props.ref` 覆盖。
+  - `key` 原始的`element.key`，除非它被`props.key`覆盖。
+
+#### 替代方案
+使用`cloneElement`的例子：
+```jsx
+import { Children, cloneElement, useState } from 'react';
+
+export default function List({ children }) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  return (
+    <div className="List">
+      {Children.map(children, (child, index) =>
+        cloneElement(child, {
+          isHighlighted: index === selectedIndex 
+        })
+      )}
+      <hr />
+      <button onClick={() => {
+        setSelectedIndex(i =>
+          (i + 1) % Children.count(children)
+        );
+      }}>
+        Next
+      </button>
+    </div>
+  );
+}
+```
+
+1. 使用 render prop 传递数据
+   ```jsx
+   import { useState } from 'react';
+
+   export default function List({ items, renderItem }) {
+     const [selectedIndex, setSelectedIndex] = useState(0);
+     return (
+       <div className="List">
+         {items.map((item, index) => {
+           const isHighlighted = index === selectedIndex;
+           return renderItem(item, isHighlighted);
+         })}
+         <hr />
+         <button onClick={() => {
+           setSelectedIndex(i =>
+             (i + 1) % items.length
+           );
+         }}>
+           Next
+         </button>
+       </div>
+     );
+   }
+   ```
+   ```jsx
+   export default function App() {
+     return (
+       <List
+         items={products}
+         renderItem={(product, isHighlighted) =>
+           <Row
+             key={product.id}
+             title={product.title}
+             isHighlighted={isHighlighted}
+           />
+         }
+       />
+     );
+   }
+   ```
+
+2. 使用 context 传递数据
+
+3. 将逻辑提取到自定义 Hook 中
+
+将“非视觉”逻辑提取到您自己的 Hook 中，并使用 Hook 返回的信息来决定渲染什么。
+
+### `Component`
+### `createElement`
+### `createRef`
+### `isValidElement`
+### `PureComponent`

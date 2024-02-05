@@ -207,8 +207,16 @@ export default {
 }
 ```
 
-## 使用useState声明state时声明类型
+## 在React项目中使用TypeScript
+:::tip
+[React TypeScript 备忘单](https://react-typescript-cheatsheet.netlify.app/)
+:::
+
+### 使用useState声明state时声明类型
 [How to use React useState hook with Typescript](https://reacthustle.com/blog/how-to-use-react-usestate-with-typescript)
+
+### `React.FC`
+`React.FunctionComponent` 或 `React.FC` 显示标明返回的是一个函数组件
 
 ## key是数组index或者key重复时删除数组渲染会有问题
 可以使用随机数
