@@ -96,6 +96,18 @@ const config = {
                 label: 'perplexity',
                 href: 'https://www.perplexity.ai/',
               },
+              {
+                label: 'webpilot',
+                href: 'https://www.webpilot.ai/',
+              },
+              {
+                label: '秘塔AI搜索',
+                href: 'https://metaso.cn/',
+              },
+              {
+                label: '360AI搜索',
+                href: 'https://sou.com/',
+              },
             ]
           },
           {label: 'developer-roadmap', position: 'right', href: 'https://roadmap.sh/'},
@@ -234,6 +246,7 @@ const config = {
               { label: 'transform.tools', href: 'https://transform.tools/html-to-jsx' },
               { label: '脑图', href: 'https://naotu.baidu.com/home' },
               { label: '免费IT资源', href: 'https://free-for.dev/#/' },
+              { label: '免费LOGO设计', href: 'https://www.uugai.com/' },
             ],
           },
           {

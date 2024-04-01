@@ -1,0 +1,10 @@
+{
+  "workbench.colorTheme": "Atom One Light",
+  "workbench.colorCustomizations": {
+    "[Atom One Light]": {
+      "editor.background": "#C7EDCC",   
+      "sideBar.background": "#C7EDCC",
+      "activityBar.background": "#C7EDCC",       
+    },
+  },
+}
