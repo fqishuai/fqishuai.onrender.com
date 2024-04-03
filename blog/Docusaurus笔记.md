@@ -71,6 +71,15 @@ date: 2021-09-13T18:00
 ## 4. markdown
 :::tip
 [markdown生成表格](https://www.tablesgenerator.com/markdown_tables)
+
+vscode插件：markdown表格优化（Markdown table prettifier）安装后command+shift+p使用命令面板中的命令
+
+markdown表格设置列宽度：使用`<div style="width:100px">XXX</div>`
+```markdown
+| <div style="width:100px">属性</div> | 说明 | 类型 | <div style="width:100px">默认值</div> |
+| --- | --- | --- | --- |
+| fill | 填充模式 | `boolean` | `false` |
+```
 :::
 
 ### 4.1 Markdown可以嵌入HTML标签

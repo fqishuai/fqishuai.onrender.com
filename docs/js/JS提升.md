@@ -3,6 +3,8 @@ slug: insight
 tags: [js]
 ---
 
+- [木易杨前端](https://muyiy.cn/)
+
 ## [How JavaScript Works? – Behind the Scenes](https://www.atatus.com/blog/how-does-javascript-works/)
 
 ## [wtfjs](https://github.com/denysdovhan/wtfjs/blob/master/README-zh-cn.md)
