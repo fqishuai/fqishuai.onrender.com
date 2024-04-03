@@ -4,7 +4,7 @@ tags: [git, 记录]
 ---
 
 :::tip
-[github访问不了的解决办法](https://cloud.tencent.com/developer/article/2310963)：1.浏览器打开`https://www.ipaddress.com/` 2. 查询`www.github.com`的IP 3. 本地配置host （注意：github的ip经常变，隔断时间访问不了的话可以重复以上步骤）
+[github访问不了的解决办法](https://cloud.tencent.com/developer/article/2310963)：1.浏览器打开[ipaddress](https://www.ipaddress.com/) 2. 查询`www.github.com`的IP 3. 本地配置host （注意：github的ip经常变，隔断时间访问不了的话可以重复以上步骤）
 :::
 
 ## 1. 使用git rebase合并分支
@@ -387,3 +387,117 @@ git branch --set-upstream-to=origin/main main
 
 ## 48. `git pull`时报错fatal: refusing to merge unrelated histories
 解决：`git pull --allow-unrelated-histories`
+
+## 49. `.gitattributes`
+`.gitattributes` 文件是一个 Git 配置文件，它允许你为特定的文件和目录设置特定的属性。这些属性可以影响 Git 如何处理文件的内容和变更。
+
+`.gitattributes` 文件通常位于 Git 仓库的根目录中，但也可以在子目录中有额外的 `.gitattributes` 文件来覆盖或补充根目录下的设置。
+
+以下是 `.gitattributes` 文件中可以设置的一些常见属性：
+- 文本属性：指定文件是否应被视为文本文件，以及如何处理行尾（EOL）转换。
+  - `*.txt text`：确保文本文件在检出时具有正确的行尾。
+  - `*.jpg binary`：指定 JPEG 文件为二进制文件，避免进行行尾转换。
+
+- 过滤器属性：定义自定义过滤器，如 Git LFS（大文件存储）。
+  - `*.psd filter=lfs diff=lfs merge=lfs -text`：为 Photoshop 文件使用 Git LFS。
+
+- 合并策略属性：为特定文件指定合并策略。
+  - `*.properties merge=ours`：在合并时，对于 `.properties` 文件，总是保留当前分支的版本。
+
+  - `pnpm-lock.yaml merge=text`：指定当发生合并冲突时，对于 `pnpm-lock.yaml` 文件应该使用文本合并策略。这意味着 Git 将尝试自动解决这个文件的合并冲突，就像它处理普通文本文件一样。然而，对于锁文件来说，这种自动合并可能并不总是安全的，因为合并的结果可能会破坏锁文件的结构，导致依赖关系不一致。在实践中，更安全的做法通常是在合并时手动解决 `pnpm-lock.yaml` 的冲突，或者使用 pnpm 的命令来重新生成锁文件，确保依赖关系的正确性。如果你选择使用 `pnpm-lock.yaml merge=text`，请确保在合并后检查锁文件的完整性和项目的依赖关系。
+
+  - `shrinkwrap.yaml merge=binary`：表示你希望 Git 将 `shrinkwrap.yaml` 文件视为二进制文件，并在合并时使用二进制合并策略。这意味着如果在合并过程中出现冲突，Git 不会尝试合并 `shrinkwrap.yaml` 文件的内容，而是会提示冲突，让用户手动解决。
+
+- 导出忽略属性：指定在导出（如 `git archive` 命令）时应忽略的文件。
+  - `*.log export-ignore`：在创建归档文件时忽略日志文件。
+
+- 语言统计属性：影响 `git diff` 和 GitHub 上的语言统计。
+  - `*.rb linguist-language=Java`：将 `.rb` 文件标记为 Java 语言，而不是 Ruby。
+  
+  - `*.html linguist-vendored`：告诉 GitHub 的 Linguist（这是 GitHub 用来检测仓库中文件语言的工具），将所有 `.html` 文件标记为 "vendored"。"vendored" 文件通常是指第三方库的文件，比如框架、库或者是自动生成的代码。当 Linguist 将文件识别为 "vendored" 时，这些文件在语言统计中会被忽略，不会计入仓库的语言分布图表。这有助于更准确地反映项目的主要编程语言，因为不会把第三方库或自动生成的代码计算在内。例如，如果你的项目中包含了大量的第三方 HTML 模板或者文档，你可能不希望这些文件影响你的项目的语言统计。这样，GitHub 在统计代码语言时就会忽略 `.html` 文件。如果你想要取消这个设置，可以使用 `*.html linguist-vendored=false` 这会将 `.html` 文件从 "vendored" 状态中移除，使其重新计入语言统计。
+
+  - `*.json linguist-language=JSON-with-Comments`：告诉 GitHub 的 Linguist 工具，所有 `.json` 文件应该被识别为“JSON with Comments”语言类型。Linguist 是 GitHub 使用的工具，用于在仓库概览中显示项目的语言统计信息。JSON 本身是不支持注释的，但是一些项目可能会使用 `.json` 文件扩展名来存储支持注释的 JSON 格式（例如 VS Code 的配置文件），或者使用一些工具处理可以包含注释的 JSON 文件。在这种情况下，你可能希望 Linguist 将这些文件识别为支持注释的 JSON，而不是标准的 JSON。
+
+- 差异和合并属性：自定义 `git diff` 和 `git merge` 的行为。
+  - `*.txt diff=custom`：为 `.txt` 文件使用自定义的差异算法。
+
+`.gitattributes` 文件中的属性设置对于确保跨不同操作系统和环境的一致性非常有用，特别是在处理行尾转换和大文件时。它也可以帮助 Git 更有效地处理仓库中的文件。
+
+## 50. `.github/workflows/ci.yml`
+`ci.yml` 是一个 GitHub Actions 工作流配置文件，用于定义一个持续集成 (CI) 流程。这个文件应该位于你的 GitHub 仓库的 `.github/workflows/` 目录中。GitHub Actions 是 GitHub 提供的一个自动化平台，可以用来自动执行软件开发工作流程，例如构建、测试和部署代码。
+
+下面是一个简单的 `ci.yml` 文件示例，它定义了一个基本的 CI 工作流，当有新的推送（push）或者拉取请求（pull request）到 main 分支时，会自动运行：
+```yml title=".github/workflows/ci.yml"
+name: Continuous Integration
+
+# 触发工作流的事件
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# on: [push, pull_request] 这意味着每当推送提交到任何分支或者当有人创建或更新一个拉取请求时，都会执行定义在该工作流文件中的任务。
+
+# 工作流中的作业
+jobs:
+  build-and-test: # 作业的 ID，可以自定义
+    runs-on: ubuntu-latest # 指定运行作业的GitHub Actions虚拟环境
+
+    steps:
+    - uses: actions/checkout@v2 # 是 GitHub Actions 的一个官方动作（action），用于在工作流程中检出（即克隆）你的仓库代码。当你在 GitHub Actions 工作流程中需要访问仓库中的代码时，通常会在步骤（steps）中的第一个位置使用这个动作。
+    - name: Set up Node.js
+      uses: actions/setup-node@v2 # 是 GitHub Actions 的一个官方动作（action），用于在工作流程中设置 Node.js 环境。这个动作允许你选择特定的 Node.js 版本来运行你的代码，确保你的 CI/CD 流程中使用的 Node.js 环境与开发和生产环境保持一致。
+      with: # 用于配置action的选项
+        node-version: '14' # 指定 Node.js 版本
+
+    - name: Install dependencies
+      run: npm install # 安装依赖
+
+    - name: Run tests
+      run: npm test # 运行测试
+```
+这个工作流包含以下部分：
+- `name`: 工作流的名称。
+- `on`: 定义触发工作流的事件和条件。
+- `jobs`: 定义工作流中的作业，可以包含一个或多个作业。
+- `build-and-test`: 一个作业的 ID，可以自定义。
+- `runs-on`: 指定运行作业的 GitHub Actions 虚拟环境。
+- `steps`: 定义作业中的步骤，每个步骤可以执行一个操作（如 actions/checkout）或运行一个脚本（如 npm install）。
+
+这只是一个基本的 CI 工作流示例。根据你的项目需求，你可以添加更多的步骤，比如代码风格检查、构建应用、部署到服务器等。GitHub Actions 提供了大量的官方和第三方动作（actions），可以帮助你定制和扩展你的 CI/CD 流程。
+
+`actions/setup-node` 动作支持多种配置选项，例如：
+- `node-version`: 指定 Node.js 的版本号。
+- `registry-url`: 设置 npm 注册表的 URL，用于安装依赖。
+- `scope`: 设置 npm scope，用于配置私有包的安装。
+- `cache`: 指定要缓存的依赖管理器的文件夹，如 npm 或 yarn。
+
+:::tip
+GitHub Actions 中的 "workflows" 是独立运行的，没有内置的执行顺序。每个 workflow 都是基于特定的事件（如 push、pull request、release 等）或者是按照设定的时间表（cron 表达式）触发的。如果你需要控制 workflows 的执行顺序，你需要在 workflows 之间建立逻辑依赖，比如：
+- 在一个 workflow 完成后，使用 `repository_dispatch` 或 `workflow_dispatch` 事件手动触发另一个 workflow。
+
+- 使用 `outputs` 将数据从一个 job 传递到另一个 job，或者从一个 workflow 传递到另一个 workflow。
+
+- 使用条件（`if`）语句和 job 的 `needs` 关键字来创建 job 之间的依赖关系，确保按照特定的顺序执行。
+
+但是，这些方法都需要你手动设置，因为 GitHub Actions 默认不会对 workflows 或 jobs 进行排序。
+:::
+
+## 51. GitHub Apps
+GitHub Apps 是 GitHub 平台上的一种集成应用，它可以帮助你通过使用 GitHub 提供的 API 来自动化、扩展和改进开发工作流程。
+
+GitHub Apps 的主要特点包括：
+- 精细的权限控制：与传统的 OAuth 应用相比，GitHub Apps 允许更精细的权限设置，这意味着它们可以只访问它们需要的特定信息，而不是用户或仓库的全部权限。
+
+- 独立身份：GitHub Apps 拥有自己的用户身份，这意味着它们可以拥有自己的用户资料页面、可以被安装在用户或组织账户下，并且可以独立于个人用户进行操作。
+
+- Webhooks 支持：GitHub Apps 可以订阅特定的事件，例如当有新的推送、拉取请求或者问题被创建时。当这些事件发生时，GitHub 会发送一个 webhook 到 App，App 可以据此执行相应的操作。
+
+- 安装和访问控制：GitHub Apps 可以被安装在个人账户或组织账户的特定仓库上，或者可以访问账户下的所有仓库。这为用户提供了更好的控制，可以选择只在需要的地方使用 App。
+
+- 自动化和集成：GitHub Apps 常用于自动化常见的开发任务，如持续集成、代码审查、项目管理等。它们也可以与外部服务集成，如 CI/CD 工具、聊天应用、部署服务等。
+
+- 市场可用性：开发者可以创建自己的 GitHub Apps 并将它们发布到 GitHub Marketplace，让其他用户发现和使用。
+
+GitHub Apps 是为了提高开发效率和改善工作流程而设计的，它们为开发者提供了一个强大的工具集，可以帮助他们更好地管理和操作 GitHub 仓库。

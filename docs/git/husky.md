@@ -2,9 +2,33 @@
 ## husky
 [husky](https://typicode.github.io/husky/)自动检查您的提交消息、代码，并在提交或推送时运行测试。
 
-安装：`pnpm add --save-dev husky`
+husky 整个安装主要有以下几步：
+1. 安装 husky 依赖： `npm install -D husky`
 
-初始化：`pnpm exec husky init`。`init` 命令简化了项目中 husky 的设置。它在 `.husky/` 中创建预提交脚本，并更新 `package.json` 中的准备脚本。可以进行修改以适合您的工作流程。
+2. 安装 husky 目录：`npx husky install`
+   
+   `npx husky install` 命令，是为了在项目中创建一个 git hook 目录，同时将本地 git 的 hook 目录指向项目内的 husky 目录。
+
+3. 添加 npm prepare 钩子：`npm pkg set scripts.prepare="husky install"`
+
+  :::info
+  npm 中也有一些生命周期钩子，prepare 就是其中一个，以下是对他的运行时机介绍:
+   - 在 `npm publish` 和 `npm pack` 期间运行
+   - 在本地 `npm install` 时运行
+   - 在prepublish和prepublishOnly期间运行
+  :::
+
+4. 添加 git pre-commit 钩子：`npx husky add .husky/pre-commit "npm run test"`
+   
+   `npx husky add` 命令用于添加 git hook 脚本, 这个命令中自动添加了文件头及文件可执行权限。
+
+依次执行完这四步，我们就完成了 husky 的安装以及 一个 pre-commit 钩子的创建。总的来说，当执行 `npx husky install` 时，会通过一个 git 命令，将 git hook 的目录指向 husky 的目录，由于 git 仓库的设置不会同步到远程仓库，所以 husky 巧妙地通过添加 npm 钩子以保证新拉取的仓库在执行 `npm install` 后会自动将 git hook 目录指向 husky 的目录。
+
+:::info
+[git官网介绍githooks](https://git-scm.com/docs/githooks)
+
+[husky 源码浅析](https://zhuanlan.zhihu.com/p/668482056)
+:::
 
 大多数 Git 命令都包含一个 `-n`或`--no-verify` 选项来跳过hooks，对于没有此选项的命令，请使用 `HUSKY=0` 暂时禁用hooks:
 ```bash
@@ -52,5 +76,5 @@ message格式如下：
   #!/bin/sh
   . "$(dirname "$0")/_/husky.sh"
 
-  pnpm exec commitlint --edit $1
+  pnpm commitlint --edit $1
   ```
