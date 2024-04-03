@@ -3,6 +3,12 @@ slug: usage
 tags: [react, 记录]
 ---
 
+:::info
+[React官方中文文档](https://zh-hans.react.dev/)
+
+[可视化介绍React](https://react.gg/visualized)
+:::
+
 ## 使用vite搭建react+typescript工程
 1. `pnpm create vite` 选择React、TypeScript（SWC熟练的话可以选择TypeScript+SWC）
 2. 生成的`tsconfig.json` 和 `tsconfig.node.json`配置文件如下
