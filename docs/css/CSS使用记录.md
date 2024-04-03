@@ -3,6 +3,12 @@ slug: usage
 tags: [css, 记录]
 ---
 
+:::tip
+[CSS灵感](https://github.com/chokcoco/CSS-Inspiration)
+
+[icss](https://github.com/chokcoco/iCSS)
+:::
+
 ## 1. `:is()`
 > [使用`is()`优化css代码](https://mp.weixin.qq.com/s/ACCGICv0hjU4LFAlPLUpog)
 
@@ -24,6 +30,17 @@ tags: [css, 记录]
 - 如果flex-grow的值全部相同，并且在flex container中还有positive free space , 那么它（positive free space）就会平均地分配给所有的flex item
 - **定义为flex布局元素的子元素，自动获得了flex-shrink的属性，这个属性是什么意思呢？就是告诉子元素当父元素宽度不够用时，自己调整自己所占的宽度比，这个flex-shrink设置为1时，表示所有子元素大家同时缩小来适应总宽度。当flex-shrink设置为0时，表示大家都不缩小适应。所以，倘若给父元素设置了flex布局后，若要其子元素的width有效果，必须给子元素设置flex-shrink为0。**
 - flex-flow：是 flex-direction 和 flex-wrap 的简写。初始值：flex-direction: row; flex-wrap: nowrap;
+
+- 在CSS的Flexbox布局中，要均分空间，可以将容器内的子元素设置为`flex: 1`。这样，每个子元素都会占据相同的空间比例。例如,以下代码会使得`.container`内的所有`.item`子元素均分可用空间。
+  ```css
+  .container {
+    display: flex;
+  }
+
+  .item {
+    flex: 1;
+  }
+  ```
 
 ## 3. box-sizing: border-box|content-box|inherit
 - border-box
@@ -54,9 +71,41 @@ position:absolute（子级）和 position: relative（父级）配合使用 ，�
 :::
 - 相对定位的元素并未脱离文档流，而绝对定位的元素则脱离了文档流。在布置文档流中其它元素时，绝对定位元素不占据空间。绝对定位元素相对于最近的非 static 祖先元素定位。当这样的祖先元素不存在时，则相对于ICB（inital container block, 初始包含块）
 
-## 9. flex-wrap: wrap flex换行设置行间距：
-- 父容器定高：父容器只要align-content: space-between即可，浏览器自动推算出中间的间距
-- 父容器不定高：子容器设置margin，为了使布局起点位置不变，父容器设置margin来抵消子容器设置的margin
+## 9. flex换行设置行间距列间距
+```html
+<div class="flex-container">
+  <div class="flex-item">Item 1</div>
+  <div class="flex-item">Item 2</div>
+  <div class="flex-item">Item 3</div>
+  <!-- 更多子项 -->
+</div>
+```
+
+- 如果父容器`.flex-container`定高，父容器只要`align-content: space-between`即可，浏览器自动推算出中间的间距
+
+- 如果父容器`.flex-container`不定高，子容器设置margin添加间距，并通过负 margin 在 Flex 容器上抵消额外的空间。这样可以防止列间距导致子容器被挤到下一行。
+  ```css
+  .flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px; /* 抵消子项的左边距 */
+  }
+
+  .flex-item {
+    margin-left: 10px; /* 设置列间距 */
+  }
+  ```
+
+- 也可以使用`gap`。请注意，`gap`、`row-gap` 和 `column-gap` 属性在较新版本的浏览器中得到支持，但在一些旧版本的浏览器中可能不可用。
+  ```css
+  .flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    // column-gap: 10px; /* 仅设置列间距 */
+    gap: 10px; /* 设置行间距和列间距 */
+  }
+  ```
+  
 
 ## 10. flex布局最后一行列表左对齐
 > [让CSS flex布局最后一行列表左对齐的N种方法](https://www.zhangxinxu.com/wordpress/2019/08/css-flex-last-align/)
@@ -500,6 +549,7 @@ div.content {
 - 解决方案：设置z-index，比如`z-index: 2;`
 
 ## 38. 使用`@font-face`
+CSS 属性 `font-family` 允许你通过给定一个有先后顺序的，由字体名或者字体族名组成的列表来为选定的元素设置字体。属性值用逗号隔开。浏览器会选择列表中第一个该计算机上有安装的字体，或者是通过 `@font-face` 指定的可以直接下载的字体。
 ```html
 @font-face {
   font-family: HeiTi;
@@ -663,11 +713,15 @@ html {
 ![flex-grow](img/flex_grow.jpeg)
 
 ## 47. input/textarea 样式美化
+:::info
+CSS 的 outline 属性是在一条声明中设置多个轮廓属性的简写属性 ，例如 `outline-style`, `outline-width` 和 `outline-color`。
+:::
+
 ```css
 input {
   /* input样式美化 */
   box-shadow: none; /* 去除阴影 */
-  outline: none; /* 聚焦input的蓝色边框 */
+  outline: none; /* 去掉input的边框 */
   resize: none; /* textarea 禁止拖拽 */
   border: none; /* 去除边框 */
   padding: 0; /* 去除padding */
@@ -705,7 +759,7 @@ input {
   /* textarea样式美化 */
   &>.detail-address {
     box-shadow:none; /* 去除阴影 */
-    outline: none; /* 聚焦input的蓝色边框 */
+    outline: none; /* 去掉input的边框 */
     resize: none; /* textarea 禁止拖拽 */
     border: none; /* 去除边框 */
     -webkit-appearance: none; /* 常用于IOS下移除原生样式 */
@@ -832,3 +886,85 @@ input {
   }
 }
 ```
+
+## 53. [The Battle of the Units: PX vs REM vs EM (font-size) ](https://dev.to/ochukodotspace/the-battle-of-the-units-px-vs-rem-vs-em-3ka8)
+- px像素（Pixel）是相对于显示器屏幕分辨率而言的。它可以帮助网页内容（不仅仅是文本）在不同设备上看起来大小相同。
+  
+  - 众所周知，不同的设备屏幕上每英寸的像素数不同，这称为像素密度(pixel density)。
+  - 像素比(device pixel ratio)本质上只是一种计算 CSS 像素 (1px) 将在设备屏幕上占用多少空间的方法，使其与其他设备相比看起来大小相同。
+
+- em是相对长度单位。使用父元素的当前字体大小作为其基础。它本质上可用于根据从父级继承的字体大小来放大或缩小元素的字体大小。
+  
+  假设我们有一个字体大小为 16px 的父 div。如果我们在该 div 中创建一个p元素并为其指定字体大小 1em，则p字体大小将为 16px。然而，如果我们在其内创建另一个p并设置 2em 的字体大小，它将转换为 32px。
+
+  :::warning
+  不建议使用 em，尤其是在复杂的结构化页面中。如果使用不当，我们可能会遇到缩放问题，其中元素的大小可能无法根据 DOM 树中尺寸的复杂继承来正确调整。
+  :::
+
+- rem(root em) 与 em 的工作原理几乎相同，但主要区别在于 rem 基于页面上根元素的字体大小，而不是父元素的字体大小。
+
+  根字体大小是用户在浏览器设置中或由您（开发人员）指定的默认字体大小。
+  
+  Web 浏览器的默认字体大小通常为 16px，因此 1rem 为 16px，2rem 为 32px。然而，在根字体大小更改为例如 10px 的情况下； 1rem 为 10px，2rem 为 20px。
+
+## 54. `-webkit-tap-highlight-color`
+`-webkit-tap-highlight-color` 是一个没有标准化的属性，能够设置点击链接的时候出现的高亮颜色。显示给用户的高光是他们成功点击的标识，以及暗示了他们点击的元素。
+
+## 55. 元素显示与隐藏设置动画
+`display: none;` 和 `display: block;` 本身不支持CSS过渡动画，因为`display`属性的变化不是一个可以过渡的属性。当你从`display: none;`切换到`display: block;`时，元素会立即显示或隐藏，没有中间状态。
+
+如果你想要设置一个元素的显示和隐藏动画，你可以使用`opacity`和`visibility`属性结合`transition`来实现平滑的过渡效果。例如：
+```css
+.fade {
+  visibility: hidden; /* 默认不可见 */
+  opacity: 0;
+  transition: visibility 0s linear 0.5s, opacity 0.5s linear;
+}
+
+.fade.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s linear 0s, opacity 0.5s linear;
+}
+```
+然后，你可以通过JavaScript切换`.visible`类来控制元素的显示和隐藏：
+```js
+// 显示元素
+element.classList.add('visible');
+
+// 隐藏元素
+element.classList.remove('visible');
+```
+这样，元素的透明度会在0.5秒内从0变到1（或从1变到0），而`visibility`属性确保在元素完全透明时不会响应任何交互。注意，`transition`属性中的`visibility`设置了一个延迟，这样在隐藏元素时，`visibility`会在透明度动画结束后变为`hidden`，而在显示元素时，`visibility`会立即变为`visible`。
+
+## 55. 元素高度设置动画(折叠板效果)
+```css
+.box {
+  height: 100px;
+  transition: height 0.3s ease-in-out;
+}
+
+.box.expanded {
+  height: 200px;
+}
+```
+当`.box`元素被赋予`.expanded`类时，它的高度会从100px平滑过渡到200px，过渡时间为0.3秒，根据ease-in-out的曲线进行加速和减速。
+
+注意，CSS过渡（transitions）不能直接应用于 `height: auto;` 的属性变化。这是因为过渡（transitions）需要明确的起始值和结束值来执行动画，而 `auto` 表示高度由内容决定，因此是不确定的。
+
+如果你想要对一个元素的高度进行过渡，而这个元素的高度是动态的（即使用了 `height: auto;`），你可以使用 `max-height` 属性作为替代方案。你需要设置一个 `max-height` 的值，该值足够大以容纳元素的最大内容高度，然后对 `max-height` 应用过渡效果。例如：
+```css
+.box {
+  overflow: hidden;
+  height: auto;
+  max-height: 0; /* 初始状态为折叠 */
+  transition: max-height 0.3s ease-in-out;
+}
+
+.box.expanded {
+  max-height: 1000px; /* 设置一个足够大的值 */
+}
+```
+这样，当你切换 `.expanded` 类时，元素的 `max-height` 会从 0 过渡到 1000px，从而实现高度的动画效果。然而，这种方法并不完美，因为如果内容的实际高度远小于 max-height 的值，过渡效果会突然结束，因为一旦内容的实际高度被达到，剩余的 `max-height` 值就不再有任何作用。
+
+另一种方法是使用 JavaScript 来动态计算内容的高度，并在过渡之前将高度设置为具体的像素值。这种方法可以提供更精确的动画效果，但它比纯 CSS 解决方案更复杂。

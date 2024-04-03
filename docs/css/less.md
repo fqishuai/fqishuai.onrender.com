@@ -81,7 +81,7 @@ p {
 }
 ```
 
-## 父级选择器
+## [父级选择器](https://lesscss.cn/features/#parent-selectors-feature)
 `&` 运算符表示 嵌套规则 的父选择器
 ```less
 a {
@@ -102,7 +102,7 @@ a:hover {
 }
 ```
 
-& 的另一个典型用途是生成重复的类名：
+`&` 的另一个典型用途是生成重复的类名：
 ```less
 .button {
   &-ok {
@@ -127,5 +127,80 @@ a:hover {
 }
 .button-custom {
   background-image: url("custom.png");
+}
+```
+
+`&` 可能会在一个选择器中出现多次。这使得重复引用父选择器而不重复其名称成为可能。
+```less
+.link {
+  & + & {
+    color: red;
+  }
+
+  & & {
+    color: green;
+  }
+
+  && {
+    color: blue;
+  }
+
+  &, &ish {
+    color: cyan;
+  }
+}
+```
+编译后：
+```css
+.link + .link {
+  color: red;
+}
+.link .link {
+  color: green;
+}
+.link.link {
+  color: blue;
+}
+.link, .linkish {
+  color: cyan;
+}
+```
+
+请注意，`&` 代表所有父选择器（不仅仅是最近的祖级）
+```less
+.grand {
+  .parent {
+    & > & {
+      color: red;
+    }
+
+    & & {
+      color: green;
+    }
+
+    && {
+      color: blue;
+    }
+
+    &, &ish {
+      color: cyan;
+    }
+  }
+}
+```
+编译后：
+```css
+.grand .parent > .grand .parent {
+  color: red;
+}
+.grand .parent .grand .parent {
+  color: green;
+}
+.grand .parent.grand .parent {
+  color: blue;
+}
+.grand .parent,
+.grand .parentish {
+  color: cyan;
 }
 ```
