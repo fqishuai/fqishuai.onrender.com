@@ -3,23 +3,19 @@ slug: ts-error
 tags: [ts, 记录]
 ---
 
-### 1. Argument of type not assignable to parameter type 'never'
-> 参考：[Argument of type not assignable to parameter type 'never'](https://bobbyhadz.com/blog/typescript-argument-type-not-assignable-parameter-type-never)
+### 1. [Argument of type not assignable to parameter type 'never'](https://bobbyhadz.com/blog/typescript-argument-type-not-assignable-parameter-type-never)
 
 当我们声明一个空数组而没有显式键入它并尝试向其中添加元素时，会出现错误“类型的参数不能分配给‘never’类型的参数”。要解决该错误，请显式键入空数组，比如：`const arr: string[] = [];`
 
-### 2. 'this' implicitly has type 'any' error in TypeScript
-> 参考：['this' implicitly has type 'any' error in TypeScript](https://bobbyhadz.com/blog/typescript-this-implicitly-has-type-any)
+### 2. ['this' implicitly has type 'any' error in TypeScript](https://bobbyhadz.com/blog/typescript-this-implicitly-has-type-any)
 
 当我们在类之外或在无法推断 this 类型的函数中使用 this 关键字时，会出现“this 隐式具有任何类型”的错误。要解决此错误，请将 this 关键字的类型添加为函数中的第一个参数。
 
-### 3. Variable 'X' is used before being assigned in TypeScript
-> 参考：[Variable 'X' is used before being assigned in TypeScript](https://bobbyhadz.com/blog/typescript-variable-is-used-before-being-assigned)
+### 3. [Variable 'X' is used before being assigned in TypeScript](https://bobbyhadz.com/blog/typescript-variable-is-used-before-being-assigned)
 
 当我们声明一个变量而不为其赋值或仅在满足条件时才赋值时，会出现错误“变量在赋值之前使用”。要解决该错误，请将变量的类型更改为可能未定义或给它一个初始值。
 
-### 4. This expression is not callable. Type 'X' no call signatures
-> 参考：[This expression is not callable. Type 'X' no call signatures](https://bobbyhadz.com/blog/typescript-this-expression-not-callable-type-has-no-call-signatures)
+### 4. [This expression is not callable. Type 'X' no call signatures](https://bobbyhadz.com/blog/typescript-this-expression-not-callable-type-has-no-call-signatures)
 
 当我们尝试将不是函数的类型调用为函数或作为其他类型键入为函数时，会发生 TypeScript 错误: “此表达式不可调用。类型 'X' 没有调用签名”。要解决此错误，请确保您正在调用一个函数并且它是作为函数输入的。
 
@@ -30,8 +26,7 @@ import { default as dayjs } from 'dayjs';
 import dayjs = require('dayjs');
 ```
 
-### 6. Binding element 'X' implicitly has an 'any' type
-> 参考：[Binding element 'X' implicitly has an 'any' type](https://bobbyhadz.com/blog/typescript-binding-element-implicitly-has-an-any-type)
+### 6. [Binding element 'X' implicitly has an 'any' type](https://bobbyhadz.com/blog/typescript-binding-element-implicitly-has-an-any-type)
 
 The error "Binding element implicitly has an 'any' type" occurs when we don't set the type of an object parameter in a function. The issue is that the functions take an object as a parameter, we destructure the object's properties, but don't type the object. To solve the error, make sure to explicitly type the object parameter of the function. 当我们没有在函数中设置对象参数的类型时，会出现“绑定元素隐式具有‘任何’类型”的错误。问题是函数将对象作为参数，我们解构对象的属性，但不键入对象。要解决该错误，请确保明确键入函数的对象参数。
 
@@ -74,8 +69,7 @@ class Employee {
 
 ```
 
-### 7. Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'.
-> 参考：[Element implicitly has an 'any' type because expression of type 'string' can't be used to index type](https://bobbyhadz.com/blog/typescript-element-implicitly-has-any-type-expression)
+### 7. [Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{}'](https://bobbyhadz.com/blog/typescript-element-implicitly-has-any-type-expression)
 
 - keyof
 - typeof
@@ -128,8 +122,7 @@ type T = keyof Person;
 
 ```
 
-### 8. Property 'value' does not exist on type 'HTMLElement'.
-> 参考：[Property 'value' does not exist on type 'HTMLElement' in TS](https://bobbyhadz.com/blog/typescript-property-value-not-exist-type-htmlelement)
+### 8. [Property 'value' does not exist on type 'HTMLElement'](https://bobbyhadz.com/blog/typescript-property-value-not-exist-type-htmlelement)
 
 The error "Property 'value' does not exist on type 'HTMLElement'" occurs when we try to access the value property on an element that has a type of HTMLElement. The reason we got the error is that the return type of the document.getElementById method is `HTMLElement | null` and the `value` property doesn't exist in the HTMLElement type. To solve the error, use a type assertion to type the element as HTMLInputElement (or HTMLTextAreaElement if you're typing a textarea element) before accessing the property. 当我们尝试访问具有 HTMLElement 类型的元素的 value 属性时，会出现错误“属性‘value’在类型‘HTMLElement’上不存在”。我们得到错误的原因是 document.getElementById 方法的返回类型是 `HTMLElement | null` 并且 value 属性在 HTMLElement 类型中不存在。要解决该错误，请在访问该属性之前使用类型断言将元素断言为 HTMLInputElement（或者 对于textarea元素 断言为 HTMLTextAreaElement）。
 
@@ -158,8 +151,8 @@ Allow imports to include TypeScript file extensions. Requires '--moduleResolutio
 
 ### 11. `strict`
 
-### 12. No index signature with a parameter of type 'string' was found on type
-> 参考：[No index signature with a parameter of type 'string' was found on type](https://bobbyhadz.com/blog/typescript-no-index-signature-with-parameter-of-type-string)
+### 12. [No index signature with a parameter of type 'string' was found on type](https://bobbyhadz.com/blog/typescript-no-index-signature-with-parameter-of-type-string)
+
 ```ts
 const key = 'country' as string;
 
@@ -176,8 +169,8 @@ console.log(obj[key]);
 console.log(obj[key as keyof typeof obj]);
 ```
 
-### 13. Property 'X' does not exist on type 'Y'
-> 参考：[Property 'X' does not exist on type 'Y'](https://www.totaltypescript.com/concepts/property-does-not-exist-on-type)
+### 13. [Property 'X' does not exist on type 'Y'](https://www.totaltypescript.com/concepts/property-does-not-exist-on-type)
+
 ```ts
 const requestParam = {
   userName,
@@ -280,3 +273,82 @@ declare module '*.less' {
      },
    }
    ```
+
+### 18. 指定target
+使用[对象的访问器属性](https://zh.javascript.info/property-accessors)报错：`Accessors are only available when targeting ECMAScript 5 and higher.` 解决办法：设置`compilerOptions.target`为`'ES6'`
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ES6"
+  }
+}
+```
+
+### 19. [Property does not exist on type 'never' in TypeScript](https://bobbyhadz.com/blog/typescript-property-does-not-exist-on-type-never)
+解决办法：
+- 使用 `obj['myProperty']` 替代 `obj.myProperty`
+
+- 使用断言，比如`(employee as Employee).salary`
+
+React中，当没有声明`useState`定义的state的类型或者没有声明`useRef`的返回值类型时，会报`Property does not exist on type 'never' in TypeScript`
+```tsx
+import {useEffect, useRef} from 'react';
+
+const ComponentA = () => {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    // ⛔️ Error: Property 'focus' does not exist on type 'never'.ts(2339)
+    inputRef.current?.focus();
+  }, []);
+
+  return (
+    <div>
+      <input ref={inputRef} />
+    </div>
+  );
+};
+```
+解决办法，使用泛型:
+
+使用泛型声明`useRef`的返回值类型
+```tsx
+import {useEffect, useRef} from 'react';
+
+const ComponentA = () => {
+  // 👇️ type the ref as HTML input element
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // ✅ Works now
+    inputRef.current?.focus();
+  }, []);
+
+  return (
+    <div>
+      <input ref={inputRef} />
+    </div>
+  );
+};
+```
+
+使用泛型声明`useState`定义的state的类型
+```tsx
+import {useState} from 'react';
+
+function App() {
+  // 👇️ type it as string[]
+  const [strArr, setStrArr] = useState<string[]>([]);
+
+  // 👇️ type it as object array
+  const [objArr, setObjArr] = useState<{name: string; age: number}[]>([]);
+
+  return (
+    <div className="App">
+      <div>Hello world</div>
+    </div>
+  );
+}
+
+export default App;
+```

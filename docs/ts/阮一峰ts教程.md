@@ -2167,6 +2167,19 @@ TypeScript内置的类型声明文件主要是内置的全局对象（JavaScript
 /// <reference lib="es2017.string" />
 ```
 
+## 类型工具
+TypeScript 提供了一些内置的类型工具，用来方便地处理各种类型，以及生成新的类型。
+
+### `Record<Keys, Type>`
+参数Keys的类型必须兼容`string|number|symbol`，否则不能用作键名，会报错。
+```ts
+type T = Record<'a', number>; // { a: number }
+
+type T = Record<'a'|'b', number>; // { a: number, b: number }
+
+type T = Record<'a', number|string>; // { a: number|string }
+```
+
 ## 泛型
 - 泛型用于反映参数与返回值之间的类型关系。
 

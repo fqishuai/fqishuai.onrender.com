@@ -247,3 +247,16 @@ type B = Merge<A, {
   },
 }
 ```
+
+## `Record<Keys, Type>`
+用于约束对象属性的类型，比如创建一个对象类型，其key 为任意 string，value 为任意类型。不使用Record：
+```ts
+type T = {
+  [x: string]: any
+}
+```
+
+使用Record：
+```ts
+type T = Record<string, any>
+```
