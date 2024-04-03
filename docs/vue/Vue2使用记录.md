@@ -17,6 +17,8 @@ tags: [vue, 记录]
   - [7.2 configureWebpack](#72-configurewebpack)
 - [8. 动态组件`<component>/component>`](#8-动态组件componentcomponent)
 - [9. vue中如何使用节流（throttle）函数](#9-vue中如何使用节流throttle函数)
+- [10. 子组件不应该直接修改它从父组件接收的props](#10-子组件不应该直接修改它从父组件接收的props)
+- [11. 折叠面板动效](#11-折叠面板动效)
 
 
 ## 1. 渲染函数 & JSX
@@ -267,4 +269,221 @@ export default {
     },
   },
 }
+```
+
+## 10. 子组件不应该直接修改它从父组件接收的props
+在Vue中，props是用来传递数据从父组件到子组件的一种机制，它们是单向数据流的一部分。子组件不应该直接修改它从父组件接收的props。这是因为Vue试图确保数据的流向是可预测的，而直接修改props会破坏这种单向数据流，导致应用程序的状态难以追踪和理解。
+
+如果子组件需要基于父组件传递的prop来修改数据，它应该定义一个本地的data属性或者计算属性（computed property），然后在这个本地属性上进行操作。
+```html
+<!-- 父组件 -->
+<template>
+  <div>
+    <child-component :parent-message="message" />
+  </div>
+</template>
+
+<script>
+import ChildComponent from './ChildComponent.vue';
+
+export default {
+  components: {
+    ChildComponent
+  },
+  data() {
+    return {
+      message: 'Hello from parent'
+    };
+  }
+}
+</script>
+```
+```html
+<!-- 子组件 -->
+<template>
+  <div>
+    <p>{{ localMessage }}</p>
+  </div>
+</template>
+
+<script>
+export default {
+  props: ['parentMessage'],
+  data() {
+    return {
+      // 初始化本地数据属性，以prop的值为初始值
+      localMessage: this.parentMessage
+    };
+  },
+  watch: {
+    // 如果prop更新了，也更新本地数据属性
+    parentMessage(newValue) {
+      this.localMessage = newValue;
+    }
+  }
+}
+</script>
+```
+
+如果子组件需要通知父组件它希望更改prop的值，它应该使用自定义事件来通知父组件。父组件可以监听这些事件并相应地更新数据。这样，数据的更新仍然是在父组件中进行的，保持了单向数据流的完整性。(可以巧妙使用`$event`)
+```html
+<!-- 子组件 -->
+<template>
+  <div>
+    <button @click="updateMessage">Update Message</button>
+  </div>
+</template>
+
+<script>
+export default {
+  props: ['parentMessage'],
+  methods: {
+    updateMessage() {
+      // 子组件不能直接修改prop，而是发出一个事件
+      this.$emit('update:message', 'New message from child');
+    }
+  }
+}
+</script>
+```
+```html
+<!-- 父组件 -->
+<template>
+  <div>
+    <child-component :parent-message="message" @update:message="message = $event" />
+  </div>
+</template>
+
+<!-- 父组件的其余代码 -->
+```
+
+## 11. 折叠面板动效
+动态计算内容的高度，并在过渡之前将高度设置为具体的像素值。使用`requestAnimationFrame()`和`will-change`进行优化。
+
+```html title="Collapse.vue"
+<template>
+  <div class="custom-collapse">
+    <div class="title" @click="toggle">
+      <div class="left">
+        <img alt="icon" :src="titleLeftIcon" />
+        <div>{{ titeLeftText }}</div>
+      </div>
+      <div class="right">
+        <div>{{ titleRightText }}</div>
+        <img alt="arrowdown icon" :src="arrowupIcon" :style="{transform: expanded ? up : down}" />
+      </div>
+    </div>
+    <div class="content"
+      :style="{ willChange: 'height', height: wrapperHeight }"
+      @transitionend="onTransitionEnd"
+    >
+      <div class="content-wrapper" ref="contentRef">
+        <slot></slot>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import arrowupIcon from '@/assets/icon-arrowup@3x.png';
+
+export default {
+  components: {},
+  directives: {},
+  mixins: [],
+  inject: {},
+  props: {
+    titleLeftIcon: {
+      type: String,
+      default: '',
+    },
+    titeLeftText: {
+      type: String,
+      default: '',
+    },
+    titleRightText: {
+      type: String,
+      default: '',
+    },
+    expanded: {
+      type: Boolean,
+      default: false,
+    }
+  },
+  data() {
+    return {
+      wrapperHeight: this.expanded ? 'auto' : '0',
+      up: 'rotate(0)',
+      down: 'rotate(180deg)',
+      arrowupIcon,
+    }
+  },
+  computed: {},
+  watch: {
+    expanded(newValue, oldValue) {
+      newValue ? this.openCollapse() : this.closeCollapse();
+    },
+  },
+  created() {},
+  mounted() {},
+  methods: {
+    onTransitionEnd() {
+      if (this.expanded) {
+        this.wrapperHeight = 'auto';
+      }
+    },
+    openCollapse() {
+      this.wrapperHeight = '0px';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const height = this.$refs.contentRef.offsetHeight;
+          this.wrapperHeight = height ? `${height}px` : 'auto';
+        })
+      })
+    },
+    closeCollapse() {
+      const height = this.$refs.contentRef.offsetHeight;
+      this.wrapperHeight = height ? `${height}px` : 'auto';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.wrapperHeight = '0px';
+        })
+      })
+    },
+    toggle() {
+      this.$emit('toggle', this.expanded);
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+@import './collapse.scss'
+</style>
+```
+```css title="collapse.scss"
+.custom-collapse {
+  background-color: rgba(255,255,255,1);
+  border-radius: 0.08rem;
+  margin: 0 auto 0.12rem;
+  .content {
+    padding: 0 0.12rem;
+    overflow: hidden;
+    transition: height 0.5s ease-in-out;
+  }
+}
+```
+使用示例：
+```html
+<Collapse
+  :titleLeftIcon="icon"
+  :titeLeftText="name"
+  :titleRightText="tip"
+  :expanded="expanded"
+  @toggle="expanded = !$event"
+>
+  <div class="item-wrapper">
+    
+  </div>
+</Collapse>
 ```
