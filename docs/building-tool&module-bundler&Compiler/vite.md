@@ -279,3 +279,62 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url))
   })
 })()
 ```
+
+## 使用记录
+### h5页面在低版本安卓浏览器白屏
+vite4+react18+ts5开发h5页面在低版本安卓（<=安卓10及鸿蒙系统）浏览器中打开出现白屏。用云真机webview调试发现没有任何报错。
+
+查看[vite对浏览器的支持](https://cn.vitejs.dev/guide/#browser-support)和[浏览器兼容性](https://cn.vitejs.dev/guide/build.html#browser-compatibility)：
+```markdown
+用于生产环境的构建包会假设目标浏览器支持现代 JavaScript 语法。默认情况下，Vite 的目标是能够 `支持原生 ESM script 标签`、`支持原生 ESM 动态导入` 和 `import.meta` 的浏览器：
+- Chrome >=87
+- Firefox >=78
+- Safari >=14
+- Edge >=88
+
+你也可以通过 `build.target` 配置项 指定构建目标，最低支持 `es2015`。
+
+请注意，默认情况下 Vite 只处理语法转译，且 不包含任何 polyfill。你可以前往 [Polyfill.io](https://polyfill.io/) 查看，这是一个基于用户浏览器 User-Agent 字符串自动生成 polyfill 包的服务。
+
+传统浏览器可以通过插件 `@vitejs/plugin-legacy` 来支持，它将自动生成传统版本的 chunk 及与其相对应 ES 语言特性方面的 polyfill。兼容版的 chunk 只会在不支持原生 ESM 的浏览器中进行按需加载。
+```
+
+所以，使用`@vitejs/plugin-legacy`来尝试解决：
+- 安装`@vitejs/plugin-legacy`，必须同时安装terser，因为该插件使用terser进行压缩
+  ```bash
+  pnpm add @vitejs/plugin-legacy -D
+  pnpm add terser -D
+  ```
+
+- 配置
+  ```ts title="vite.config.ts"
+  import legacy from '@vitejs/plugin-legacy';
+
+  export default defineConfig({
+    plugins: [
+      legacy({
+        targets: [
+          '> 0%',
+          'Chrome > 4',
+          'Android >= 4',
+          'IOS >= 7',
+          'not ie <= 6',
+          'Firefox ESR',
+        ],
+      }),
+    ]
+  })
+  ```
+
+打包部署后在低版本安卓（<=安卓10及鸿蒙系统）浏览器中打开页面正常了，但是在某些app的webview中打开会报错，提示`replaceAll is not a function`，使用`replace`替换`replaceAll`进行解决：
+```js
+const str = ' A   B   C    D ';
+console.log(str.replaceAll(' ', '+')); // +A+++B+++C++++D+
+console.log(str.replace(/ /g, '+'));   // +A+++B+++C++++D+
+```
+
+:::info
+[解决低版本系统白屏问题](https://juejin.cn/post/7224304954596737079)
+
+[从 JavaScript 中的字符串中删除/替换所有空格](https://www.jiyik.com/tm/xwzj/web_2604.html)
+:::

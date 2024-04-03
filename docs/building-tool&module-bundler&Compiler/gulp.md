@@ -2,7 +2,7 @@
 tags: [workflows]
 ---
 
-[gulp](https://gulpjs.com/docs/en/getting-started/quick-start)
+[gulp](https://gulpjs.com/docs/en/getting-started/quick-start) 将开发流程中让人痛苦或耗时的任务自动化，从而减少你所浪费的时间、创造更大价值。 
 
 [中文文档](https://www.gulpjs.com.cn/)
 
