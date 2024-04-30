@@ -247,6 +247,7 @@ const config = {
               { label: '脑图', href: 'https://naotu.baidu.com/home' },
               { label: '免费IT资源', href: 'https://free-for.dev/#/' },
               { label: '免费LOGO设计', href: 'https://www.uugai.com/' },
+              { label: 'sinqi tools', href: 'https://sinqi.tools/zh' },
             ],
           },
           {
