@@ -1,6 +1,9 @@
 ---
+slug: performance
 tags: [browser, performance]
 ---
+
+[DevTools](https://developer.chrome.com/docs/devtools?hl=zh-cn)
 
 ## Chrome DevTools Performance/Performance insights/Performance monitor panel
 :::tip
@@ -50,15 +53,15 @@ Open Google Chrome in Incognito Mode. Incognito Mode ensures that Chrome runs in
 
 #### 2. Record performance
 - You can throttle the network and CPU while recording. 可以在录制时限制网络和 CPU。4x slowdown 选项会使您的 CPU 运行速度比平时慢 4 倍。 DevTools 无法真正模拟移动设备的 CPU，因为移动设备的架构与台式机和笔记本电脑的架构非常不同。
-![设置Disable cache及CPU 4x slowdown](img/performance_insights_usage.png)
+![设置Disable cache及CPU 4x slowdown](../img/performance_insights_usage.png)
 
 - Click Measure page load. DevTools records performance metrics while the page reloads and then automatically stops the recording a couple seconds after the page load has finished. 点击Measure page load，DevTools 在页面重新加载时记录性能指标，然后在页面加载完成几秒钟后自动停止记录。
-![Start recording/Measure page load](img/performance_insights_usage1.png)
+![Start recording/Measure page load](../img/performance_insights_usage1.png)
 
 - If you want to measure general performance of your web page, use Start recording. Interact with the page and click Stop recording manually to stop recording. 如果您想衡量网页的总体性能，请使用Start recording。与页面交互，手动点击Stop recording停止录制。
 
 #### 3. Replay a performance recording
-![Replay a performance recording](img/performance_insights_usage2.png)
+![Replay a performance recording](../img/performance_insights_usage2.png)
 Use the controls at the bottom to control the replay of your recording:
 - Click Play to play the recording.
 - Click Pause to pause the replay.
@@ -67,20 +70,20 @@ Use the controls at the bottom to control the replay of your recording:
 
 #### 4. Navigate a performance recording
 DevTools automatically zooms out to show the full recording timeline. You can navigate the recording with zoom and move the timeline. DevTools 会自动缩小以显示完整的录制时间线。您可以使用 缩放 浏览录制内容并移动时间线。
-![Navigate a performance recording](img/performance_insights_usage3.png)
+![Navigate a performance recording](../img/performance_insights_usage3.png)
 
 #### 5. View performance insights
 Get a list of performance insights in the Insights pane. Identify and fix potential performance issues. 在“Insights”窗格中获取性能见解列表。识别并修复潜在的性能问题。
-![View performance insights](img/performance_insights_usage4.png)
+![View performance insights](../img/performance_insights_usage4.png)
 
 Hover over each of the insights to highlight them on the main tracks. 将鼠标悬停在每个见解上会在主要轨道上突出显示它们。
 
 点击某一个见解会打开Details pane
-![Details pane](img/performance_insights_usage5.png)
+![Details pane](../img/performance_insights_usage5.png)
 
 #### 6. View Web Vitals performance metrics
 [Web Vitals](https://web.dev/vitals/) 旨在为质量信号提供统一指导，这些信号对于在网络上提供出色的用户体验至关重要。可以在 Timeline and Insights pane 查看这些指标。
-![View Web Vitals performance metrics](img/performance_insights_usage6.png)
+![View Web Vitals performance metrics](../img/performance_insights_usage6.png)
 
 将鼠标悬停在每个指标上可以查看更多信息。
 
@@ -94,10 +97,10 @@ A [good LCP score](https://web.dev/lcp/#what-is-a-good-lcp-score?) is 2.5 second
 If the largest contentful paint on your page takes longer to render, in the timeline, you will see the LCP badge with a yellow square or red triangle. 黄色正方形或红色三角形。
 
 To open the Details pane, click the LCP badge on the timeline or on the Insights pane on the right. In the pane, you can discover potential causes for the delays and suggestions on how to fix them. 要打开“详细信息”窗格，请单击时间线上或右侧“见解”窗格上的 LCP 徽章。在窗格中，您可以发现延迟的潜在原因以及有关如何解决这些问题的建议。
-![Discover delays of the largest contentful paint](img/performance_insights_usage7.png)
+![Discover delays of the largest contentful paint](../img/performance_insights_usage7.png)
 
 To view the [sub-parts of LCP render time](https://web.dev/optimize-lcp/#lcp-breakdown), scroll down to the Details > Timings breakdown section.
-![Timings breakdown](img/performance_insights_usage8.png)
+![Timings breakdown](../img/performance_insights_usage8.png)
 
 LCP render time consists of the following sub-parts:
 - Time to first byte (TTFB). The time from when the user initiates loading the page until when the browser receives the first byte of the HTML document response. 从用户开始加载页面到浏览器收到 HTML 文档响应的第一个字节的时间。
@@ -109,28 +112,28 @@ If an LCP element doesn't require a resource load to render, the resource load d
 
 #### 8. View layout shifts activity
 > 查看布局转换活动。View layout shifts activity in the Layout Shifts track. 在 Layout Shifts 轨道中查看 Layout Shifts 活动。
-![Layout Shifts](img/performance_insights_usage9.png)
+![Layout Shifts](../img/performance_insights_usage9.png)
 
 [Cumulative Layout Shifts (CLS)](https://web.dev/cls/) is one of the [core web vitals](https://web.dev/vitals/#core-web-vitals) metrics. Use the Layout Shifts track to identify potential issues and causes of layout shifts. Cumulative Layout Shifts (CLS) 是核心 Web Vitals 指标之一。使用 Layout Shifts 轨道来识别潜在问题和布局偏移的原因。
 
 Click on a screenshot to view the layout shift's details, identify potential root causes and impacted elements. 单击屏幕截图以查看布局转变的详细信息，确定潜在的根本原因和受影响的元素。
-![Click on a screenshot to view the layout shift's details](img/performance_insights_usage10.png)
+![Click on a screenshot to view the layout shift's details](../img/performance_insights_usage10.png)
 
 [Optimize Cumulative Layout Shift](https://web.dev/optimize-cls/#images-without-dimensions)
 
-![good CLS](img/performance_insights_usage11.png)
+![good CLS](../img/performance_insights_usage11.png)
 
 #### 9. View network activity
 View network activity in the Network track. You can expand the network track to view all the network activities and click on each item to view the details. 查看网络轨道中的网络活动。您可以展开网络轨道以查看所有网络活动并单击每个项目以查看详细信息。
-![View network activity](img/performance_insights_usage12.png)
+![View network activity](../img/performance_insights_usage12.png)
 
 #### 10. View renderer activity
 View render activity in the Renderer track. You can expand each renderer to view the activities and click on each item to view the details. 在渲染器轨道中查看渲染活动。您可以展开每个渲染器以查看活动并单击每个项目以查看详细信息。
-![View renderer activity](img/performance_insights_usage13.png)
+![View renderer activity](../img/performance_insights_usage13.png)
 
 #### 11. View GPU activity
 View GPU activity in the GPU track. The GPU track is hidden by default. To enable it, check GPU in Settings.
-![View GPU activity](img/performance_insights_usage14.png)
+![View GPU activity](../img/performance_insights_usage14.png)
 
 #### 12. View user timings
 To get custom performance measures, you can use [User Timing](https://www.w3.org/TR/user-timing/) and visualize your timings with the Timing track. For more information, see the [User timing API](https://web.dev/usertiming/).
@@ -141,6 +144,6 @@ To view user timings:
 - Record performance.
 - View the measurements on the Timings track. If you can't see the track, check User timings in Settings.
 - To view details, click the timing on the track.
-![view user timings](img/performance_insights_usage15.png)
+![view user timings](../img/performance_insights_usage15.png)
 
 ### Performance monitor介绍

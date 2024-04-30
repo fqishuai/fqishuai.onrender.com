@@ -1,5 +1,5 @@
 ---
-slug: debugging
+slug: sources
 tags: [browser]
 ---
 
