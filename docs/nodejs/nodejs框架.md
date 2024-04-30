@@ -295,7 +295,37 @@ npm run start -- --stdout="/xx/master-stdout.log" --stderr="/xx/master-stderr.lo
 > [基于Egg框架的日志链路追踪实践](https://www.nodejs.red/#/nodejs/logger?id=%e5%9f%ba%e4%ba%8eegg%e6%a1%86%e6%9e%b6%e7%9a%84%e6%97%a5%e5%bf%97%e9%93%be%e8%b7%af%e8%bf%bd%e8%b8%aa%e5%ae%9e%e8%b7%b5)
 
 ### 8. egg-ts-helper
-ets clean 支持清除包含同名 tsx 文件的 js 文件
+```json title="egg-ts-helper/package.json"
+"description": "egg typescript helper",
+"bin": {
+  "ets": "dist/bin.js"
+},
+"main": "dist/index.js",
+"types": "dist/index.d.ts",
+"files": [
+  "src",
+  "dist",
+  "register.js"
+],
+"repository": {
+  "type": "git",
+  "url": "git@github.com:eggjs/egg-ts-helper.git"
+},
+"scripts": {
+  "clean": "tsc -b --clean",
+  "tsc": "tsc -d",
+  "tsc:w": "tsc -d -w",
+  "lint": "eslint . --ext .ts",
+  "check": "npm run tsc && npm run lint",
+  "test": "npm run check && npm run test-local",
+  "test-local": "egg-bin test --ts",
+  "prepublishOnly": "del dist && npm run tsc",
+  "cov": "egg-bin cov --ts",
+  "ci": "npm run check && npm run cov && npm run tsc"
+},
+```
+
+执行`ets clean`，即执行`tsc -b --clean` 支持清除包含同名 tsx 文件的 js 文件
 
 ### 9. [eggjs处理jsonp请求](https://www.jianshu.com/p/afc0acc6206a)
 jsonp作为前端跨域的一种解决方案，优缺点如下：
@@ -567,7 +597,7 @@ server.route({
   init();
   ```
 
-#### [Route options]((https://hapi.dev/api/?v=21.3.2#route-options))
+#### [Route options](https://hapi.dev/api/?v=21.3.2#route-options)
 除了`method` `path` `handler`之外，还可以为每个路由指定一个`options`参数。
 ```js
 server.route({
@@ -1530,3 +1560,74 @@ start();
 - `Boom.unauthorized([message], [scheme], [attributes])` 返回 401 未经授权错误
 
 ## nestjs
+
+## express
+### `use()`
+`use()` 方法是一个中间件函数，它能够将一个或多个中间件添加到请求处理链中。中间件是一个函数，它可以访问请求对象（`req`）、响应对象（`res`）以及应用程序的请求/响应循环中的下一个中间件函数（通常表示为一个名为 `next` 的变量）。
+
+下面是一个基本的例子，展示了如何在Express应用程序中使用 `use()` 方法：
+
+```javascript
+const express = require('express');
+const app = express();
+
+// 一个简单的中间件函数
+const myMiddleware = (req, res, next) => {
+  console.log('中间件被调用！');
+  next(); // 调用下一个中间件
+};
+
+// 使用中间件
+app.use(myMiddleware);
+
+// 另一个中间件，这次是直接定义的
+app.use((req, res, next) => {
+  console.log('另一个中间件被调用！');
+  next();
+});
+
+// 路由处理
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
+// 监听端口
+app.listen(3000, () => {
+  console.log('服务器正在监听端口3000');
+});
+```
+
+在这个例子中，我们定义了两个中间件函数，并且使用 `app.use()` 将它们添加到了应用程序中。当一个请求到达Express应用程序时，它会**按照中间件添加的顺序依次执行这些中间件**，直到遇到一个发送响应的中间件或路由处理函数。如果中间件内部没有结束请求/响应循环（例如，通过调用 `res.send()`），它必须调用 `next()` 函数将控制权传递给下一个中间件或路由处理函数。
+
+### `express.static`
+`express.static` 是 Express.js 框架中的一个内置中间件函数。它用于托管静态文件，如图片、CSS、JavaScript 文件等。通过使用这个中间件，你可以将一个或多个目录指定为包含静态资源的位置，这样客户端就可以直接访问这些文件了。
+```js
+const express = require('express');
+const app = express();
+
+// 指定静态文件目录
+app.use(express.static('public'));
+
+app.listen(3000, () => {
+  console.log('Server is running on http://localhost:3000');
+});
+```
+在上面的例子中，`public` 目录被设置为静态文件目录。这意味着，如果你在 `public` 目录下有一个名为 `image.png` 的文件，你可以通过访问 `http://localhost:3000/image.png` 来直接获取这个文件。
+
+- 可以为静态资源指定一个虚拟路径前缀（实际上并不存在于文件系统中）
+  ```js
+  app.use('/static', express.static('public'));
+  ```
+  这样，`public` 目录下的文件就可以通过带有 `/static` 前缀的 URL 访问了，例如 `http://localhost:3000/static/image.png`。
+
+- 可以通过多次调用 `express.static` 中间件来设置多个静态文件目录
+  ```js
+  app.use(express.static('public'));
+  app.use(express.static('uploads'));
+  ```
+
+- 可以通过其他中间件来修改静态文件的响应头或设置缓存策略。
+
+`express.static` 是处理静态资源的简便方法，但在实际应用中，需要根据项目的具体需求和部署环境做出相应的配置和优化。
+- 安全性：当使用 `express.static` 中间件时，应确保只对外提供必要的文件，避免暴露敏感数据。
+- 性能：对于生产环境，考虑使用 Nginx、CDN 或其他静态资源服务来提供静态文件，以减轻 Node.js 服务器的负担并提高响应速度。

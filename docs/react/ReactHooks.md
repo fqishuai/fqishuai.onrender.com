@@ -523,9 +523,41 @@ useInsertionEffect 适用于 CSS-in-JS 库作者。除非您正在开发 CSS-in-
 
 ### Performance Hooks
 #### `useMemo`
+`useMemo`在每次重新渲染的时候能够缓存计算的结果。`const cachedValue = useMemo(calculateValue, dependencies)`
+- `calculateValue`: 是一个没有任何参数的纯函数，并且可以返回任意类型。React 将会在首次渲染时调用该函数；在之后的渲染中，如果 `dependencies` 没有发生变化，React 将直接返回相同值。否则，将会再次调用 `calculateValue` 并返回最新结果，然后缓存该结果以便下次重复使用。
+- `dependencies`: 所有在 `calculateValue` 函数中使用的响应式变量组成的数组。响应式变量包括 `props`、`state` 和所有你直接在组件中定义的变量和函数。依赖项数组的长度必须是固定的并且必须写成 `[dep1, dep2, dep3]` 这种形式。React 使用 `Object.is` 将每个依赖项与其之前的值进行比较。如果通过 `Object.is` 比较所有依赖项都没有发生变化，那么 `useMemo` 将会返回之前已经计算过的那个值。否则，React 将会重新执行 `calculation` 函数并且返回一个新的值。
 :::tip
-`useMemo` won’t make the first render faster. It only helps you skip unnecessary work on updates.
+`useMemo` 不会让首次渲染更快，它只会帮助你跳过不必要的更新工作。
 :::
+:::warning
+- `useMemo` 是一个 React Hook，所以你只能 在组件的顶层 或者自定义 Hook 中调用它。你不能在循环语句或条件语句中调用它。如有需要，将其提取为一个新组件并使用 `state`。
+- 除非有特定原因，React 不会丢弃缓存值。例如，在开发过程中，React 会在你编辑组件文件时丢弃缓存。无论是在开发环境还是在生产环境，如果你的组件在初始挂载期间被终止，React 都会丢弃缓存。
+:::
+
+##### 使用场景：跳过代价昂贵的重新计算
+默认情况下，React 会在每次重新渲染时重新运行整个组件。例如，如果 `TodoList` 更新了 `state` 或从父组件接收到新的 `props`，`filterTodos` 函数将会重新运行。如果计算速度很快，这将不会产生问题。但是，当正在过滤转换一个大型数组，或者进行一些昂贵的计算，而数据没有改变，那么可能希望跳过这些重复计算。
+```jsx
+function TodoList({ todos, tab, theme }) {
+  const visibleTodos = filterTodos(todos, tab);
+  // ...
+}
+```
+
+如果 `todos` 与 `tab` 都与上次渲染时相同，那么将计算函数包装在 `useMemo` 中，便可以重用已经计算过的 `visibleTodos`。
+```jsx
+import { useMemo } from 'react';
+
+function TodoList({ todos, tab, theme }) {
+  const visibleTodos = useMemo(
+    () => filterTodos(todos, tab),
+    [todos, tab]
+  );
+  // ...
+}
+```
+
+##### 使用场景：跳过组件的重新渲染
+默认情况下，当一个组件重新渲染时，React 会递归地重新渲染它的所有子组件。
 
 #### `useCallback`
 用于在重新渲染之间缓存函数定义。语法：`useCallback(fn, dependencies)`，使用示例如下：

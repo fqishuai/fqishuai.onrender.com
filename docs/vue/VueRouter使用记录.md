@@ -3,13 +3,13 @@ slug: usage-router
 tags: [vue, 记录]
 ---
 
-## 1. router.addRoute
-### 1.1 注意查看使用的vue-router版本中是否有addRoute方法
+## `router.addRoute`
+### 注意查看使用的`vue-router`版本中是否有`addRoute`方法
 - vue-router 3.1.6 使用addRoute时报错：router.addRoute is not a function；升级到3.5.4，问题解决
 - 可以把vue-router的实例log出来看`[[Prototype]]`中是否有addRoute方法
 ![vue-router](img/vue_router.jpeg)
 
-### 1.2 Navigation cancelled
+### Navigation cancelled
 > Error: Navigation cancelled from "/" to "/xxx" with a new navigation.
     at createRouterError (vue-router.esm.js?8c4f:2065:1)
 
@@ -21,22 +21,22 @@ router = new Router({
 })
 ```
 
-### 1.3 Redirected
+### Redirected
 > Error: Redirected when going from "/xxx" to "/yy/zzz" via a navigation guard.
   at createRouterError (vue-router.esm.js?8c4f:2065:1)
 
 - 应该怎么捕获next()的异常？router.onError()也不生效
 
-## 2. router.beforeEach
-### 2.1 next()
-- 注意：next函数在有参和无参的时候是不一样的，当传参时，会中断当前导航然后进行一个新的导航，此时beforeEach函数会被再次调用,而不传参时next()不会重新触发beforeEach函数。
+## `router.beforeEach`
+### `next()`
+- 注意：`next`函数在有参和无参的时候是不一样的，当传参时，会中断当前导航然后进行一个新的导航，此时`beforeEach`函数会被再次调用,而不传参时`next()`不会重新触发beforeEach函数。
 
-## 3. [路由组件传参](https://v3.router.vuejs.org/zh/guide/essentials/passing-props.html)
+## [路由组件传参](https://v3.router.vuejs.org/zh/guide/essentials/passing-props.html)
 :::tip
 参考：[Vue 路由组件传参的 8 种方式](https://segmentfault.com/a/1190000039398462)
 :::
 
-### 3.1 RouteConfig
+### RouteConfig
 ```js
 interface RouteConfig = {
   path: string,
@@ -56,8 +56,8 @@ interface RouteConfig = {
 }
 ```
 
-### 3.2 使用 `props` 将组件和路由解耦 (props: boolean | Object | Function)
-- boolean。当 props 设置为 true 时，route.params 将被设置为组件的 props。
+### 使用 `props` 将组件和路由解耦 (`props: boolean | Object | Function`)
+- boolean。当 `props` 设置为 true 时，`route.params` 将被设置为组件的 `props`。
 ```js
 // 下面的代码是通过 $route.params 的方式获取动态字段 id
 const User = {
@@ -84,7 +84,7 @@ const routes = [
 ]
 ```
 
-- Object。当 props 是一个对象时，它将原样设置为组件 props。当 props 是静态的时候很有用。
+- Object。当 `props` 是一个对象时，它将原样设置为组件 `props`。当 `props` 是静态的时候很有用。
 ```js
 // 路由配置
 const routes = [
@@ -109,7 +109,7 @@ const Hello = {
 // <Hello /> 组件默认显示 Hello Vue，但路由配置了 props 对象，当路由跳转到 /hello 时，会显示传递过来的 name， 页面会显示为 Hello World。
 ```
 
-- Function。请尽可能保持 props 函数为无状态的，因为它只会在路由发生变化时起作用。如果你需要状态来定义 props，请使用包装组件，这样 Vue 才可以对状态变化做出反应。使用函数模式时，返回 props 的函数接受的参数为路由记录 route。
+- Function。请尽可能保持 `props` 函数为无状态的，因为它只会在路由发生变化时起作用。如果你需要状态来定义 `props`，请使用包装组件，这样 Vue 才可以对状态变化做出反应。使用函数模式时，返回 `props` 的函数接受的参数为路由记录 route。
 ```js
 // 路由配置
 // 创建一个返回 props 的函数
@@ -137,7 +137,7 @@ const Hello = {
 }
 ```
 
-## 4. NavigationDuplicated: Avoided redundant navigation to current location
+## NavigationDuplicated: Avoided redundant navigation to current location
 > [How to fix ‘Avoided redundant navigation to current location’ error in Vue.js](https://renatello.com/vuejs-avoided-redundant-navigation/)
 
 ```js
@@ -151,3 +151,11 @@ this.$router.push({name: 'AdminProjects', params: { id: item.id }}).catch(error 
   }
 })
 ```
+
+## `router.onReady`
+`router.onReady(callback, [errorCallback])` 该方法把一个回调排队，在路由完成初始导航时调用，这意味着它可以解析所有的异步进入钩子和路由初始化相关联的异步组件。这可以**有效确保服务端渲染时服务端和客户端输出的一致**。
+
+第二个参数 `errorCallback` 只在 2.4+ 支持。它会在初始化路由解析运行出错 (比如解析一个异步组件失败) 时被调用。
+
+## `router.getMatchedComponents`
+`const matchedComponents: Array<Component> = router.getMatchedComponents(location?)` 返回目标位置或是当前路由匹配的组件数组 (是数组的定义/构造类，不是实例)。通常在服务端渲染的数据预加载时使用。

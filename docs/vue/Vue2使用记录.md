@@ -19,6 +19,9 @@ tags: [vue, 记录]
 - [9. vue中如何使用节流（throttle）函数](#9-vue中如何使用节流throttle函数)
 - [10. 子组件不应该直接修改它从父组件接收的props](#10-子组件不应该直接修改它从父组件接收的props)
 - [11. 折叠面板动效](#11-折叠面板动效)
+- [12. 计算属性依赖的变量是引用类型](#12-计算属性依赖的变量是引用类型)
+  - [依赖的是对象](#依赖的是对象)
+  - [数组](#数组)
 
 
 ## 1. 渲染函数 & JSX
@@ -487,3 +490,69 @@ export default {
   </div>
 </Collapse>
 ```
+
+## 12. 计算属性依赖的变量是引用类型
+### 依赖的是对象
+在Vue 2中，计算属性(computed properties)是基于它们的依赖进行缓存的。如果计算属性依赖于一个对象，并且你想要在对象改变时触发计算属性的重新计算，你需要确保Vue能够检测到对象的变化。
+
+Vue无法检测到对象属性的添加或删除。因此，如果你依赖的对象有新的属性添加或已有属性被删除，你需要使用`Vue.set`方法来添加新属性，或者使用`vm.$set`实例方法（`vm`是Vue实例），这样Vue才能够跟踪变化并更新计算属性。
+
+如果你改变的是对象的某个已有属性的值，那么计算属性应该能够自动检测到变化并重新计算。例如：
+
+```javascript
+computed: {
+  myComputedProp() {
+    return this.myObject.key; // 依赖于myObject的key属性
+  }
+}
+```
+
+当`myObject.key`的值改变时，`myComputedProp`会重新计算。
+
+如果你整个替换了依赖的对象，Vue也能够检测到这个变化，并且会重新计算依赖于该对象的计算属性。例如：
+
+```javascript
+methods: {
+  updateMyObject() {
+    this.myObject = { ...this.myObject, newKey: 'newValue' }; // 整个对象替换
+  }
+}
+```
+
+在这个例子中，当调用`updateMyObject`方法时，`myObject`被整个替换了，计算属性也会因为依赖于`myObject`而重新计算。
+
+### 数组
+在Vue 2中，如果计算属性依赖于一个数组，那么当数组的内容发生变化时（例如，通过使用`push`、`pop`、`shift`、`unshift`、`splice`、`sort`或`reverse`方法），计算属性会自动重新计算。这是因为这些方法会触发数组的响应式更新。
+
+例如：
+
+```javascript
+data() {
+  return {
+    myArray: [1, 2, 3]
+  };
+},
+computed: {
+  sumOfArray() {
+    return this.myArray.reduce((sum, num) => sum + num, 0);
+  }
+}
+```
+
+在这个例子中，如果你使用`this.myArray.push(4)`，`sumOfArray`计算属性会检测到`myArray`的变化，并重新计算数组元素的总和。
+
+然而，如果你直接通过索引修改数组（例如`this.myArray[0] = 10`）或者修改数组的长度（例如`this.myArray.length = 10`），Vue将无法检测到这些变化。为了确保这些类型的变化也能触发计算属性的更新，你应该使用`Vue.set`或`vm.$set`来设置数组索引的值，或者使用`splice`方法来修改数组。
+
+例如，使用`Vue.set`来修改数组中的元素：
+
+```javascript
+Vue.set(this.myArray, 0, 10); // 或者 this.$set(this.myArray, 0, 10);
+```
+
+或者使用`splice`来修改数组：
+
+```javascript
+this.myArray.splice(0, 1, 10); // 替换索引0的元素为10
+```
+
+这些方法都会触发Vue的响应式系统，从而更新依赖于`myArray`的计算属性。

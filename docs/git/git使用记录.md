@@ -5,6 +5,8 @@ tags: [git, 记录]
 
 :::tip
 [github访问不了的解决办法](https://cloud.tencent.com/developer/article/2310963)：1.浏览器打开[ipaddress](https://www.ipaddress.com/) 2. 查询`www.github.com`的IP 3. 本地配置host （注意：github的ip经常变，隔断时间访问不了的话可以重复以上步骤）
+
+[git常用命令](https://hx.dcloud.net.cn/Tutorial/SourceControl/Git/README)
 :::
 
 ## 1. 使用git rebase合并分支
