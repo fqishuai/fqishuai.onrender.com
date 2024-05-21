@@ -6,6 +6,19 @@ tags: [http]
 [HTTP](https://developer.mozilla.org/zh-CN/docs/Web/HTTP) 是一个用于传输超媒体文档（例如 HTML）的应用层协议。它是为 Web 浏览器与 Web 服务器之间的通信而设计的，但也可以用于其他目的。HTTP 遵循经典的客户端—服务端模型，客户端打开一个连接以发出请求，然后等待直到收到服务器端响应。HTTP 是无状态协议，这意味着服务器不会在两个请求之间保留任何数据（状态）。
 ![http知识图谱](img/http知识图谱.jpg)
 
+## HTTP请求头
+### `X-Forwarded-For`
+"X-Forwarded-For" 是一个 HTTP 请求头字段，通常用于标识通过代理或负载均衡器访问 Web 服务器的客户端的原始 IP 地址。这个字段可以包含多个 IP 地址，最左边的 IP 地址通常是客户端的原始 IP 地址，后面的 IP 地址是经过的代理服务器的 IP 地址。
+
+例如：
+```
+X-Forwarded-For: 192.0.2.1, 203.0.113.2, 198.51.100.3
+```
+
+在这个例子中，`192.0.2.1` 是客户端的原始 IP 地址，`203.0.113.2` 和 `198.51.100.3` 是代理服务器的 IP 地址。
+
+这个字段在调试和日志记录时非常有用，因为它可以帮助服务器识别和记录客户端的真实 IP 地址，即使请求是通过多个代理服务器转发的。
+
 ## [HTTP 响应状态码](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Status)
 HTTP 响应状态码用来表明特定 HTTP 请求是否成功完成。 响应被归为以下五大类：
 - 信息响应 (100–199)
@@ -93,35 +106,6 @@ const sever = https.createServer((req, res) => {
   proxy.end()
 })
 ```
-
-## 浏览器缓存
-
-### [webpack 缓存指南](https://webpack.docschina.org/guides/caching/)
-### 清除缓存
-- [vue打包优化3：hash解决浏览器缓存](https://www.jianshu.com/p/822af1648831)
-- 清除浏览器缓存的几种方法：
-> - 修改html入口文件
-```html
-<meta http-equiv="pragram" content="no-cache">
-<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="expires" content="0">
-```
-> - 修改nginx
-```xml
-## 如果是部署在nginx上，在nginx的配置文件 nginx.config添加：
-location = /index.html {
-  add_header Cache-Control "no-cache, no-store";
-}
-## 或者设置expires为0
-
-## 如果是用nginx做反向代理的：
-location = /xx（xx为你的代理的项目名） {
-  add_header Cache-Control "no-cache, no-store";
-}
-
-## 如果nginx上有 proxy_cache 的配置，也考虑删掉，这是nginx的服务器缓存
-```
-> - 修改构建配置文件：output的filename和chunkFilename加上时间戳
 
 ## XMLHttpRequest(XHR)
 ### `withCredentials`属性
