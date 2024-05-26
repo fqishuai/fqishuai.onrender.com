@@ -19,6 +19,562 @@ X-Forwarded-For: 192.0.2.1, 203.0.113.2, 198.51.100.3
 
 这个字段在调试和日志记录时非常有用，因为它可以帮助服务器识别和记录客户端的真实 IP 地址，即使请求是通过多个代理服务器转发的。
 
+### `Pragma`
+`Pragma` 是一个 HTTP 请求头字段，主要用于向服务器发送特定的指令。最常见的用途是 `Pragma: no-cache`，用于指示中间缓存服务器不要缓存请求或响应。虽然 `Pragma` 字段在 HTTP/1.0 中定义，但它在现代 HTTP/1.1 中仍然被支持，主要用于向后兼容。在 HTTP/1.1 中，应该优先使用 `Cache-Control` 字段来控制缓存行为，但为了向后兼容，可以同时使用 `Pragma` 和 `Cache-Control` 字段。
+
+### `Cache-Control`
+`Cache-Control` 头字段不仅可以在响应中使用，也可以在请求中使用。作为请求头，`Cache-Control` 用于向服务器和中间缓存（如代理服务器和 CDN）发送缓存控制指令，指定客户端希望如何处理缓存。
+
+#### 常见的 `Cache-Control` 请求指令
+
+以下是一些常见的 `Cache-Control` 请求指令及其作用：
+- `no-cache`
+
+  指示缓存服务器在使用缓存对象前，必须向源服务器重新验证其有效性。这并不意味着不使用缓存，而是要求重新验证。
+
+  ```http
+  Cache-Control: no-cache
+  ```
+
+- `no-store`
+
+  指示缓存服务器和浏览器不要缓存请求或响应的任何部分。这意味着请求和响应都不会被缓存。
+
+  ```http
+  Cache-Control: no-store
+  ```
+
+- `max-age=<seconds>`
+
+  指示缓存服务器和浏览器只接受在指定时间内（以秒为单位）缓存的响应。如果缓存对象的年龄超过了这个时间，则必须重新验证。
+
+  ```http
+  Cache-Control: max-age=60
+  ```
+
+- `max-stale[=<seconds>]`
+
+  指示客户端愿意接受过期的响应。如果指定了时间，则表示愿意接受过期不超过指定时间的响应。
+
+  ```http
+  Cache-Control: max-stale=120
+  ```
+
+- `min-fresh=<seconds>`
+
+  指示客户端希望接受在指定时间内仍然有效的响应。
+
+  ```http
+  Cache-Control: min-fresh=60
+  ```
+
+- `only-if-cached`
+
+  指示客户端只接受缓存的响应。如果缓存中没有可用的响应，则返回 504（网关超时）状态码。
+
+  ```http
+  Cache-Control: only-if-cached
+  ```
+
+#### 使用场景
+
+- 强制重新验证缓存
+
+  在某些情况下，客户端可能希望强制缓存服务器在使用缓存对象前重新验证其有效性。例如：
+
+  ```http
+  Cache-Control: no-cache
+  ```
+
+  这将指示缓存服务器在使用缓存对象前，必须向源服务器重新验证其有效性。
+
+- 禁止缓存
+
+  在某些情况下，客户端可能希望禁止缓存请求或响应的任何部分。例如：
+
+  ```http
+  Cache-Control: no-store
+  ```
+
+  这将指示缓存服务器和浏览器不要缓存请求或响应的任何部分。
+
+- 只接受缓存的响应
+
+  在某些情况下，客户端可能希望只接受缓存的响应，而不向源服务器发送请求。例如：
+
+  ```http
+  Cache-Control: only-if-cached
+  ```
+
+  这将指示客户端只接受缓存的响应，如果缓存中没有可用的响应，则返回 504（网关超时）状态码。
+
+#### Node.js处理`Cache-Control`请求头
+
+以下是一个简单的示例，展示如何在 Node.js 中处理包含 `Cache-Control` 请求头的请求：
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+    const cacheControl = req.get('Cache-Control');
+    if (cacheControl) {
+        console.log(`Cache-Control: ${cacheControl}`);
+    }
+    res.set('Cache-Control', 'public, max-age=600');
+    res.send('Hello, world!');
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
+```
+
+在这个示例中，服务器会检查请求头中的 `Cache-Control` 头字段，并在响应头中设置 `Cache-Control: public, max-age=600`，指示浏览器缓存对象 600 秒（10 分钟）。
+
+## HTTP响应头
+### `Age`
+`Age` 是一个 HTTP 响应头字段，用于指示缓存对象在缓存中存储的时间（以秒为单位）。它通常由缓存服务器（如 CDN 或代理服务器）添加，用于帮助客户端和其他缓存服务器确定缓存对象的“新鲜度”。
+
+#### 作用
+
+`Age` 头字段的主要作用包括：
+
+1. **指示缓存对象的年龄**：显示缓存对象在缓存中存储的时间，帮助客户端和其他缓存服务器判断缓存对象是否仍然有效。
+2. **缓存管理**：帮助缓存服务器管理缓存对象的生命周期，确保缓存对象在适当的时间内被更新或删除。
+3. **性能优化**：通过缓存对象的年龄信息，可以优化缓存策略，提高系统性能和响应速度。
+
+#### 示例
+
+以下是一个示例响应头，包含 `Age`：
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+Connection: keep-alive
+Date: Mon, 01 Jan 2023 12:00:00 GMT
+Cache-Control: max-age=3600
+Age: 1200
+```
+
+在这个示例中，`Age: 1200` 表示缓存对象已经在缓存中存储了 1200 秒（即 20 分钟）。
+
+#### 使用场景
+1. CDN 缓存
+
+   在使用 CDN（内容分发网络）时，`Age` 头字段可以帮助客户端和其他缓存服务器判断缓存对象的“新鲜度”，从而决定是否使用缓存对象或从源服务器获取新的对象。
+
+2. 代理缓存
+
+   在使用代理服务器进行缓存时，`Age` 头字段可以帮助代理服务器管理缓存对象的生命周期，确保缓存对象在适当的时间内被更新或删除。
+
+3. 浏览器缓存
+
+   浏览器可以使用 `Age` 头字段来判断缓存对象是否仍然有效，从而决定是否使用缓存对象或发送新的请求。
+
+#### 如何使用
+
+1. **配置缓存服务器**：确保缓存服务器（如 CDN 或代理服务器）正确配置，以生成和返回 `Age` 头字段。
+2. **检查响应头**：在客户端或其他缓存服务器中检查响应头中的 `Age` 头字段，判断缓存对象的“新鲜度”。
+3. **优化缓存策略**：根据 `Age` 头字段的信息，优化缓存策略，提高系统性能和响应速度。
+
+以下是一个简单的示例，展示如何在 Nginx 中配置缓存并返回 `Age` 头字段：
+
+```nginx
+http {
+  proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=10g inactive=60m use_temp_path=off;
+
+  server {
+    listen 80;
+    server_name example.com;
+
+    location / {
+      proxy_pass http://backend_server;
+      proxy_cache my_cache;
+      proxy_cache_valid 200 302 10m;
+      proxy_cache_valid 404 1m;
+      add_header X-Cache-Status $upstream_cache_status;
+    }
+  }
+}
+```
+
+在这个示例中，Nginx 配置了一个缓存区域 `my_cache`，并在响应头中添加了 `X-Cache-Status` 头字段，用于指示缓存状态。`Age` 头字段将由 Nginx 自动生成和返回。
+
+### `Cache-Control`
+`Cache-Control` 头字段不仅可以在请求中使用，也可以在响应中使用。作为响应头，`Cache-Control` 用于指定服务器希望客户端和中间缓存（如代理服务器和 CDN）如何处理缓存。
+
+#### 常见的 `Cache-Control` 响应指令
+
+以下是一些常见的 `Cache-Control` 响应指令及其作用：
+
+- `max-age=<seconds>`
+
+  指定缓存对象的最大存储时间（以秒为单位）。在此时间内，缓存对象被认为是新鲜的，不需要重新验证。
+
+  ```http
+  Cache-Control: max-age=3600
+  ```
+
+- `s-maxage=<seconds>`
+
+  指定共享缓存（如 CDN 和代理服务器）中缓存对象的最大存储时间（以秒为单位）。优先级高于 `max-age`。
+
+  ```http
+  Cache-Control: s-maxage=3600
+  ```
+
+- `no-cache`
+
+  强制缓存服务器在每次使用缓存对象前，必须向源服务器重新验证其有效性。这并不意味着不使用缓存，而是要求重新验证。
+
+  ```http
+  Cache-Control: no-cache
+  ```
+
+- `no-store`
+
+  禁止缓存服务器和浏览器缓存请求或响应的任何部分。这意味着请求和响应都不会被缓存。
+
+  ```http
+  Cache-Control: no-store
+  ```
+
+- `public`
+
+  指示响应可以被任何缓存（包括浏览器、CDN 和代理服务器）缓存。
+
+  ```http
+  Cache-Control: public
+  ```
+
+- `private`
+
+  指示响应只能被私有缓存（如浏览器）缓存，不能被共享缓存（如 CDN 和代理服务器）缓存。
+
+  ```http
+  Cache-Control: private
+  ```
+
+- `must-revalidate`
+
+  指示缓存服务器在使用过期的缓存对象前，必须向源服务器重新验证其有效性。
+
+  ```http
+  Cache-Control: must-revalidate
+  ```
+
+- `proxy-revalidate`
+
+  指示共享缓存（如 CDN 和代理服务器）在使用过期的缓存对象前，必须向源服务器重新验证其有效性。
+
+  ```http
+  Cache-Control: proxy-revalidate
+  ```
+
+- `immutable`
+
+  指示缓存对象在其有效期内不会改变，缓存服务器和浏览器可以放心地使用缓存对象，而不需要重新验证。
+
+  ```http
+  Cache-Control: immutable
+  ```
+
+#### 示例
+
+以下是一些包含 `Cache-Control` 头字段的响应示例：
+
+- 示例 1: 缓存 1 小时
+
+  ```http
+  HTTP/1.1 200 OK
+  Content-Type: text/html
+  Content-Length: 1234
+  Cache-Control: max-age=3600
+  ```
+
+- 示例 2: 禁止缓存
+
+  ```http
+  HTTP/1.1 200 OK
+  Content-Type: text/html
+  Content-Length: 1234
+  Cache-Control: no-store
+  ```
+
+- 示例 3: 共享缓存 1 小时，私有缓存 10 分钟
+
+  ```http
+  HTTP/1.1 200 OK
+  Content-Type: text/html
+  Content-Length: 1234
+  Cache-Control: public, max-age=600, s-maxage=3600
+  ```
+
+#### 使用场景
+
+- 浏览器缓存
+
+  通过设置 `Cache-Control` 头字段，可以控制浏览器缓存对象的行为。例如：
+
+  ```http
+  Cache-Control: max-age=600
+  ```
+
+  这将指示浏览器缓存对象 600 秒（10 分钟）。
+
+- CDN 缓存
+
+  通过设置 `s-maxage` 指令，可以控制 CDN 缓存对象的行为。例如：
+
+  ```http
+  Cache-Control: public, s-maxage=3600
+  ```
+
+  这将指示 CDN 缓存对象 3600 秒（1 小时）。
+
+- 代理缓存
+
+  通过设置 `no-cache` 或 `must-revalidate` 指令，可以控制代理缓存对象的行为。例如：
+
+  ```http
+  Cache-Control: no-cache
+  ```
+
+  这将指示代理服务器在每次使用缓存对象前，必须向源服务器重新验证其有效性。
+
+#### Node.js设置`Cache-Control`响应头
+
+以下是一个简单的示例，展示如何在 Node.js 中设置 `Cache-Control` 头字段：
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=600, s-maxage=3600');
+    res.send('Hello, world!');
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
+```
+
+在这个示例中，响应头中包含 `Cache-Control: public, max-age=600, s-maxage=3600`，指示浏览器缓存对象 600 秒（10 分钟），而共享缓存（如 CDN 和代理服务器）缓存对象 3600 秒（1 小时）。
+
+### `ETag`
+`ETag`（实体标签）是一个 HTTP 响应头字段，用于标识特定版本的资源。它是由服务器生成的一个唯一标识符，用于表示资源的当前状态或版本。`ETag` 头字段在缓存控制和条件请求中起着重要作用，帮助客户端和服务器高效地管理缓存和资源更新。通过合理使用 `ETag` 头字段，可以提高缓存效率，减少带宽消耗，提高系统性能。
+
+`ETag` 头字段的主要作用包括：
+
+1. **缓存验证**：通过比较客户端缓存的 `ETag` 和服务器上的 `ETag`，可以确定资源是否发生了变化，从而决定是否需要重新下载资源。
+2. **条件请求**：与 `If-None-Match` 请求头字段结合使用，可以实现条件请求，减少不必要的数据传输。
+
+
+以下是一个包含 `ETag` 头字段的响应示例：
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+ETag: "686897696a7c876b7e"
+```
+
+在这个示例中，`ETag: "686897696a7c876b7e"` 是由服务器生成的唯一标识符，用于表示资源的当前版本。
+
+#### 缓存验证/条件请求
+通过使用 `ETag` 和 `If-None-Match` 头字段，可以实现条件请求，减少不必要的数据传输。例如：
+
+```http
+GET /example HTTP/1.1
+Host: www.example.com
+If-None-Match: "686897696a7c876b7e"
+```
+
+如果资源没有变化，服务器会返回 304 Not Modified 状态码：
+
+```http
+HTTP/1.1 304 Not Modified
+```
+
+如果资源发生了变化，服务器会返回新的资源和新的 `ETag` 值：
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+ETag: "7e897696a7c876b7e6868"
+```
+
+#### Node.js 中生成和使用 `ETag`
+
+以下是一个简单的示例，展示如何在 Node.js 中生成和使用 `ETag` 头字段：
+
+```javascript
+const express = require('express');
+const etag = require('etag');
+const app = express();
+
+app.get('/', (req, res) => {
+    const body = 'Hello, world!';
+    const etagValue = etag(body);
+
+    res.set('ETag', etagValue);
+
+    if (req.get('If-None-Match') === etagValue) {
+        res.status(304).end();
+    } else {
+        res.send(body);
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
+```
+
+在这个示例中，服务器生成了一个 `ETag` 值，并在响应头中返回。如果客户端发送的 `If-None-Match` 值与服务器上的 `ETag` 值相同，服务器会返回 304 Not Modified 状态码，而不是重新发送整个资源。
+
+### `Last-modified`
+`Last-Modified` 是一个 HTTP 响应头字段，用于指示服务器上资源的最后修改时间。它是由服务器生成的一个时间戳，用于表示资源的最新更新时间。`Last-Modified` 头字段在缓存控制和条件请求中起着重要作用，帮助客户端和服务器高效地管理缓存和资源更新。与 `If-Modified-Since` 请求头字段结合使用，可以实现条件请求，减少不必要的数据传输。通过合理使用 `Last-Modified` 头字段，可以提高缓存效率，减少带宽消耗，提高系统性能。
+
+`Last-Modified` 头字段的主要作用包括：
+
+1. **缓存验证**：通过比较客户端缓存的 `Last-Modified` 时间和服务器上的 `Last-Modified` 时间，可以确定资源是否发生了变化，从而决定是否需要重新下载资源。
+2. **条件请求**：与 `If-Modified-Since` 请求头字段结合使用，可以实现条件请求，减少不必要的数据传输。
+
+
+以下是一个包含 `Last-Modified` 头字段的响应示例：
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+Last-Modified: Wed, 21 Oct 2015 07:28:00 GMT
+```
+
+在这个示例中，`Last-Modified: Wed, 21 Oct 2015 07:28:00 GMT` 是由服务器生成的时间戳，用于表示资源的最新更新时间。
+
+#### 缓存验证/条件请求
+客户端可以使用 `Last-Modified` 头字段来验证缓存的有效性。例如，当客户端缓存了一个资源并再次请求该资源时，可以使用 `If-Modified-Since` 请求头字段发送缓存的 `Last-Modified` 时间：
+
+```http
+GET /example HTTP/1.1
+Host: www.example.com
+If-Modified-Since: Wed, 21 Oct 2015 07:28:00 GMT
+```
+
+服务器接收到请求后，会比较客户端发送的 `If-Modified-Since` 时间和服务器上的 `Last-Modified` 时间。如果两者相同，表示资源没有变化，服务器会返回 304 Not Modified 状态码，而不是重新发送整个资源：
+
+```http
+HTTP/1.1 304 Not Modified
+```
+
+如果资源发生了变化，服务器会返回新的资源和新的 `Last-Modified` 时间：
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+Last-Modified: Thu, 22 Oct 2015 08:30:00 GMT
+```
+
+#### Node.js 中生成和使用 `Last-Modified`
+
+以下是一个简单的示例，展示如何在 Node.js 中生成和使用 `Last-Modified` 头字段：
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+    const body = 'Hello, world!';
+    const lastModified = new Date().toUTCString();
+
+    res.set('Last-Modified', lastModified);
+
+    if (req.get('If-Modified-Since') === lastModified) {
+        res.status(304).end();
+    } else {
+        res.send(body);
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
+```
+
+在这个示例中，服务器生成了一个 `Last-Modified` 时间，并在响应头中返回。如果客户端发送的 `If-Modified-Since` 时间与服务器上的 `Last-Modified` 时间相同，服务器会返回 304 Not Modified 状态码，而不是重新发送整个资源。
+
+### `Expires`
+`Expires` 是一个 HTTP 响应头字段，用于指定资源的过期时间。它是由服务器生成的一个日期和时间，表示在此时间之后，缓存的资源将被视为过期，需要重新从服务器获取。`Expires` 头字段在缓存控制中起着重要作用，帮助客户端和中间缓存（如代理服务器和 CDN）管理缓存的生命周期。虽然 `Cache-Control` 头字段在 HTTP/1.1 中提供了更强大和灵活的缓存控制机制，但为了向后兼容，可以同时使用 `Expires` 和 `Cache-Control` 头字段。通过合理使用 `Expires` 头字段，可以有效管理缓存的生命周期，提高系统性能。
+
+`Expires` 头字段的主要作用包括：
+
+1. **缓存控制**：通过指定资源的过期时间，帮助客户端和中间缓存决定何时需要重新获取资源。
+2. **提高性能**：通过合理设置 `Expires` 头字段，可以减少对服务器的请求，提高系统性能和响应速度。
+
+
+以下是一个包含 `Expires` 头字段的响应示例：
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+Expires: Wed, 21 Oct 2023 07:28:00 GMT
+```
+
+在这个示例中，`Expires: Wed, 21 Oct 2023 07:28:00 GMT` 指示资源将在 2023 年 10 月 21 日 07:28:00 GMT 过期。
+
+
+通过设置 `Expires` 头字段，可以控制浏览器缓存对象(或者CDN缓存对象)的生命周期。例如：
+
+```http
+Expires: Wed, 21 Oct 2023 07:28:00 GMT
+```
+
+这将指示浏览器(或者CDN)在指定时间之前可以使用缓存的资源，而不需要重新从服务器(或者源服务器)获取。
+
+#### 与 `Cache-Control` 的关系
+
+在 HTTP/1.1 中，`Cache-Control` 头字段提供了更强大和灵活的缓存控制机制。通常情况下，应该优先使用 `Cache-Control` 头字段来控制缓存行为。然而，为了向后兼容，可以同时使用 `Expires` 和 `Cache-Control` 头字段。
+
+```http
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+Cache-Control: max-age=3600
+Expires: Wed, 21 Oct 2023 07:28:00 GMT
+```
+
+在这个示例中，`Cache-Control: max-age=3600` 指示资源在 3600 秒（1 小时）内有效，而 `Expires` 头字段提供了一个具体的过期时间。
+
+#### Node.js 中设置 `Expires`
+
+以下是一个简单的示例，展示如何在 Node.js 中设置 `Expires` 头字段：
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+    const body = 'Hello, world!';
+    const expires = new Date(Date.now() + 3600 * 1000).toUTCString(); // 1 小时后过期
+
+    res.set('Expires', expires);
+    res.send(body);
+});
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+});
+```
+
+在这个示例中，服务器生成了一个 `Expires` 时间，并在响应头中返回，指示资源将在 1 小时后过期。
+
 ## [HTTP 响应状态码](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Status)
 HTTP 响应状态码用来表明特定 HTTP 请求是否成功完成。 响应被归为以下五大类：
 - 信息响应 (100–199)

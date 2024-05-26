@@ -503,3 +503,8 @@ GitHub Apps 的主要特点包括：
 - 市场可用性：开发者可以创建自己的 GitHub Apps 并将它们发布到 GitHub Marketplace，让其他用户发现和使用。
 
 GitHub Apps 是为了提高开发效率和改善工作流程而设计的，它们为开发者提供了一个强大的工具集，可以帮助他们更好地管理和操作 GitHub 仓库。
+
+## 52. 撤销合并
+merge时发现有需要修改的代码，不想merge了，虽然都discard了，但是使用`git status`查看还是提示`All conflicts fixed but you are still merging.`
+
+此时，可以使用`git reset --merge 最新的commitid`来撤销合并
