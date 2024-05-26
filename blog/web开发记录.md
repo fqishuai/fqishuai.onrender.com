@@ -648,6 +648,150 @@ API：Text Annotation
 - type: 'text', 标识为：辅助文本，在指定位置添加文本说明
 - position 文本标注位置
 
+## ant design使用记录
+### 1. `form`和`select`结合使用，设置`select`的`value`不生效
+被设置了 `name` 属性的 `Form.Item` 包装的控件，表单控件会自动添加 `value`（或 `valuePropName` 指定的其他属性） `onChange`（或 `trigger` 指定的其他属性），数据同步将被 `Form` 接管，这会导致以下结果：
+
+- 你不再需要也不应该用 `onChange` 来做数据收集同步（你可以使用 `Form` 的 `onValuesChange`），但还是可以继续监听 `onChange` 事件。
+
+- 你不能用控件的 `value` 或 `defaultValue` 等属性来设置表单域的值，默认值可以用 `Form` 里的 `initialValues` 来设置。注意 `initialValues` 不能被 `setState` 动态更新，你需要用 `setFieldsValue` 来更新。
+
+- 你不应该用 `setState`，可以使用 `form.setFieldsValue` 来动态改变表单值。
+  ```js
+  form.setFieldsValue({
+    字段名: 值,
+  })
+  ```
+
+### 2. 表单最后一行右对齐适配电脑分辨率
+使用`Col`嵌套`Row`
+```jsx
+<Form
+  form={form}
+  name="basic"
+  labelCol={{ span: 8 }}
+  wrapperCol={{ span: 16 }}
+  initialValues={{ remember: true }}
+  className='form-container'
+>
+  <div className='content'>
+    <Row>
+      <Col span={8}>
+        <Form.Item
+          label="AAA"
+          labelCol={{span: 5}}
+          name="aaa"
+        >
+          <Select
+            mode="multiple"
+            style={{width:300,fontSize:11,borderRadius:3}}
+            size='small'
+            showArrow={true}
+            showSearch={false}
+            allowClear={true}
+            onChange={(seletedData) => handleCommonChange(seletedData,'aaa')}
+          >
+            {
+              [1,2,3,4].map((item,index) => {
+                return <Option key={index} value={item}>{item}</Option>
+              })
+            }
+          </Select>
+        </Form.Item>
+      </Col>
+      <Col span={8}>
+        <Form.Item
+          label="BBB"
+          labelCol={{span: 4}}
+          name="bbb"
+        >
+          <Select
+            mode="multiple"
+            style={{width:300,fontSize:11,borderRadius:3}}
+            size='small'
+            showArrow={true}
+            showSearch={false}
+            allowClear={true}
+            onChange={(seletedData) => handleCommonChange(seletedData,'bbb')}
+          >
+            {
+              [1,2,3,4].map((item,index) => {
+                return <Option key={index} value={item}>{item}</Option>
+              })
+            }
+          </Select>
+        </Form.Item>
+      </Col>
+      <Col span={8}>
+        <Form.Item
+          label="CCC"
+          labelCol={{span: 4}}
+          name="ccc"
+        >
+          <Select
+            mode="multiple"
+            style={{width:300,fontSize:11,borderRadius:3}}
+            size='small'
+            showArrow={true}
+            showSearch={false}
+            allowClear={true}
+            onChange={(seletedData) => handleCommonChange(seletedData,'ccc')}
+          >
+            {
+              [1,2,3,4].map((item,index) => {
+                return <Option key={index} value={item}>{item}</Option>
+              })
+            }
+          </Select>
+        </Form.Item>
+      </Col>
+    </Row>
+    <Row>
+      <Col span={8} offset={16}>
+        <Row>
+          <Col span={4}></Col>
+          <Col span={16}>
+            <div style={{width:'300px',textAlign:'right'}}>
+              <Button className='reset-btn' onClick={handleReset}>重置</Button>
+              <Button className='search-btn' onClick={handleSearch}>查询</Button>
+            </div>
+          </Col>
+        </Row>
+      </Col>
+    </Row>
+  </div>
+</Form>
+```
+
+### 3. 组件的方法自定义传参
+- 比如，`DatePicker`的`onChange`
+```jsx
+const handleDateChange = (_date:unknown,dateString:string,type:string) => {
+  // type是自定义入参，date、dateString是onChange自带的入参
+}
+
+<DatePicker
+  size='small'
+  style={{width:300,fontSize:11,borderRadius:3}}
+  placeholder='请选择日期'
+  onChange={(date,dateString) => handleDateChange(date,dateString,'beginTime')}
+/>
+```
+
+### 4. `Table`组件的数据源需要有`key`这个属性
+否则虽然不影响使用但是控制台报错提示
+```js
+const resultWithKey = res.result.reduce((acc: any[],cur: { key: number; },ind:number) => {
+  cur.key = ind;
+  acc.push(cur);
+  return acc;
+}, []);
+setTableDatas(resultWithKey); // Table的数据源需要有key prop，否则不影响使用但控制台会报错提示
+```
+
+### 5. `Table`组件列特别多时，设置列宽不生效
+注意设置 `scroll={{ x: '4000px' }}` 这个`x`的宽度首先要能够容纳所有设置的列宽之和('4000px'只是举例)，这样在这个总的宽度之内去设置列宽，才能生效。
+
 ## elementui使用记录
 ### 1. el-radio切换不了
 - 查看选中的值有没有变

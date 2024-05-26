@@ -7,6 +7,7 @@ tags: [react]
 - [reactrouter文档](https://reactrouter.com/en/main)
 - [examples](https://github.com/remix-run/react-router/tree/dev/examples)
 路由可以在没有path的情况下使用，这让它们可以参与 UI 布局。
+- [react-router-config](https://www.npmjs.com/package/react-router-config) React Router 的静态路由配置助手。
 :::
 
 首先，使用vite创建一个react工程：`npm create vite@latest name-of-your-project -- --template react`
