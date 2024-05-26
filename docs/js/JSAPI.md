@@ -3,7 +3,7 @@ slug: js_api
 tags: [js]
 ---
 
-## API(应区分JS内置API和宿主环境API)
+## [JavaScript 标准内置对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects)
 ### Object
 #### Object.fromEntries
 :::note
@@ -72,32 +72,45 @@ let a = {1: 'a'};
 Object.values(a) // ["a"]
 ```
 
-### HTMLElement
-#### dragstart
-> 当用户开始拖动一个元素或者一个选择文本的时候 dragstart 事件就会触发。
+### String
+#### replaceAll、replace
+这俩方法并不改变调用它的字符串本身，而是返回一个新的字符串。
+```js
+const str = ' A   B   C    D ';
+console.log(str.replaceAll(' ', '+')); // +A+++B+++C++++D+
+console.log(str.replace(/ /g, '+'));   // +A+++B+++C++++D+
+```
 
-#### dragend
-> dragend 事件在拖放操作结束时触发（通过释放鼠标按钮或单击 escape 键）。该事件无法取消。
+### 数组
+#### `Array.prototype.shift()`
+- 从数组中删除第一个元素，并返回该元素的值。此方法更改数组的长度。
+- shift 方法会读取 `this` 的 length 属性，如果长度为 0，length 再次设置为 0（而之前可能为负值或 undefined）。否则，返回 0 处的属性，其余属性向左移动 1。length 属性递减 1。
+<CodeRun>
+{
+  `
+  const arrayLike1 = {
+    length: 3,
+    unrelated: "foo",
+    2: 4,
+  };
+  console.log('arrayLike1 shift --->', Array.prototype.shift.call(arrayLike1)); // 没有属性0，返回undefined
+  console.log('arrayLike1 --->', arrayLike1); // 属性length的值减1，属性2变为1
+  const arrayLike2 = {
+    length: 3,
+    unrelated: "foo",
+    1: 4,
+    0: 3,
+  };
+  console.log('arrayLike2 shift --->', Array.prototype.shift.call(arrayLike2));
+  console.log('arrayLike2 --->', arrayLike2);
+  console.log('arrayLike2 shift --->', [].shift.call(arrayLike2));
+  console.log('arrayLike2 --->', arrayLike2);
+  `
+}
+</CodeRun>
 
-#### dragenter
-> 当拖动的元素或被选择的文本进入有效的放置目标时， dragenter 事件被触发。
-
-#### dragleave
-> dragleave 事件在拖动的元素或选中的文本离开一个有效的放置目标时被触发。此事件不可取消。
-
-#### dragover
-> 当元素或者选择的文本被拖拽到一个有效的放置目标上时，触发 dragover 事件（每几百毫秒触发一次）。这个事件在可被放置元素的节点上触发。
-
-#### drag
-> drag 事件在用户拖动元素或选择的文本时，每隔几百毫秒就会被触发一次。
-
-#### drop
-> drop 事件在元素或选中的文本被放置在有效的放置目标上时被触发。
-
-
-- 在 dragstart 事件处理器中，获得对用户拖动的元素的引用。
-- 在目标容器的 dragover 事件处理器中，调用 event.preventDefault()，以使得该元素能够接收 drop 事件。
-- 在放置区域的 drop 事件处理器中，将可拖动元素从原先的容器移动到该放置区域。
+#### `Array.prototype.sort()`
+- 对数组的元素进行排序，此方法改变原数组。如果想要不改变原数组的排序方法，可以使用 `Array.prototype.toSorted()`。
 
 ### 循环
 #### Array.prototype.forEach()
@@ -166,13 +179,564 @@ for (let i of iterable) {
 ```
 [查看执行结果](https://code.juejin.cn/pen/7163183675436171299)
 
-### export
-- export 语句用于从模块中导出实时绑定的函数、对象或原始值，以便其他程序可以通过 import 语句使用它们。
-- 无论您是否声明，导出的模块都处于严格模式。export 语句不能用在嵌入式脚本中。
+### Reflect
+`Reflect` 是 JavaScript 中的一个内置对象，提供了一些用于操作对象的静态方法。这些方法与 `Object` 对象的方法类似，但 `Reflect` 的方法更为一致和可靠，特别是在处理代理（`Proxy`）时。
+
+#### 常用的 `Reflect` 方法
+- `Reflect.apply(target, thisArgument, argumentsList)`
+  
+  调用一个目标函数，并指定 `this` 值和参数列表。
+  ```javascript
+  function sum(a, b) {
+    return a + b;
+  }
+  console.log(Reflect.apply(sum, null, [1, 2])); // 输出: 3
+  ```
+
+- `Reflect.construct(target, argumentsList[, newTarget])`
+  
+  类似于 `new` 操作符，但以函数形式调用。
+  ```javascript
+  function Person(name) {
+    this.name = name;
+  }
+  const person = Reflect.construct(Person, ['Alice']);
+  console.log(person.name); // 输出: Alice
+  ```
+
+- `Reflect.defineProperty(target, propertyKey, attributes)`
+
+  与 `Object.defineProperty` 类似，用于定义或修改对象的属性。
+  ```javascript
+  const obj = {};
+  Reflect.defineProperty(obj, 'name', { value: 'Alice' });
+  console.log(obj.name); // 输出: Alice
+  ```
+
+- `Reflect.deleteProperty(target, propertyKey)`
+
+  删除对象的属性，类似于 `delete` 操作符。
+  ```javascript
+  const obj = { name: 'Alice' };
+  Reflect.deleteProperty(obj, 'name');
+  console.log(obj.name); // 输出: undefined
+  ```
+
+- `Reflect.get(target, propertyKey[, receiver])`
+
+  获取对象的属性值。
+  ```javascript
+  const obj = { name: 'Alice' };
+  console.log(Reflect.get(obj, 'name')); // 输出: Alice
+  ```
+
+- `Reflect.set(target, propertyKey, value[, receiver])`
+
+  设置对象的属性值。
+  ```javascript
+  const obj = {};
+  Reflect.set(obj, 'name', 'Alice');
+  console.log(obj.name); // 输出: Alice
+  ```
+
+- `Reflect.has(target, propertyKey)`
+
+  检查对象是否具有某个属性，类似于 `in` 操作符。
+  ```javascript
+  const obj = { name: 'Alice' };
+  console.log(Reflect.has(obj, 'name')); // 输出: true
+  ```
+
+- `Reflect.ownKeys(target)`
+
+  返回一个包含对象自身属性键的数组，包括符号属性。
+  ```javascript
+  const obj = { name: 'Alice', [Symbol('id')]: 123 };
+  console.log(Reflect.ownKeys(obj)); // 输出: ['name', Symbol(id)]
+  ```
+
+`Reflect` 对象的方法提供了一种更为一致和功能强大的方式来操作 JavaScript 对象，特别是在使用代理（`Proxy`）时非常有用。
+
+#### `Reflect` 和 `Object`
+`Reflect` 和 `Object` 都是 JavaScript 中的内置对象，它们提供了一些用于操作对象的方法。虽然它们有一些相似之处，但也有一些关键的区别。
+- `Reflect` 提供了一组与 `Object` 方法类似但更为一致和可靠的方法，特别是在处理代理（Proxy）时非常有用。
+- `Reflect` 方法通常返回布尔值，表示操作是否成功，而 `Object` 方法在失败时会抛出异常。
+- `Reflect` 的方法名与 `Proxy` 的处理程序方法名相对应，使得在代理中调用默认行为变得更加简单和一致。
+
+通过结合使用 `Reflect` 和 `Object`，你可以更灵活地操作 JavaScript 对象，并在需要时调用默认行为。
+
+##### 相似之处
+
+许多 `Reflect` 方法与 `Object` 方法功能相似，甚至有些方法的名称和参数完全相同。例如：
+
+- `Reflect.defineProperty` 与 `Object.defineProperty`
+- `Reflect.getOwnPropertyDescriptor` 与 `Object.getOwnPropertyDescriptor`
+- `Reflect.getPrototypeOf` 与 `Object.getPrototypeOf`
+- `Reflect.setPrototypeOf` 与 `Object.setPrototypeOf`
+
+##### 不同之处
+
+1. **返回值**：
+   - `Reflect` 方法通常返回一个布尔值，表示操作是否成功，而 `Object` 方法在失败时会抛出异常。
+   - 例如，`Reflect.defineProperty` 返回 `true` 或 `false`，而 `Object.defineProperty` 在失败时会抛出异常。
+
+2. **一致性**：
+   - `Reflect` 提供了一组更为一致的方法，这些方法的命名和参数设计都遵循统一的规则。
+   - `Reflect` 的方法名与 `Proxy` 的处理程序方法名相对应，使得在代理中调用默认行为变得更加简单和一致。
+
+##### `Reflect.defineProperty` vs `Object.defineProperty`
+
+```javascript
+const obj = {};
+
+// 使用 Object.defineProperty
+try {
+  Object.defineProperty(obj, 'name', { value: 'Alice' });
+  console.log(obj.name); // 输出: Alice
+} catch (e) {
+  console.error(e);
+}
+
+// 使用 Reflect.defineProperty
+const success = Reflect.defineProperty(obj, 'name', { value: 'Alice' });
+if (success) {
+  console.log(obj.name); // 输出: Alice
+} else {
+  console.error('Failed to define property');
+}
+```
+
+##### `Reflect.getOwnPropertyDescriptor` vs `Object.getOwnPropertyDescriptor`
+
+```javascript
+const obj = { name: 'Alice' };
+
+// 使用 Object.getOwnPropertyDescriptor
+const descriptor1 = Object.getOwnPropertyDescriptor(obj, 'name');
+console.log(descriptor1); // 输出: { value: 'Alice', writable: true, enumerable: true, configurable: true }
+
+// 使用 Reflect.getOwnPropertyDescriptor
+const descriptor2 = Reflect.getOwnPropertyDescriptor(obj, 'name');
+console.log(descriptor2); // 输出: { value: 'Alice', writable: true, enumerable: true, configurable: true }
+```
+
+##### `Reflect.getPrototypeOf` vs `Object.getPrototypeOf`
+
+```javascript
+const obj = {};
+
+// 使用 Object.getPrototypeOf
+const proto1 = Object.getPrototypeOf(obj);
+console.log(proto1); // 输出: {}
+
+// 使用 Reflect.getPrototypeOf
+const proto2 = Reflect.getPrototypeOf(obj);
+console.log(proto2); // 输出: {}
+```
+
+### Proxy
+`Proxy` 是 JavaScript 中的一个构造函数，用于创建一个代理对象，可以拦截和自定义基本操作（例如属性查找、赋值、枚举、函数调用等）。通过使用 `Proxy`，你可以定义自定义行为来处理这些操作。
+
+以下是一些关于 `Proxy` 的基本概念和示例：
+
+#### 基本语法
+
+```javascript
+const proxy = new Proxy(target, handler);
+```
+
+- `target`：要包装的目标对象（可以是任何类型的对象，包括数组、函数等）。
+- `handler`：一个对象，其属性是当执行一个操作时定义代理行为的函数。
+
+#### 示例
+
+1. **基本示例**
+
+```javascript
+const target = {
+  message: "Hello, world!"
+};
+
+const handler = {
+  get: function(target, property) {
+    if (property === 'message') {
+      return target[property].toUpperCase();
+    }
+    return target[property];
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+console.log(proxy.message); // 输出: HELLO, WORLD!
+```
+
+2. **拦截属性设置**
+
+```javascript
+const target = {
+  name: "Alice"
+};
+
+const handler = {
+  set: function(target, property, value) {
+    if (property === 'name' && typeof value === 'string') {
+      target[property] = value.toUpperCase();
+      return true;
+    }
+    return false;
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+proxy.name = "Bob";
+console.log(proxy.name); // 输出: BOB
+```
+
+3. **拦截函数调用**
+
+```javascript
+const target = function(name) {
+  return `Hello, ${name}!`;
+};
+
+const handler = {
+  apply: function(target, thisArg, argumentsList) {
+    return target(argumentsList[0]).toUpperCase();
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+console.log(proxy("Alice")); // 输出: HELLO, ALICE!
+```
+
+4. **拦截属性删除**
+
+```javascript
+const target = {
+  name: "Alice"
+};
+
+const handler = {
+  deleteProperty: function(target, property) {
+    if (property === 'name') {
+      console.log(`Deleting property ${property}`);
+      delete target[property];
+      return true;
+    }
+    return false;
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+delete proxy.name; // 输出: Deleting property name
+console.log(proxy.name); // 输出: undefined
+```
+
+#### 常用的 `Proxy` 处理程序方法
+
+- `get(target, property, receiver)`：拦截对象属性的读取操作。
+- `set(target, property, value, receiver)`：拦截对象属性的设置操作。
+- `has(target, property)`：拦截 `in` 操作符。
+- `deleteProperty(target, property)`：拦截 `delete` 操作符。
+- `apply(target, thisArg, argumentsList)`：拦截函数调用。
+- `construct(target, argumentsList, newTarget)`：拦截 `new` 操作符。
+
+`Proxy` 对象提供了强大的功能，可以用来创建灵活和动态的对象行为，适用于各种高级编程场景。
+
+#### `Proxy` 和 `Reflect` 结合使用
+`Proxy` 和 `Reflect` 可以结合使用，以便在代理对象中更方便地调用默认行为。`Reflect` 提供了一组与 `Proxy` 处理程序方法对应的静态方法，这使得在代理中调用默认行为变得更加简单和一致。
+
+以下是一些示例，展示了如何结合使用 `Proxy` 和 `Reflect`：
+
+示例 1: 拦截属性读取
+
+```javascript
+const target = {
+  message: "Hello, world!"
+};
+
+const handler = {
+  get: function(target, property, receiver) {
+    // 自定义行为：将 message 属性转换为大写
+    if (property === 'message') {
+      return Reflect.get(target, property, receiver).toUpperCase();
+    }
+    // 默认行为
+    return Reflect.get(target, property, receiver);
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+console.log(proxy.message); // 输出: HELLO, WORLD!
+console.log(proxy.nonExistent); // 输出: undefined
+```
+
+示例 2: 拦截属性设置
+
+```javascript
+const target = {
+  name: "Alice"
+};
+
+const handler = {
+  set: function(target, property, value, receiver) {
+    // 自定义行为：将 name 属性的值转换为大写
+    if (property === 'name' && typeof value === 'string') {
+      return Reflect.set(target, property, value.toUpperCase(), receiver);
+    }
+    // 默认行为
+    return Reflect.set(target, property, value, receiver);
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+proxy.name = "Bob";
+console.log(proxy.name); // 输出: BOB
+```
+
+示例 3: 拦截函数调用
+
+```javascript
+const target = function(name) {
+  return `Hello, ${name}!`;
+};
+
+const handler = {
+  apply: function(target, thisArg, argumentsList) {
+    // 自定义行为：将返回值转换为大写
+    return Reflect.apply(target, thisArg, argumentsList).toUpperCase();
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+console.log(proxy("Alice")); // 输出: HELLO, ALICE!
+```
+
+示例 4: 拦截属性删除
+
+```javascript
+const target = {
+  name: "Alice"
+};
+
+const handler = {
+  deleteProperty: function(target, property) {
+    // 自定义行为：记录删除操作
+    if (property === 'name') {
+      console.log(`Deleting property ${property}`);
+      return Reflect.deleteProperty(target, property);
+    }
+    // 默认行为
+    return Reflect.deleteProperty(target, property);
+  }
+};
+
+const proxy = new Proxy(target, handler);
+
+delete proxy.name; // 输出: Deleting property name
+console.log(proxy.name); // 输出: undefined
+```
+
+示例 5: 在Vue项目中使用
+```html
+<el-button type="primary" @click="proxySubmit">提交</el-button>
+```
+```js title="demo.vue"
+import { riskSubmitHandler } from './handlers.js';
+
+export default {
+  data() {
+    return {
+      riskNoticeVisible: false,
+      riskNoticeMessage: '',
+      submitSuccess: null,
+    }
+  },
+  methods: {
+    proxySubmit() {
+      const proxy = new Proxy(this.submit, riskSubmitHandler);
+      // 业务逻辑...
+      const promise = proxy(param1, param2);
+      promise.then(result => {
+        if (Object.prototype.toString.call(result) == '[object Object]') {
+          const { canSubmit, dialogMessage } = result;
+          this.riskNoticeMessage = dialogMessage;
+          this.submitSuccess = canSubmit;
+          this.riskNoticeVisible = !canSubmit;
+        } else {
+          this.riskNoticeMessage = '';
+          this.submitSuccess = null;
+          this.riskNoticeVisible = false;
+        }
+      })
+    },
+    submit() {
+      // ...
+    },
+  }
+}
+```
+```js title="handlers.js"
+export const riskSubmitHandler = {
+  apply: async function(target, thisArg, args) {
+    const param1 = args[0];
+    const param2 = args[1];
+    if (param1 && param2) {
+      try {
+        const result = await riskVerifyApi({
+          param1,
+          param2,
+        });
+        const { riskState, noticeDesc } = result;
+        switch (riskState) {
+          case 0:
+            return Reflect.apply(target, thisArg, args);
+          case 1:
+            // 卡流程
+            return {
+              canSubmit: false,
+              dialogMessage: noticeDesc,
+            };
+          case 2:
+            Reflect.apply(target, thisArg, args);
+            return {
+              canSubmit: true,
+              dialogMessage: noticeDesc,
+            };
+          default:
+            return Reflect.apply(target, thisArg, args);
+        }
+      } catch (error) {
+        // 接口异常不卡流程
+        return Reflect.apply(target, thisArg, args);
+      }
+    } else {
+      return Reflect.apply(target, thisArg, args);
+    }
+  }
+};
+```
+
+##### `Proxy` 和 `Reflect` 结合使用的好处
+结合使用 `Proxy` 和 `Reflect` 可以带来以下好处：
+- **简化默认行为调用**：使用 `Reflect` 可以更方便地调用默认行为。
+- **提高代码一致性**：`Reflect` 方法与 `Proxy` 处理程序方法相对应，使代码更为一致和易读。
+- **提供更好的错误处理**：`Reflect` 方法返回布尔值，便于处理错误情况。
+- **更灵活的代理行为**：可以在代理中实现复杂的逻辑，同时保留对默认行为的访问。
+
+通过这些好处，你可以更高效地创建和管理代理对象，提高代码的可维护性和可靠性。
+
+1. 简化默认行为调用
+
+   使用 `Reflect` 可以简化在 `Proxy` 处理程序中调用默认行为的过程。`Reflect` 提供了一组与 `Proxy` 处理程序方法对应的静态方法，使得代码更为简洁和一致。
+   ```javascript
+   const target = {
+     message: "Hello, world!"
+   };
+
+   const handler = {
+     get: function(target, property, receiver) {
+       // 自定义行为：将 message 属性转换为大写
+       if (property === 'message') {
+         return Reflect.get(target, property, receiver).toUpperCase();
+       }
+       // 默认行为
+       return Reflect.get(target, property, receiver);
+     }
+   };
+
+   const proxy = new Proxy(target, handler);
+
+   console.log(proxy.message); // 输出: HELLO, WORLD!
+   console.log(proxy.nonExistent); // 输出: undefined
+   ```
+
+2. 提高代码一致性
+
+   `Reflect` 方法的命名和参数设计与 `Proxy` 处理程序方法相对应，使得代码更为一致和易读。这种一致性有助于减少错误并提高代码的可维护性。
+   ```javascript
+   const target = {
+     name: "Alice"
+   };
+
+   const handler = {
+     set: function(target, property, value, receiver) {
+       // 自定义行为：将 name 属性的值转换为大写
+       if (property === 'name' && typeof value === 'string') {
+         return Reflect.set(target, property, value.toUpperCase(), receiver);
+       }
+       // 默认行为
+       return Reflect.set(target, property, value, receiver);
+     }
+   };
+
+   const proxy = new Proxy(target, handler);
+
+   proxy.name = "Bob";
+   console.log(proxy.name); // 输出: BOB
+   ```
+
+3. 提供更好的错误处理
+
+   `Reflect` 方法通常返回布尔值，表示操作是否成功，而不是抛出异常。这使得在 `Proxy` 处理程序中更容易处理错误情况。
+   ```javascript
+   const target = {};
+
+   const handler = {
+     defineProperty: function(target, property, descriptor) {
+       // 自定义行为：记录属性定义操作
+       console.log(`Defining property ${property}`);
+       return Reflect.defineProperty(target, property, descriptor);
+     }
+   };
+
+   const proxy = new Proxy(target, handler);
+
+   const success = Reflect.defineProperty(proxy, 'name', { value: 'Alice' });
+   if (success) {
+     console.log(proxy.name); // 输出: Alice
+   } else {
+     console.error('Failed to define property');
+   }
+   ```
+
+4. 更灵活的代理行为
+
+   通过结合使用 `Proxy` 和 `Reflect`，你可以更灵活地定义和管理代理对象的行为。例如，你可以在代理中实现复杂的逻辑，同时保留对默认行为的访问。
+   ```javascript
+   const target = {
+     name: "Alice"
+   };
+
+   const handler = {
+     deleteProperty: function(target, property) {
+       // 自定义行为：记录删除操作
+       if (property === 'name') {
+         console.log(`Deleting property ${property}`);
+         return Reflect.deleteProperty(target, property);
+       }
+       // 默认行为
+       return Reflect.deleteProperty(target, property);
+     }
+   };
+
+   const proxy = new Proxy(target, handler);
+
+   delete proxy.name; // 输出: Deleting property name
+   console.log(proxy.name); // 输出: undefined
+   ```
 
 ### Intl
-> Intl 对象是 ECMAScript 国际化 API 的一个命名空间，它提供了精确的字符串对比、数字格式化，和日期时间格式化。
+Intl 对象是 ECMAScript 国际化 API 的一个命名空间，它提供了精确的字符串对比、数字格式化，和日期时间格式化。
 
+## Web API(浏览器环境提供的宿主对象)
 ### [Crypto](https://developer.mozilla.org/en-US/docs/Web/API/Crypto)
 > Crypto 接口提供了基本的加密功能，可用于当前的上下文中。
 
@@ -186,39 +750,6 @@ window.crypto.getRandomValues(array);
 console.log(JSON.stringify(array));
 ```
 [查看执行结果](https://code.juejin.cn/pen/7163899016164409380)
-
-### base64
-[url、base64、blob相互转换方法](https://juejin.cn/post/6959003541457502222)
-
-#### base64解密
-> 参考：[原来浏览器原生支持JS Base64编码解码](https://www.zhangxinxu.com/wordpress/2018/08/js-base64-atob-btoa-encode-decode/)
-- 浏览器中
-```js
-const decodedData = window.atob(encodedData);
-```
-- Service Workers和Web Workers中
-```js
-const decodedData = self.atob(encodedData);
-```
-#### base64加密
-- 浏览器中
-```js
-const encodedData = window.btoa(stringToEncode);
-```
-- Service Workers和Web Workers中
-```js
-const encodedData = self.btoa(stringToEncode);
-```
-
-### String
-
-#### replaceAll、replace
-这俩方法并不改变调用它的字符串本身，而是返回一个新的字符串。
-```js
-const str = ' A   B   C    D ';
-console.log(str.replaceAll(' ', '+')); // +A+++B+++C++++D+
-console.log(str.replace(/ /g, '+'));   // +A+++B+++C++++D+
-```
 
 ### Window
 #### `window.prompt`
@@ -277,6 +808,7 @@ const paddingValue = parseInt(parentStyle.paddingLeft.replace('px', '')) + parse
 > 各种类型的 DOM API 对象会从这个接口继承
 
 #### `Node.appendChild()`
+`Node.appendChild()` 方法将一个节点附加到指定父节点的子节点列表的末尾处。如果将被插入的节点已经存在于当前文档的文档树中，那么 `appendChild()` 只会将它从原先的位置移动到新的位置（不需要事先移除要移动的节点）。
 
 ### XMLHttpRequest
 XMLHttpRequest (XHR) 对象用于与服务器交互，这使网页可以只更新页面的一部分，而不会中断用户正在做的事情。
@@ -358,33 +890,52 @@ console.log(searchParams3.has('query')); // true
 document.querySelectorAll('[class^="operation"]')
 ```
 
-### 改变数组
-#### `Array.prototype.shift()`
-- 从数组中删除第一个元素，并返回该元素的值。此方法更改数组的长度。
-- shift 方法会读取 `this` 的 length 属性，如果长度为 0，length 再次设置为 0（而之前可能为负值或 undefined）。否则，返回 0 处的属性，其余属性向左移动 1。length 属性递减 1。
-<CodeRun>
-{
-  `
-  const arrayLike1 = {
-    length: 3,
-    unrelated: "foo",
-    2: 4,
-  };
-  console.log('arrayLike1 shift --->', Array.prototype.shift.call(arrayLike1)); // 没有属性0，返回undefined
-  console.log('arrayLike1 --->', arrayLike1); // 属性length的值减1，属性2变为1
-  const arrayLike2 = {
-    length: 3,
-    unrelated: "foo",
-    1: 4,
-    0: 3,
-  };
-  console.log('arrayLike2 shift --->', Array.prototype.shift.call(arrayLike2));
-  console.log('arrayLike2 --->', arrayLike2);
-  console.log('arrayLike2 shift --->', [].shift.call(arrayLike2));
-  console.log('arrayLike2 --->', arrayLike2);
-  `
-}
-</CodeRun>
+### base64
+[url、base64、blob相互转换方法](https://juejin.cn/post/6959003541457502222)
 
-#### `Array.prototype.sort()`
-- 对数组的元素进行排序，此方法改变原数组。如果想要不改变原数组的排序方法，可以使用 `Array.prototype.toSorted()`。
+#### base64解密
+> 参考：[原来浏览器原生支持JS Base64编码解码](https://www.zhangxinxu.com/wordpress/2018/08/js-base64-atob-btoa-encode-decode/)
+- 浏览器中
+```js
+const decodedData = window.atob(encodedData);
+```
+- Service Workers和Web Workers中
+```js
+const decodedData = self.atob(encodedData);
+```
+#### base64加密
+- 浏览器中
+```js
+const encodedData = window.btoa(stringToEncode);
+```
+- Service Workers和Web Workers中
+```js
+const encodedData = self.btoa(stringToEncode);
+```
+
+### HTMLElement
+#### dragstart
+> 当用户开始拖动一个元素或者一个选择文本的时候 dragstart 事件就会触发。
+
+#### dragend
+> dragend 事件在拖放操作结束时触发（通过释放鼠标按钮或单击 escape 键）。该事件无法取消。
+
+#### dragenter
+> 当拖动的元素或被选择的文本进入有效的放置目标时， dragenter 事件被触发。
+
+#### dragleave
+> dragleave 事件在拖动的元素或选中的文本离开一个有效的放置目标时被触发。此事件不可取消。
+
+#### dragover
+> 当元素或者选择的文本被拖拽到一个有效的放置目标上时，触发 dragover 事件（每几百毫秒触发一次）。这个事件在可被放置元素的节点上触发。
+
+#### drag
+> drag 事件在用户拖动元素或选择的文本时，每隔几百毫秒就会被触发一次。
+
+#### drop
+> drop 事件在元素或选中的文本被放置在有效的放置目标上时被触发。
+
+
+- 在 dragstart 事件处理器中，获得对用户拖动的元素的引用。
+- 在目标容器的 dragover 事件处理器中，调用 event.preventDefault()，以使得该元素能够接收 drop 事件。
+- 在放置区域的 drop 事件处理器中，将可拖动元素从原先的容器移动到该放置区域。

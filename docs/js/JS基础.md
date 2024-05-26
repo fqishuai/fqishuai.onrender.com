@@ -142,3 +142,7 @@ callee 是 arguments 对象的一个属性。它可以用于引用该函数的�
 :::caution
 在严格模式下，第 5 版 ECMAScript (ES5) 禁止使用 `arguments.callee()`。当一个函数必须调用自身的时候，避免使用 `arguments.callee()`，通过要么给函数表达式一个名字，要么使用一个函数声明。
 :::
+
+## export
+- export 语句用于从模块中导出实时绑定的函数、对象或原始值，以便其他程序可以通过 import 语句使用它们。
+- 无论您是否声明，导出的模块都处于严格模式。export 语句不能用在嵌入式脚本中。
