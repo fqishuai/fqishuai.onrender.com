@@ -22,7 +22,7 @@
 
 - [modern.js](https://github.com/web-infra-dev/modern.js): pnpm workspace + nx + changesets
 
-## Changesets
+## [Changesets](https://github.com/changesets/changesets/blob/main/docs/intro-to-using-changesets.md)
 > [Changesets: 流行的 monorepo 场景发包工具](https://zhuanlan.zhihu.com/p/427588430)
 
 :::tip
