@@ -89,6 +89,18 @@ const config = {
             position : 'right',
             items: [
               {
+                label: '天工AI',
+                href: 'https://www.tiangong.cn/',
+              },
+              {
+                label: 'Kimi',
+                href: 'https://kimi.moonshot.cn/',
+              },
+              {
+                label: '通往AGI之路',
+                href: 'https://www.waytoagi.com/',
+              },
+              {
                 label: 'devv_',
                 href: 'https://devv.ai/',
               },
