@@ -47,6 +47,8 @@ tags: [小程序开发,h5开发,跨端]
   - [16.2 PageContainer](#162-pagecontainer)
 - [17. 表单组件](#17-表单组件)
   - [17.1 Picker](#171-picker)
+- [遇到的问题](#遇到的问题)
+  - [编译报错](#编译报错)
 
 
 :::info
@@ -670,3 +672,108 @@ export default function PageContainerDemo() {
   </View>
 </Picker>
 ```
+
+## 遇到的问题
+### 编译报错
+1. `thread '<unnamed>' panicked at 'failed to invoke plugin`
+   ```
+   thread '<unnamed>' panicked at 'failed to invoke plugin: failed to invoke plugin on 'Some("/Users/xxx/Desktop/taro-demo/src/app.config.ts")'
+
+   Caused by:
+       0: Failed to create plugin instance
+       1: missing requires CPU features: "EnumSet(SSE2)"', /Users/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/swc-0.244.4/src/plugin.rs:228:14
+   ```
+
+   解决办法：删除 `.swc` 目录，重新编译
+
+   参考：[启动报错 1: missing requires CPU features: "EnumSet(SSE2)"](https://github.com/NervJS/taro/issues/13373)
+
+2. taro3.6启动报错 `digital envelope routines::unsupported`
+   ```
+   Error: error:0308010C:digital envelope routines::unsupported
+      at new Hash (node:internal/crypto/hash:79:19)
+   ```
+   在使用 Taro 3.6 启动项目时遇到 `Error: error:0308010C:digital envelope routines::unsupported` 错误，通常是由于 Node.js 17 及以上版本中默认启用了 OpenSSL 3.0，而某些依赖库与其不兼容导致的。
+
+   解决办法：
+
+   可以通过设置环境变量来解决这个问题。Node.js 17 引入了一个环境变量 `NODE_OPTIONS`，可以用来禁用 OpenSSL 3.0 的某些特性。
+
+   在启动项目之前，设置环境变量：
+
+   在 Unix/Linux/macOS 系统上：
+   ```bash
+   export NODE_OPTIONS=--openssl-legacy-provider
+   ```
+
+   在 Windows 系统上：
+   ```bash
+   set NODE_OPTIONS=--openssl-legacy-provider
+   ```
+
+   或者你可以在 `package.json` 中的 `scripts` 部分添加这个环境变量：
+   ```json title="package.json"
+   "scripts": {
+     "build": "NODE_OPTIONS=--openssl-legacy-provider taro build --type weapp",
+     "start": "NODE_OPTIONS=--openssl-legacy-provider taro build --type weapp --watch"
+    }
+   ```
+
+3. `Error: true is not a PostCSS plugin`
+   解决办法：
+   ```
+   各位可以先检查一下 lockfile 里存在多少个 postcss 依赖的版本，其上游的依赖拓扑是怎么样的。
+
+   以我定位到的其中一种情况来看，排查思路大概是如下：
+
+   问题的根本原因是 `postcss` 版本和 `autoprefixer` 版本有冲突
+   调查 lockfile 里 autoprefixer 的确存在两个版本，且其分别依赖了不同的 postcss
+
+   autoprefixer@^8.0.0 依赖了 postcss "^6.0.23"
+   autoprefixer@^9.7.4 依赖了 postcss "^7.0.32"
+
+   再追溯 autoprefixer 的引用方，分别是 Taro 和项目依赖的 stylelint
+
+   升级项目中的 stylelint 依赖到最新版本 ^14.4.0，其依赖的 postcss 已更新到最新版本 ^8.4.19
+
+   至此问题解决
+   ```
+
+   参考：[taro 从 3.4.8 升级到 3.5.2 后，postcss 版本和 autoprefixer 版本有冲突](https://github.com/NervJS/taro/issues/12274)
+
+4. `node: --openssl-legacy-provider is not allowed in NODE_OPTIONS`
+   
+   `node: --openssl-legacy-provider is not allowed in NODE_OPTIONS` 错误通常是由于 Node.js 版本不支持该选项引起的。确保你使用的 Node.js 版本支持 `--openssl-legacy-provider` 选项。这个选项在 Node.js 17 版本中被引入，用于解决 OpenSSL 3.0 引起的兼容性问题。如果你使用的是较新的 Node.js 版本（例如 18 或更高），可能不需要这个选项。
+
+   解决办法：
+   ```
+   方案1. 移除 --openssl-legacy-provider 选项
+
+   如果你的项目不需要 --openssl-legacy-provider 选项，或者你使用的是较新的 Node.js 版本，可以尝试移除这个选项。
+
+   如果你在 package.json 中的 scripts 字段中使用了这个选项，请将其移除。例如：
+
+   {
+     "scripts": {
+       "start": "NODE_OPTIONS=--openssl-legacy-provider node app.js"
+     }
+   }
+
+   改为：
+
+   {
+     "scripts": {
+       "start": "node app.js"
+     }
+   }
+
+   方案2: 检查环境变量
+
+   如果你在环境变量中设置了 NODE_OPTIONS，请确保移除 --openssl-legacy-provider 选项。例如，在 Unix 系统上可以通过以下命令移除：
+
+   unset NODE_OPTIONS
+
+   在 Windows 系统上，可以通过以下命令移除：
+
+   set NODE_OPTIONS=
+   ```
