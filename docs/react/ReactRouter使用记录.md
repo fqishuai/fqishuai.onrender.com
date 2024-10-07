@@ -476,3 +476,38 @@ function useLogoutTimer() {
 ```
 - navigate函数接收两个参数，第一个参数是一个路径字符串，第二个参数是options(`options.replace`,`options.state`,`options.preventScrollReset`,`options.relative`)
 - navigate函数也可以传递想要进入历史堆栈的增量。例如，`navigate(-1)` 相当于点击后退按钮
+
+## 路由守卫
+### 使用`loader`实现
+```tsx
+import { createBrowserRouter } from 'react-router-dom';
+import { checkLogin } from './utils';
+
+const routerLoader = async () => {
+  const loginUser = await checkLogin();
+  return loginUser;
+}
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Home />,
+    loader: routerLoader,
+  },
+  {
+    path: '/',
+    element: <Detail />,
+    loader: routerLoader,
+  },
+], {
+  basename: "/loaderDemo",
+});
+export default router;
+```
+```tsx title="Home.tsx"
+import { useLoaderData } from "react-router-dom";
+
+export default function Home() {
+  const loginUser = useLoaderData();
+}
+```

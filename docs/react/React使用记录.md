@@ -224,6 +224,70 @@ export default {
 ### `React.FC`
 `React.FunctionComponent` 或 `React.FC` 显示标明返回的是一个函数组件
 
+### MutableRefObject
+`MutableRefObject` 是 `useRef` 钩子返回的对象类型，用于在 React 组件中创建和管理可变的引用对象。它的 `current` 属性可以存储任何可变的值，并在组件的整个生命周期内保持不变。`useRef` 常用于访问和操作 DOM 元素，但也可以用于存储其他可变值。通过使用 `useRef` 和 `MutableRefObject`，你可以在 React 组件中更方便地管理和操作可变的引用对象。
+
+在 TypeScript 中，`MutableRefObject` 的类型定义如下：
+```typescript
+interface MutableRefObject<T> {
+  current: T;
+}
+```
+
+`useRef` 常用于访问和操作 DOM 元素。例如：
+```javascript
+import React, { useRef, useEffect } from 'react';
+
+const MyComponent = () => {
+  // 创建一个 MutableRefObject，初始值为 null
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (divRef.current) {
+      // 访问和操作 DOM 元素
+      divRef.current.style.backgroundColor = 'lightblue';
+    }
+  }, []);
+
+  return (
+    <div ref={divRef}>
+      This div has a light blue background.
+    </div>
+  );
+};
+
+export default MyComponent;
+```
+
+除了处理 DOM 元素，`useRef` 还可以用于存储其他可变值，例如计数器、定时器 ID 等：
+```javascript
+import React, { useRef, useEffect } from 'react';
+
+const TimerComponent = () => {
+  const timerId = useRef<number | null>(null);
+
+  useEffect(() => {
+    timerId.current = window.setTimeout(() => {
+      console.log('Timer expired');
+    }, 1000);
+
+    return () => {
+      if (timerId.current !== null) {
+        clearTimeout(timerId.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div>
+      <p>Check the console for the timer message.</p>
+    </div>
+  );
+};
+
+export default TimerComponent;
+```
+
 ## key是数组index或者key重复时删除数组渲染会有问题
 可以使用随机数
 ```tsx

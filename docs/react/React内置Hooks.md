@@ -7,9 +7,127 @@ tags: [react]
 
 ## State Hooks
 ### `useState`
+:::tip
 [How to store and update arrays in React useState hook](https://www.codingdeft.com/posts/react-usestate-array/)
+:::
 
-#### useState怎么区分不同的state？
+#### `setState`传入函数与非函数的区别
+在 React 中，`setState` 可以接受一个新的状态值或一个返回新状态值的函数。这两种方式有一些重要的区别，特别是在处理异步状态更新时。
+
+##### 传入非函数值
+
+当你直接传入一个非函数值（例如一个对象或基本类型值）时，`setState` 会将该值作为新的状态。
+
+```jsx
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = () => {
+    setCount(count + 1);
+  };
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+在这个示例中，`setCount(count + 1)` 直接将 `count + 1` 作为新的状态值。
+
+##### 传入函数
+
+当你传入一个函数时，React 会将当前的状态值作为参数传递给这个函数，并使用函数的返回值作为新的状态。这种方式在需要基于当前状态计算新状态时非常有用，尤其是在处理异步状态更新时。
+
+```jsx
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = () => {
+    setCount(prevCount => prevCount + 1);
+  };
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+在这个示例中，`setCount(prevCount => prevCount + 1)` 使用了一个函数，该函数接收当前的状态值 `prevCount` 并返回新的状态值 `prevCount + 1`。
+
+##### 区别和使用场景
+
+1. **直接传入值**：
+   - 简单且直观，适用于不依赖当前状态计算新状态的情况。
+   - 适用于状态更新是同步的情况。
+
+2. **传入函数**：
+   - 更加灵活，适用于需要基于当前状态计算新状态的情况。
+   - 适用于状态更新是异步的情况，确保状态更新的正确性。
+   - 避免了由于异步更新导致的状态不一致问题。
+
+假设我们有一个按钮，每次点击时会增加计数器的值。如果用户快速点击按钮多次，直接传入值的方式可能会导致状态更新不正确。
+
+以下示例中，快速点击按钮可能会导致计数器的值不正确，因为 `setCount(count + 1)` 两次调用都基于相同的 `count` 值。
+```jsx
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = () => {
+    setCount(count + 1);
+    setCount(count + 1);
+  };
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+以下示例中，`setCount(prevCount => prevCount + 1)` 确保每次状态更新都是基于最新的状态值，因此计数器的值会正确增加。
+```jsx
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = () => {
+    setCount(prevCount => prevCount + 1);
+    setCount(prevCount => prevCount + 1);
+  };
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+
+export default Counter;
+```
+
+#### `useState`怎么区分不同的`state`？
 调用useState时，只传了state的初始值，并没有传是哪个state的标识，它是怎么知道返回哪个state variables的？
 - 答案是：Hooks 在同一组件的每个渲染器上都依赖于稳定的调用顺序。Hooks rely on a stable call order on every render of the same component. 因为遵循“只在顶层调用 Hooks”的规则(而不是在某个函数内调用useState()等hooks)，那么Hooks 将总是以相同的顺序被调用。
 - 不在顶层调用Hooks会报错：Rendered fewer hooks than expected. This may be caused by an accidental early return statement. 必须无条件地且始终以相同的顺序调用 Hooks！
@@ -431,6 +549,27 @@ export default function Form() {
   ```jsx
   <div ref={(node) => console.log(node)} />
   ```
+
+  例子：在 map 方法中渲染多个 div 并为每个 div 生成一个对应的 ref
+  ```jsx
+  function Example() {
+    const divRefs = useRef([]);
+
+    return (
+      <div>
+        {items.map((item, index) => (
+          <div
+            key={index}
+            ref={(ele) => (divRefs.current[index] = ele)}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+    )
+  }
+  ```
+
   :::tip
     - Do not return anything from the ref callback.
     
@@ -486,6 +625,79 @@ export default function Form() {
 
 ## Effect Hooks
 ### `useEffect`
+#### 组件卸载时使用
+在 React 中，当组件卸载时，你可以使用 `useEffect` 钩子来执行清理操作。`useEffect` 钩子可以返回一个清理函数，这个清理函数会在组件卸载时执行。
+
+以下是一个示例，展示如何在组件卸载时执行清理操作：
+
+```jsx
+import React, { useEffect } from 'react';
+
+const MyComponent = () => {
+  useEffect(() => {
+    // 组件挂载时执行的操作
+    console.log('Component mounted');
+
+    // 返回一个清理函数，组件卸载时执行
+    return () => {
+      console.log('Component unmounted');
+      // 在这里执行清理操作，例如取消订阅、清除计时器等
+    };
+  }, []); // 空依赖数组，确保只在组件挂载和卸载时执行
+
+  return (
+    <div>
+      My Component
+    </div>
+  );
+};
+
+export default MyComponent;
+```
+
+在这个示例中：
+
+1. `useEffect` 钩子在组件挂载时执行。
+2. 返回的清理函数会在组件卸载时执行。
+3. 空依赖数组 `[]` 确保 `useEffect` 只在组件挂载和卸载时执行一次。
+
+以下是一个更实际的示例，展示如何在组件卸载时取消订阅和清除计时器：
+
+```jsx
+import React, { useEffect, useState } from 'react';
+
+const TimerComponent = () => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    // 设置一个计时器
+    const timer = setInterval(() => {
+      setCount(prevCount => prevCount + 1);
+    }, 1000);
+
+    // 返回一个清理函数，组件卸载时清除计时器
+    return () => {
+      clearInterval(timer);
+      console.log('Timer cleared');
+    };
+  }, []); // 空依赖数组，确保只在组件挂载和卸载时执行
+
+  return (
+    <div>
+      Timer: {count}
+    </div>
+  );
+};
+
+export default TimerComponent;
+```
+
+在这个示例中：
+
+1. `useEffect` 钩子在组件挂载时设置一个计时器。
+2. 返回的清理函数会在组件卸载时清除计时器，防止内存泄漏。
+
+通过这种方式，你可以确保在组件卸载时执行必要的清理操作，保持应用的性能和稳定性。
 
 ### `useLayoutEffect`
 useLayoutEffect 会损害性能。尽可能首选 useEffect。
