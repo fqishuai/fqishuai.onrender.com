@@ -2,10 +2,6 @@
 tags: [api]
 ---
 
-:::tip
-[API documentation](https://nodejs.org/en/docs/)
-:::
-
 ## File system
 ### 1. 校验是否是目录---statSync/isDirectory
 ```js

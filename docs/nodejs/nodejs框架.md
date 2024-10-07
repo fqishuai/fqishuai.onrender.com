@@ -440,6 +440,82 @@ document.body.appendChild(script)
 /**/ typeof getList === 'function' && getList([{ "id": 1, "name": '天問'}, { "id": 2,"name": '天问'},{"id": 3, "name": 'Tiven'}]);
 ```
 
+### 10. [`egg-redis`](https://github.com/eggjs/egg-redis)
+这个插件基于ioredis
+
+安装：
+```bash
+npm i egg-redis --save
+```
+
+配置：
+```ts title="config/plugin.ts"
+import { EggPlugin } from 'egg';
+
+const plugin: EggPlugin = {
+  redis: {
+    enable: true,
+    package: 'egg-redis',
+  },
+};
+
+export default plugin;
+```
+```ts title="config/config.prepare.ts"
+// 本地开发使用，部署以配置文件为准
+import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg';
+const path = require('path');
+
+export default (appInfo: EggAppInfo) => {
+  const config: PowerPartial<EggAppConfig> = {};
+
+  config.logger = {
+    dir: path.join(appInfo.baseDir, 'logs', appInfo.name)
+  }
+  // 日志按照文件大小(100MB)进行切割
+  config.logrotator = {
+    filesRotateBySize: [
+      // 业务日志切割
+      path.join(appInfo.baseDir, 'logs', appInfo.name, 'common-error.log'),
+      path.join(appInfo.baseDir, 'logs', appInfo.name, `${appInfo.name}-web.log`),
+    ],
+    maxFileSize: 100 * 1024 * 1024, // 100MB
+    maxDays: 7, // 保留7天日志
+  }
+  // redis
+  config.redis = {
+    client: {
+      port: 6379,
+      host: '127.0.0.1',
+      password: 'auth',
+      enableReadyCheck: false,
+      db: 0,
+    },
+  }
+
+  return config;
+};
+```
+
+使用：
+```tsx
+import { Controller } from 'egg';
+
+export default class Example extends Controller {
+  public async demo() {
+    const { ctx, app, logger } = this;
+
+    // 删除redis的key
+    await app.redis.del('test');
+    // 获取
+    await app.redis.get('test');
+    // 更新/赋值
+    await app.redis.set('test', '123');
+  }
+}
+```
+
+
 ## [hapi](https://hapi.dev/)
 - 官方文档有中文
 - [Learn Hapi](https://github.com/dwyl/learn-hapi)
@@ -1559,7 +1635,6 @@ start();
 
 - `Boom.unauthorized([message], [scheme], [attributes])` 返回 401 未经授权错误
 
-## nestjs
 
 ## express
 ### `use()`
@@ -1631,3 +1706,6 @@ app.listen(3000, () => {
 `express.static` 是处理静态资源的简便方法，但在实际应用中，需要根据项目的具体需求和部署环境做出相应的配置和优化。
 - 安全性：当使用 `express.static` 中间件时，应确保只对外提供必要的文件，避免暴露敏感数据。
 - 性能：对于生产环境，考虑使用 Nginx、CDN 或其他静态资源服务来提供静态文件，以减轻 Node.js 服务器的负担并提高响应速度。
+
+
+## nestjs

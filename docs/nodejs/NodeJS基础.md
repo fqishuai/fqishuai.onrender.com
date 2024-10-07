@@ -4,10 +4,14 @@ tags: [nodejs]
 ---
 
 :::tip
+- [文档](https://nodejs.org/zh-cn)
+
 - [node.js在线运行](https://toolin.cn/run-nodejs)
 
-- [查看node.js不同版本所支持的ES版本特性](https://node.green/)。比如 `Array.prototype.at()` 是 ES2022的新特性，在Node.js16.8.0版本及以上才支持，否则报错TypeError: xxx.at is not a function
+- [查看node.js不同版本所支持的ES版本特性](https://node.green/)。比如 `Array.prototype.at()` 是 ES2022的新特性，在Node.js16.8.0版本及以上才支持，否则报错`TypeError: xxx.at is not a function`
   ![node.green](img/nodejs_es.jpeg)
+
+- [Node.js生态中积极维护且流行的库](https://nodejstoolbox.com/)
 
 - Node.js 支持 `CommonJS` 和 `ES module systems` (自从 Node.js v12), 在 Node.js 中可以使用 `require()` 和 `import`。（`.mjs` 后缀是用于标识 ECMAScript 模块（ESM）的 JavaScript 文件的扩展名。这种文件格式允许在 Node.js 环境中使用模块化的 JavaScript 代码，它支持 `import` 和 `export` 语句来导入和导出模块。使用 `.mjs` 后缀可以明确地告诉 Node.js 这个文件应该作为一个 ES 模块来处理，而不是传统的 CommonJS 模块（通常使用 `.js` 后缀）。）
 
