@@ -793,7 +793,7 @@ setTableDatas(resultWithKey); // Table的数据源需要有key prop，否则不�
 注意设置 `scroll={{ x: '4000px' }}` 这个`x`的宽度首先要能够容纳所有设置的列宽之和('4000px'只是举例)，这样在这个总的宽度之内去设置列宽，才能生效。
 
 ## elementui使用记录
-### 1. el-radio切换不了
+### 1. `el-radio`切换不了
 - 查看选中的值有没有变
 - 选中的值变了，但是显示的没变，可以在change事件中强更新
 ```js
@@ -802,7 +802,7 @@ handleChange() {
 }
 ```
 
-### 2. el-form校验不通过
+### 2. `el-form`校验不通过
 - 初次按规则输入，校验正常通过
 - 回填后，清空，再填，相同规则校验一直不能通过
 - 发现清空时对表单字段的处理有问题，表单对象初始化没有的字段，使用`delete`关键字清空
@@ -870,6 +870,50 @@ handleChange() {
 </script>
 ```
 
+### 3. `el-upload`校验文件类型
+```html
+<el-upload
+  class="upload-acceptance"
+  :action="'https://xxx'"
+  :headers="{'xxx': 'xxx'}"
+  :on-preview="handleAcceptPreview"
+  :on-remove="handleAcceptRemove"
+  :on-success="handleAcceptSuccess"
+  multiple
+  :limit="20"
+  :before-upload="handleBeforeUpload"
+  :on-exceed="handleAcceptExceed"
+  :file-list="fileList"
+  list-type="picture"
+>
+  <el-button size="small">点击上传</el-button>
+  <div slot="tip" class="el-upload__tip">只能上传图片，最多支持20个，且单个不超过5MB</div>
+</el-upload>
+```
+```js
+handleBeforeUpload(file) {
+  // 判断是否为图片
+  const isImage = file.type.startsWith('image/');
+  // 判断是否为excel
+  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  // 对file name做处理
+  if (file.name.includes('(')) {
+    Object.defineProperty(file, 'name', {
+      writable: true,
+      value: file.name.replace(/\([^\)]*\)/g,"") // 去掉文件名中的括号
+    });
+  }
+  const isLt5M = file.size / 1024 / 1024 < 5;
+  if (!isImage) {
+    this.$message.error('只能上传图片！');
+  }
+  if (!isLt5M) {
+    this.$message.error('上传图片大小不能超过 5MB！');
+  }
+  return isImage && isLt5M;
+},
+```
+
 ## vxe-grid使用记录
 :::tip
 [vxe-table](https://vxetable.cn/): 一个基于 vue 的 PC 端表格组件，支持增删改查、虚拟列表、虚拟树、懒加载、快捷菜单、数据校验、打印导出、表单渲染、数据分页、弹窗、自定义模板、渲染器、贼灵活的配置项等。
@@ -902,4 +946,535 @@ Vue.use(VTable) // 需要引入vxe-table的Table组件，否则使用vxe-grid时
     ]
   ]
 }
+```
+
+## 生成二维码
+在 Vue.js 项目中生成二维码可以使用 `qrcode` 库。以下是一个简单的步骤指南：
+
+1. **安装 `qrcode` 库**：
+   ```bash
+   npm install qrcode
+   ```
+
+2. **在 Vue 组件中使用 `qrcode`**：
+
+   ```vue
+   <template>
+     <div>
+       <canvas ref="qrcodeCanvas"></canvas>
+     </div>
+   </template>
+
+   <script>
+   import QRCode from 'qrcode'
+
+   export default {
+     name: 'QRCodeGenerator',
+     mounted() {
+       this.generateQRCode()
+     },
+     methods: {
+       generateQRCode() {
+         const canvas = this.$refs.qrcodeCanvas
+         const text = 'https://example.com' // 你想要生成二维码的文本或URL
+
+         QRCode.toCanvas(canvas, text, function (error) {
+           if (error) console.error(error)
+           console.log('二维码生成成功！')
+         })
+       }
+     }
+   }
+   </script>
+   ```
+
+遇到的问题：需要在弹窗中展示二维码，按以上步骤开发运行报错：`TypeError: Cannot read properties of undefined (reading 'getContext')`
+```vue
+<template>
+  <div>
+   <el-button @click="handleLookQrcode">查看二维码</el-button>
+   <el-dialog
+      :visible.sync="qrcodeVisible"
+      width="500px"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+    >
+      <div slot="title">二维码如下</div>
+      <div>
+        <canvas ref="qrcodeCanvas"></canvas>
+      </div>
+      <div slot="footer">
+        <el-button @click="qrcodeVisible = false">取消</el-button>
+        <el-button @click="handleCopy">复制</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import QRCode from 'qrcode'
+
+export default {
+  data() {
+    return {
+      qrcodeVisible: false,
+    }
+  },
+  methods: {
+    handleLookQrcode() {
+      this.qrcodeVisible = true;
+      this.generateQRCode();
+    },
+    generateQRCode() {
+      const canvas = this.$refs.qrcodeCanvas;
+      const text = 'https://example.com' // 你想要生成二维码的文本或URL
+      console.log('canvas', canvas)
+      try {
+        QRCode.toCanvas(canvas, text, function (error) {
+          if (error) console.error(error)
+          console.log('二维码生成成功！')
+        })
+      } catch (error) {
+        console.log('error', error)
+      }
+    },
+  }
+}
+</script>
+```
+这个报错是因为尝试获取二维码画布的上下文时，画布对象未正确初始化或未找到。如上打印`canvas`为`undefined`，将`handleLookQrcode`改为：
+```js
+handleLookQrcode() {
+  this.qrcodeVisible = true;
+  setTimeout(() => {
+    this.generateQRCode();
+  }, 0);
+},
+```
+
+## 复制粘贴
+为了确保在所有浏览器中都能正常工作，可以使用 `clipboard-polyfill` 库。安装：`npm install clipboard-polyfill`
+
+### 复制文本
+```js
+<template>
+  <div>
+    <button @click="handleCopy">Copy Multiple Texts</button>
+  </div>
+</template>
+
+<script>
+import * as clipboard from 'clipboard-polyfill';
+
+export default {
+  methods: {
+    async handleCopy() {
+      try {
+        const text1 = 'First text content';
+        const text2 = 'Second text content';
+        
+        // 将多个文本内容组合成一个字符串
+        const combinedText = `${text1}\n${text2}`;
+        
+        // 使用 clipboard-polyfill 复制组合后的文本内容
+        await clipboard.writeText(combinedText);
+        alert('Multiple texts copied to clipboard!');
+      } catch (error) {
+        console.error('Failed to copy texts: ', error);
+      }
+    }
+  }
+};
+</script>
+```
+
+### 复制图片
+在 Vue 中复制图片到剪贴板可以通过以下步骤实现：
+
+1. **获取图片的 Blob 对象**。
+2. **将 Blob 对象写入剪贴板**。
+
+以下是一个完整的示例：
+
+```javascript
+<template>
+  <div>
+    <img ref="image" src="path/to/your/image.jpg" alt="Image to copy" />
+    <button @click="copyImage">Copy Image</button>
+  </div>
+</template>
+
+<script>
+import * as clipboard from 'clipboard-polyfill';
+
+export default {
+  methods: {
+    async copyImage() {
+      try {
+        const img = this.$refs.image;
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+        await clipboard.write([new clipboard.ClipboardItem({ [blob.type]: blob })]);
+        alert('Image copied to clipboard!');
+      } catch (error) {
+        console.error('Failed to copy image: ', error);
+      }
+    }
+  }
+};
+</script>
+```
+
+1. **获取图片元素**：通过 `this.$refs.image` 获取图片元素。
+2. **获取图片的 Blob 对象**：使用 `fetch` 请求图片的 URL，并将响应转换为 Blob 对象。
+3. **将 Blob 对象写入剪贴板**：使用 `clipboard-polyfill` 库的 `write` 方法将 Blob 对象写入剪贴板。
+
+:::warning
+只在HTTPS环境下生效，HTTP环境下粘贴的内容为空
+:::
+
+### 复制canvas
+以下是一个完整的示例：
+
+```javascript
+<template>
+  <div>
+    <canvas ref="qrcodeCanvas"></canvas>
+    <button @click="copyQRCode">Copy QR Code</button>
+  </div>
+</template>
+
+<script>
+import QRCode from 'qrcode';
+import * as clipboard from 'clipboard-polyfill';
+
+export default {
+  mounted() {
+    this.generateQRCode();
+  },
+  methods: {
+    generateQRCode() {
+      const canvas = this.$refs.qrcodeCanvas;
+      QRCode.toCanvas(canvas, 'Your QR Code Data', function (error) {
+        if (error) console.error(error);
+        console.log('QR code generated!');
+      });
+    },
+    async copyQRCode() {
+      try {
+        const canvas = this.$refs.qrcodeCanvas;
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            await clipboard.write([new clipboard.ClipboardItem({ [blob.type]: blob })]);
+            alert('QR Code copied to clipboard!');
+          } else {
+            console.error('Failed to convert canvas to Blob');
+          }
+        });
+      } catch (error) {
+        console.error('Failed to copy QR Code: ', error);
+      }
+    }
+  }
+};
+</script>
+```
+
+1. **生成二维码**：在 `mounted` 钩子中调用 `generateQRCode` 方法，使用 `qrcode` 库生成二维码并绘制到 `<canvas>` 元素上。
+2. **复制二维码**：在 `copyQRCode` 方法中，将 `<canvas>` 元素转换为 Blob 对象，并使用 `clipboard-polyfill` 库将 Blob 对象写入剪贴板。
+
+:::warning
+只在HTTPS环境下生效，HTTP环境下粘贴的内容为空
+:::
+
+### 复制多个内容
+比如同时复制图片和文本，可以将不同类型的内容（如图像和文本）组合在一起。以下是一个示例，展示如何将二维码图像和文本同时写入剪贴板：
+
+```javascript
+<template>
+  <div>
+    <canvas ref="qrcodeCanvas"></canvas>
+    <button @click="handleCopy">Copy QR Code and Text</button>
+  </div>
+</template>
+
+<script>
+import QRCode from 'qrcode';
+import * as clipboard from 'clipboard-polyfill';
+
+export default {
+  data() {
+    return {
+      qrcodeUrl: 'https://example.com' // 你想要复制的文本内容
+    };
+  },
+  mounted() {
+    this.generateQRCode();
+  },
+  methods: {
+    generateQRCode() {
+      const canvas = this.$refs.qrcodeCanvas;
+      QRCode.toCanvas(canvas, this.qrcodeUrl, function (error) {
+        if (error) console.error(error);
+        console.log('QR code generated!');
+      });
+    },
+    handleCopy() {
+      try {
+        const canvas = this.$refs.qrcodeCanvas;
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            const clipboardItems = [
+              new clipboard.ClipboardItem({ [blob.type]: blob }),
+              new clipboard.ClipboardItem({ 'text/plain': new Blob([this.qrcodeUrl], { type: 'text/plain' }) })
+            ];
+            await clipboard.write(clipboardItems);
+            alert('QR Code and text copied to clipboard!');
+          } else {
+            console.error('Failed to convert canvas to Blob');
+          }
+        });
+      } catch (error) {
+        console.error('Failed to copy QR Code: ', error);
+      }
+    }
+  }
+};
+</script>
+```
+
+1. **生成二维码**：在 `mounted` 钩子中调用 `generateQRCode` 方法，使用 `qrcode` 库生成二维码并绘制到 `<canvas>` 元素上。
+2. **复制二维码和文本**：在 `handleCopy` 方法中，将 `<canvas>` 元素转换为 Blob 对象，并将其与文本内容一起写入剪贴板。
+
+:::warning
+粘贴后发现始终只能粘贴一项，虽然可以将多个内容作为不同的 MIME 类型添加到剪贴板中，但是剪贴板 API 并不支持将不同类型的内容（如图像和文本）同时粘贴到目标应用程序中。大多数应用程序（如文本编辑器、浏览器等）只能处理一种类型的剪贴板内容。
+:::
+
+不过，可以通过以下方法来实现类似的效果：将图像和文本组合成一个 HTML 片段，然后将其作为 HTML 内容复制到剪贴板中。这样，当你粘贴时，支持 HTML 粘贴的应用程序（如富文本编辑器）将能够同时显示图像和文本。
+```js
+<template>
+  <div>
+    <canvas ref="qrcodeCanvas"></canvas>
+    <button @click="handleCopy">Copy QR Code and Text</button>
+  </div>
+</template>
+
+<script>
+import QRCode from 'qrcode';
+import * as clipboard from 'clipboard-polyfill';
+
+export default {
+  data() {
+    return {
+      qrcodeUrl: 'https://example.com' // 你想要复制的文本内容
+    };
+  },
+  mounted() {
+    this.generateQRCode();
+  },
+  methods: {
+    generateQRCode() {
+      const canvas = this.$refs.qrcodeCanvas;
+      QRCode.toCanvas(canvas, this.qrcodeUrl, function (error) {
+        if (error) console.error(error);
+        console.log('QR code generated!');
+      });
+    },
+    async handleCopy() {
+      try {
+        const canvas = this.$refs.qrcodeCanvas;
+        const textContent = this.qrcodeUrl;
+        
+        // 将 canvas 转换为 Data URL
+        const imageDataUrl = canvas.toDataURL('image/png');
+        
+        // 创建 HTML 片段
+        const htmlContent = `
+          <div>
+            <img src="${imageDataUrl}" alt="QR Code">
+            <p>${textContent}</p>
+          </div>
+        `;
+        
+        // 创建 ClipboardItem 对象
+        const clipboardItem = new clipboard.ClipboardItem({
+          'text/html': new Blob([htmlContent], { type: 'text/html' })
+        });
+        
+        // 写入剪贴板
+        await clipboard.write([clipboardItem]);
+        alert('QR Code and text copied to clipboard!');
+      } catch (error) {
+        console.error('Failed to copy QR Code: ', error);
+      }
+    }
+  }
+};
+</script>
+```
+
+1. **生成二维码**：在 `mounted` 钩子中调用 `generateQRCode` 方法，使用 `qrcode` 库生成二维码并绘制到 `<canvas>` 元素上。
+2. **将 canvas 转换为 Data URL**：使用 `canvas.toDataURL` 方法将 `<canvas>` 元素转换为 Data URL。
+3. **创建 HTML 片段**：将图像 Data URL 和文本内容组合成一个 HTML 片段。
+4. **创建 `ClipboardItem` 对象**：将 HTML 片段和纯文本内容包装在 `ClipboardItem` 对象中。
+5. **写入剪贴板**：使用 `clipboard-polyfill` 库的 `write` 方法将 `ClipboardItem` 对象写入剪贴板。
+
+:::tip
+这种方式在HTTPS和HTTP环境下都生效。
+::
+
+## 文件下载
+### 使用`<a>`配合`download`属性实现文件下载
+
+例1，使用`<a>`标签的`download`属性来实现图片下载
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Image</title>
+</head>
+<body>
+    <img id="image" src="https://example.com/image.jpg" alt="Example Image" style="display:none;">
+    <a id="downloadLink" href="#" download="image.jpg">Download Image</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var image = document.getElementById('image');
+            var downloadLink = document.getElementById('downloadLink');
+            
+            // 设置下载链接的href为图片的src
+            downloadLink.href = image.src;
+        });
+    </script>
+</body>
+</html>
+```
+
+例2，JS创建一个隐藏的`<a>`标签，设置其`href`属性为文件的URL，并设置`download`属性为文件的默认名称。然后，模拟点击这个链接以触发下载，最后移除这个隐藏的链接。
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件下载示例</title>
+</head>
+<body>
+    <button id="downloadBtn">下载文件</button>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            // 文件的URL
+            var fileUrl = 'https://example.com/path/to/your/file.pdf';
+            // 创建一个隐藏的a标签
+            var a = document.createElement('a');
+            a.href = fileUrl;
+            a.download = 'file.pdf'; // 设置下载文件的默认名称
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    </script>
+</body>
+</html>
+```
+
+例3，如果你需要下载的是动态生成的文件（例如，生成的文本或图像），可以使用Blob对象：
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件下载示例</title>
+</head>
+<body>
+    <button id="downloadBtn">下载文件</button>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            // 动态生成的文件内容
+            var fileContent = '这是一个示例文件的内容';
+            var blob = new Blob([fileContent], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+
+            // 创建一个隐藏的a标签
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'example.txt'; // 设置下载文件的默认名称
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // 释放URL对象
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
+```
+
+:::tip
+某些浏览器可能会对跨域下载有安全限制，确保文件URL与页面URL在同一个域名下，或者服务器配置了正确的CORS头。
+:::
+
+例4，使用Canvas绘制图片并下载(适用于需要对图片进行处理或修改的情况)
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Image</title>
+</head>
+<body>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <a id="downloadLink" href="#" download="image.jpg">Download Image</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var canvas = document.getElementById('canvas');
+            var ctx = canvas.getContext('2d');
+            var downloadLink = document.getElementById('downloadLink');
+            var image = new Image();
+            image.crossOrigin = 'Anonymous'; // 处理跨域问题
+            image.src = 'https://example.com/image.jpg';
+
+            image.onload = function() {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                ctx.drawImage(image, 0, 0);
+                
+                // 将Canvas内容转换为Data URL
+                var dataURL = canvas.toDataURL('image/jpeg');
+                
+                // 设置下载链接的href为Data URL
+                downloadLink.href = dataURL;
+            };
+        });
+    </script>
+</body>
+</html>
+```
+
+### 使用[`file-saver`](https://github.com/eligrey/FileSaver.js)
+安装：
+```bash
+npm install file-saver --save
+npm install @types/file-saver --save-dev
+```
+
+使用：
+```js
+import { saveAs } from 'file-saver';
+
+// Saving text
+var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
+FileSaver.saveAs(blob, "hello world.txt");
+
+// Saving URLs
+FileSaver.saveAs("https://httpbin.org/image", "image.jpg");
 ```

@@ -71,6 +71,14 @@ npm 包在发布时使用的配置值。比如在安装依赖时指定了 regist
 
 #### `engines`
 
+#### `peerDependencies`
+在 npm 版本 3 到 6 中，`peerDependencies` 不会自动安装，如果在依赖树中发现对等依赖项的无效版本，则会发出警告。从 npm v7 开始，默认安装`peerDependencies`。
+
+peerDependencies 的作用：
+- 版本一致性：确保多个包使用相同版本的依赖。例如，多个 React 组件库可能需要确保它们使用相同版本的 React。
+- 避免重复安装：防止在项目中安装多个版本的同一个依赖，从而减少包的体积和潜在的冲突。
+- 明确依赖关系：让使用你包的开发者明确知道需要安装哪些额外的依赖。
+
 ### 第三方配置
 一些第三方库或应用在进行某些内部处理时会依赖这些字段，使用它们时需要安装对应的第三方库。
 
@@ -163,6 +171,155 @@ import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 #### `lint-staged`
 
 #### `commitlint`
+
+#### `exports`
+在 `package.json` 文件中，`exports` 字段用于定义包的导出路径，以便消费者可以通过不同的入口点导入包的不同部分。这个字段在 Node.js 和现代打包工具（如 Webpack 和 Rollup）中非常有用，因为它允许你更精细地控制包的导出结构。
+
+`exports` 字段是一个对象，其中键是导出路径，值是导出路径的目标。你可以使用不同的条件来定义不同的导出路径，例如 `require`、`import`、`node`、`default` 等。
+
+下面是一个示例，展示如何在 `package.json` 中使用 `exports` 字段：
+
+```json
+{
+  "name": "my-package",
+  "version": "1.0.0",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
+    },
+    "./feature": {
+      "import": "./esm/feature.js",
+      "require": "./cjs/feature.js"
+    },
+    "./package.json": "./package.json"
+  }
+}
+```
+- **`"."`**：表示包的主入口点。
+  - **`"import"`**：用于 ES 模块导入（`import`）。
+  - **`"require"`**：用于 CommonJS 模块导入（`require`）。
+- **`"./feature"`**：表示包的一个子模块。
+  - **`"import"`**：用于 ES 模块导入（`import`）。
+  - **`"require"`**：用于 CommonJS 模块导入（`require`）。
+- **`"./package.json"`**：允许消费者直接导入 `package.json` 文件。
+
+假设你有以下文件结构：
+
+```
+my-package/
+├── cjs/
+│   ├── index.js
+│   └── feature.js
+├── esm/
+│   ├── index.js
+│   └── feature.js
+└── package.json
+```
+
+在你的项目中，你可以这样导入 `my-package`：
+
+```javascript
+// 使用 ES 模块导入
+import { mainFunction } from 'my-package';
+import { featureFunction } from 'my-package/feature';
+
+// 使用 CommonJS 模块导入
+const { mainFunction } = require('my-package');
+const { featureFunction } = require('my-package/feature');
+```
+
+你还可以使用条件导出来根据不同的环境导出不同的模块。例如，你可以为浏览器和 Node.js 环境定义不同的导出路径：
+
+```json
+{
+  "name": "my-package",
+  "version": "1.0.0",
+  "main": "index.js",
+  "exports": {
+    ".": {
+      "browser": "./dist/browser/index.js",
+      "node": "./dist/node/index.js",
+      "default": "./dist/index.js"
+    }
+  }
+}
+```
+
+在这个示例中：
+
+- **`"browser"`**：用于浏览器环境。
+- **`"node"`**：用于 Node.js 环境。
+- **`"default"`**：用于默认导出路径。
+
+通过这种方式，你可以更精细地控制包的导出结构，以便在不同的环境中使用不同的模块。
+
+#### `prepublishOnly`
+`prepublishOnly` 是 `package.json` 中的一个脚本钩子，它在 `npm publish` 和 `npm install`（仅当安装的是本地包时）命令运行之前执行。这个钩子非常适合用于在发布包之前执行一些必要的构建或验证步骤。
+
+你可以在 `package.json` 文件的 `scripts` 字段中定义 `prepublishOnly` 脚本。例如：
+
+```json
+{
+  "name": "my-package",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "test": "jest",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "webpack": "^5.0.0",
+    "jest": "^26.0.0"
+  }
+}
+```
+
+在这个示例中：
+- **`build`**：定义了一个构建脚本，使用 Webpack 进行构建。
+- **`test`**：定义了一个测试脚本，使用 Jest 进行测试。
+- **`prepublishOnly`**：在发布包之前运行构建和测试脚本。
+
+什么时候运行 `prepublishOnly`:
+- **`npm publish`**：当你运行 `npm publish` 命令时，`prepublishOnly` 脚本会在发布包之前执行。
+- **`npm install`**：当你在本地安装包（例如 `npm install ./path/to/package`）时，`prepublishOnly` 脚本也会执行。
+
+假设你有一个简单的项目结构：
+```
+my-package/
+├── src/
+│   └── index.js
+├── dist/
+│   └── index.js
+├── package.json
+└── webpack.config.js
+```
+
+你可以在 `package.json` 中定义 `prepublishOnly` 脚本，以确保在发布包之前进行构建和测试：
+
+```json
+{
+  "name": "my-package",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "test": "jest",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "webpack": "^5.0.0",
+    "jest": "^26.0.0"
+  }
+}
+```
+
+当你运行 `npm publish` 命令时，以下步骤将依次执行：
+
+1. **`prepublishOnly`**：首先执行 `prepublishOnly` 脚本，即 `npm run build && npm test`。
+2. **发布包**：如果 `prepublishOnly` 脚本成功执行，包将被发布到 npm 注册表。
+
+通过这种方式，你可以确保在发布包之前进行必要的构建和测试步骤，从而提高包的质量和可靠性。
 
 ## 使用`package.json`
 ```js

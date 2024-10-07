@@ -322,6 +322,9 @@ tags: [monorepo, react, leaflet]
 组件的依赖使用`peerDependencies`和`dependencies`和`devDependencies`:
 - `dependencies` 用于依赖的自开发组件库
 - `peerDependencies` 用于依赖的基本库和插件，从 npm v7 开始会自动安装`peerDependencies`指定的包（pnpm也会自动安装`peerDependencies`指定的包）
+  :::tip
+  使用`pnpm add --save-peer <pkg>` 将安装依赖到 peerDependencies 和 devDependencies
+  :::
 - `devDependencies` 用于依赖的类型声明
 ```json
 {

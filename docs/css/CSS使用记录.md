@@ -7,40 +7,50 @@ tags: [css, 记录]
 [CSS灵感](https://github.com/chokcoco/CSS-Inspiration)
 
 [icss](https://github.com/chokcoco/iCSS)
+
+[csshake](https://elrumordelaluz.github.io/csshake/)
 :::
 
 ## 1. `:is()`
 > [使用`is()`优化css代码](https://mp.weixin.qq.com/s/ACCGICv0hjU4LFAlPLUpog)
 
-## 2. flex
-- https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Flexible_Box_Layout/Controlling_Ratios_of_Flex_Items_Along_the_Main_Ax
-- [彻底理解Flexbox](https://blog.csdn.net/liuhe688/article/details/51453330)
-- 在html中若一个元素的css设置为display:flex，则这个元素就是flex container，其子元素为flex item。
-- 应用于flex item的三个属性：flex-grow flex-shrink flex-basis，可以在主轴方向上控制flex item的尺寸和伸缩性
-- flex-grow：这个flex item得到(伸张)多少positive free space
-- flex-shrink：从这个flex item消除(收缩)多少negative free space
-- flex-basis：在flex item未伸张和收缩之前，它的大小是多少
-- flex: 2 1 auto 相当于 flex-grow: 2;flex-shrink: 1;flex-basis: auto;
-- positive free space 正向自由空间
-- negative free space 反向自由空间
+## 2. [flex](https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_flexible_box_layout/Basic_concepts_of_flexbox)
+[彻底理解Flexbox](https://blog.csdn.net/liuhe688/article/details/51453330)
+
+在html中若一个元素的css设置为`display: flex`，则这个元素就是flex container，其子元素为flex item。
+
+应用于flex item的三个属性：`flex-grow` `flex-shrink` `flex-basis`，可以在主轴方向上控制flex item的[尺寸和伸缩性](https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Flexible_Box_Layout/Controlling_Ratios_of_Flex_Items_Along_the_Main_Ax)
+- `flex-grow`：这个flex item得到(伸张)多少正向自由空间(positive free space)
+- `flex-shrink`：从这个flex item消除(收缩)多少反向自由空间(negative free space)
+- `flex-basis`：在flex item未伸张和收缩之前，它的大小是多少
+- `flex: 2 1 auto` 相当于 `flex-grow: 2;flex-shrink: 1;flex-basis: auto;`
+
+:::info
 - flex item包含在flex container中，当flex item在主轴上的尺寸(大小)之和小于flex container的尺寸时，flex container中就会有多余的空间没有被填充，这些空间就被叫做positive free space
+
 - 当flex item在主轴上的尺寸之和大于flex container的尺寸时，flex容器的空间就不够用，此时flex item的尺寸之和减去flex container的尺寸(flex item溢出的尺寸)就是negative free space，这个negative free space加上flex container的尺寸刚好可以容纳flex item
-- flex-basis 属性在任何空间分配发生之前初始化flex item的尺寸. 此属性的初始值为 auto. 如果 flex-basis 设置为 auto , 浏览器会先检查flex item的主尺寸是否设置了绝对值再计算出flex item的初始值. 比如已经给flex item设置了200px 的宽，则200px 就是这个flex item的 flex-basis.如果flex item 为自动调整大小，则auto 会解析为其内容的大小. 此时min-content和max-content大小会变得有用, flexbox 会将flex item的 max-content 大小作为 flex-basis.
-- 空间分配时，如果想flexbox 完全忽略flex item的尺寸就设置flex-basis 为 0. 这基本上告诉flexbox所有空间都可以抢占，并按比例分享.
-- 如果flex-grow的值全部相同，并且在flex container中还有positive free space , 那么它（positive free space）就会平均地分配给所有的flex item
-- **定义为flex布局元素的子元素，自动获得了flex-shrink的属性，这个属性是什么意思呢？就是告诉子元素当父元素宽度不够用时，自己调整自己所占的宽度比，这个flex-shrink设置为1时，表示所有子元素大家同时缩小来适应总宽度。当flex-shrink设置为0时，表示大家都不缩小适应。所以，倘若给父元素设置了flex布局后，若要其子元素的width有效果，必须给子元素设置flex-shrink为0。**
-- flex-flow：是 flex-direction 和 flex-wrap 的简写。初始值：flex-direction: row; flex-wrap: nowrap;
+:::
+  
+`flex-basis` 属性在任何空间分配发生之前初始化flex item的尺寸. 此属性的初始值为 `auto`. 如果 `flex-basis` 设置为 auto , 浏览器会先检查flex item的主尺寸是否设置了绝对值再计算出flex item的初始值. 比如已经给flex item设置了200px 的宽，则200px 就是这个flex item的 `flex-basis`。如果flex item 为自动调整大小，则`auto` 会解析为其内容的大小. 此时`min-content` 和 `max-content`大小会变得有用, flexbox 会将flex item的 `max-content` 大小作为 `flex-basis`。
 
-- 在CSS的Flexbox布局中，要均分空间，可以将容器内的子元素设置为`flex: 1`。这样，每个子元素都会占据相同的空间比例。例如,以下代码会使得`.container`内的所有`.item`子元素均分可用空间。
-  ```css
-  .container {
-    display: flex;
-  }
+空间分配时，如果想flexbox 完全忽略flex item的尺寸就设置`flex-basis` 为 `0`. 这基本上告诉flexbox所有空间都可以抢占，并按比例分享。
 
-  .item {
-    flex: 1;
-  }
-  ```
+如果`flex-grow`的值全部相同，并且在flex container中还有positive free space , 那么它（positive free space）就会平均地分配给所有的flex item
+
+**定义为flex布局元素的子元素，自动获得了`flex-shrink`的属性，这个属性是什么意思呢？就是告诉子元素当父元素宽度不够用时，自己调整自己所占的宽度比，这个`flex-shrink`设置为`1`时，表示所有子元素大家同时缩小来适应总宽度。当`flex-shrink`设置为`0`时，表示大家都不缩小适应。所以，倘若给父元素设置了flex布局后，若要其子元素的width有效果，必须给子元素设置`flex-shrink`为`0`。**
+
+`flex-flow`：是 `flex-direction` 和 `flex-wrap` 的简写。初始值：`flex-direction: row; flex-wrap: nowrap;`
+
+在CSS的Flexbox布局中，要均分空间，可以将容器内的子元素设置为`flex: 1`。这样，每个子元素都会占据相同的空间比例。例如,以下代码会使得`.container`内的所有`.item`子元素均分可用空间。
+```css
+.container {
+  display: flex;
+}
+
+.item {
+  flex: 1;
+}
+```
 
 ## 3. box-sizing: border-box|content-box|inherit
 - border-box
@@ -209,7 +219,9 @@ div {
 - user-select: all; 在一个HTML编辑器中，当双击子元素或者上下文时，那么包含该子元素的最顶层元素也会被选中。
 
 ## 19. `word-break:break-all;` 或 `word-wrap:break-word;` 汉字、数字、字母超出折行
-> text-overflow: ellipsis; //文本溢出显示省略号  在使用的时候，有时候发现不会出现省略标记效果，经过测试发现，使用ellipsis的时候，必须配合overflow:hidden; white-space:nowrap; width:具体值;这三个样式共同使用才会有效果。
+`text-overflow: ellipsis;` //文本溢出显示省略号
+
+在使用的时候，有时候发现不会出现省略标记效果，经过测试发现，使用`ellipsis`的时候，必须配合 `overflow:hidden; white-space:nowrap; width:具体值;` 这三个样式共同使用才会有效果。
 
 ## 20. `inline-block`
 - [关于inline-block问题](https://www.jianshu.com/p/381dd29caa57)
@@ -968,3 +980,45 @@ element.classList.remove('visible');
 这样，当你切换 `.expanded` 类时，元素的 `max-height` 会从 0 过渡到 1000px，从而实现高度的动画效果。然而，这种方法并不完美，因为如果内容的实际高度远小于 max-height 的值，过渡效果会突然结束，因为一旦内容的实际高度被达到，剩余的 `max-height` 值就不再有任何作用。
 
 另一种方法是使用 JavaScript 来动态计算内容的高度，并在过渡之前将高度设置为具体的像素值。这种方法可以提供更精确的动画效果，但它比纯 CSS 解决方案更复杂。
+
+## 56. border闪烁
+```css
+.bomb-border {
+  animation: glow 800ms ease-out infinite alternate;
+}
+@keyframes glow {
+  0% {
+    border-color: #FF0000;
+    box-shadow: 0 0 5px #FF6347, inset 0 0 5px #FF4500, 0 1px 0 #FF0000;
+  }
+  100% {
+    border-color: #FF0000;
+    box-shadow: 0 0 20px #FF0000, inset 0 0 10px #FF4500, 0 1px 0 #FF6347;
+  }
+}
+```
+
+## 57. 渐隐渐显
+```css
+img {
+  width: 100px;
+  height: 100px;
+  animation: fireworks 2s 0.5s linear infinite;
+}
+@keyframes fireworks {
+  0% {
+    transform: scale(0,0);
+  }
+  60% {
+    transform: scale(1,1);
+    opacity: 1;
+  }
+  95% {
+    transform: scale(0.9,0.9);
+  }
+  100% {
+    transform: scale(0.9,0.9);
+    opacity: 0;
+  }
+}
+```

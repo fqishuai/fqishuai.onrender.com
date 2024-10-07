@@ -258,6 +258,23 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 - `build.emptyOutDir` 若 `outDir` 在 root 目录(默认为`process.cwd()`)下，则 该值默认为`true`，Vite 会在构建时清空该目录，设为`false`则不清空。若 `outDir` 在根目录之外则会抛出一个警告避免意外删除掉重要的文件。可以设置该选项来关闭这个警告。
 
+## 环境变量与模式
+默认情况下，开发服务器 (`dev` 命令) 运行在 `development` (开发) 模式，而 `build` 命令则运行在 `production` (生产) 模式。
+
+这意味着当执行 `vite build` 时，它会自动加载 `.env.production` 中可能存在的环境变量。
+
+## [缓存](https://vitejs.cn/vite3-cn/guide/dep-pre-bundling.html#caching)
+Vite 会将预构建的依赖缓存到 `node_modules/.vite`。它根据几个源来决定是否需要重新运行预构建步骤:
+- `package.json` 中的 `dependencies` 列表
+- 包管理器的 lockfile，例如 `package-lock.json`, `yarn.lock`，或者 `pnpm-lock.yaml`
+- 可能在 `vite.config.js` 相关字段中配置过的
+
+只有在上述其中一项发生更改时，才需要重新运行预构建。
+
+如果出于某些原因，你想要强制 Vite 重新构建依赖，你可以用 `--force` 命令行选项启动开发服务器，或者手动删除 `node_modules/.vite` 目录。
+
+如果需要调试`node_modules`中的依赖包，则依赖包改动内容后，执行`vite dev --force`后改动就能生效
+
 ## [JavaScript API](https://cn.vitejs.dev/guide/api-javascript.html#build)
 ### `build`
 ```js
@@ -338,3 +355,34 @@ console.log(str.replace(/ /g, '+'));   // +A+++B+++C++++D+
 
 [从 JavaScript 中的字符串中删除/替换所有空格](https://www.jiyik.com/tm/xwzj/web_2604.html)
 :::
+
+### 使用proxy报错
+```ts title="vite.config.ts"
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://jsonplaceholder.typicode.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    }
+  }
+})
+```
+如上使用报错了：`react.js:1 Failed to load module script: Expected a JavaScript module script but the server responded with a MIME type of "application/json". Strict MIME type checking is enforced for module scripts per HTML spec.`
+
+使用正则表达式写法则不报错：
+```ts title="vite.config.ts"
+export default defineConfig({
+  server: {
+    proxy: {
+      '^/api/.*': {
+        target: 'http://jsonplaceholder.typicode.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    }
+  }
+})
+```

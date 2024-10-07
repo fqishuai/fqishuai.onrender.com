@@ -22,6 +22,7 @@ tags: [vue, 记录]
 - [12. 计算属性依赖的变量是引用类型](#12-计算属性依赖的变量是引用类型)
   - [依赖的是对象](#依赖的是对象)
   - [数组](#数组)
+- [`computed`的`setter`](#computed的setter)
 
 
 ## 1. 渲染函数 & JSX
@@ -556,3 +557,67 @@ this.myArray.splice(0, 1, 10); // 替换索引0的元素为10
 ```
 
 这些方法都会触发Vue的响应式系统，从而更新依赖于`myArray`的计算属性。
+
+## `computed`的`setter`
+```js
+<template>
+  <span>剩余{{ sendNum }}次</span>
+</template>
+<script>
+  export default {
+    data() {
+      return {
+        showSendNum: 3,
+      }
+    },
+    computed: {
+      sendNum: {
+        set: function(value) {
+          localStorage.setItem(this.userId, value);
+          this.showSendNum = value;
+        },
+        get: function({ userId, showSendNum }) {
+          if (userId) {
+            return localStorage.getItem(userId) || showSendNum;
+          } else {
+            return '--';
+          }
+        }
+      },
+    },
+    methods: {
+      handleSend() {
+        if (this.sendNum <= 0 ) return this.$message({
+          type: 'warning',
+          message: '已超出今天发送上限，最多3次'
+        }); 
+        this.$confirm('最多发送3次','发送', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+          center: true
+        }).then(async () => {
+          // await api(param)
+          if (true) {
+            this.$message({
+              type: 'success',
+              message: '发送成功'
+            });
+            this.sendNum -= 1;
+          } else {
+            this.$message({
+              type: 'error',
+              message: '发送失败'
+            });
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消操作'
+          });
+        })
+      },
+    }
+  }
+</script>
+```

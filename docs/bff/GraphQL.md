@@ -13,6 +13,8 @@ GraphQL 查询不仅能够获得资源的属性，还能沿着资源间引用进
 
 GraphQL最适合的场景莫过于作为BFF（Backend for Frontend）的网关层，即根据客户端的实际需要，将后端的原始HSF接口、第三方RESTful接口进行整合和封装形成自己的Service Facade层。GraphQL自身的特性使得其非常容易与RESTful、MTOP/MOPEN等基于HTTP的现有网关进行集成。而另一方面，GraphQL非常适合作为Serverless/FaaS的网关层，只需要唯一一个HTTP Trigger就能实现代理所有背后的API。
 
+GraphQL 在需要高度定制化和实时数据更新的场景中，成为一种更具吸引力的选择。
+
 Apollo GraphQL Server是目前使用最广泛的开源GraphQL服务，它的Node.js版本更是被BFF类应用广为使用。
 
 ## [GraphQL 入门](https://graphql.cn/learn/)
