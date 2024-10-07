@@ -12,6 +12,24 @@ tags: [react]
   :::
 
 ### 生成的目录文件的用途
+#### `public`目录
+- 如果将文件放入 public 文件夹中，webpack 不会处理该文件。相反，它将原封不动地复制到构建文件夹中。要引用公共文件夹中的资源，您需要使用名为 `PUBLIC_URL` 的环境变量。只有公用文件夹内的文件才能通过`%PUBLIC_URL%`前缀访问。
+  ```html title="index.html"
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  ```
+
+- 当您运行 `npm run build` 时，Create React App 会将 `%PUBLIC_URL%` 替换为正确的绝对路径，这样即使您使用客户端路由或将其托管在非根 URL 上，您的项目也能正常运行。
+
+- 在 JavaScript 代码中，您可以使用 `process.env.PUBLIC_URL`
+  ```js
+  render() {
+    // Note: this is an escape hatch and should be used sparingly!
+    // Normally we recommend using `import` for getting asset URLs
+    // as described in “Adding Images and Fonts” above this section.
+    return <img src={process.env.PUBLIC_URL + '/img/logo.png'} />;
+  }
+  ```
+
 #### `public/manifest.json`
 ```json
 {
@@ -376,3 +394,6 @@ yarn add sass
    # pnpm
    pnpm create react-app my-app --scripts-version @rawlinsfeng/react-scripts --template typescript
    ```
+
+## 区分环境
+您可以通过在 `shell` 中或使用 `.env` 设置环境变量来调整各种开发和生产设置。

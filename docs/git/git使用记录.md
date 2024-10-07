@@ -64,7 +64,7 @@ tags: [git, 记录]
 ## 10. 推送现有空的存储库
 1. `cd existing_folder`
 2. `git init`
-3. `git remote add origin https://xxx`
+3. `git remote add origin https://github.com/fqishuai/fl-home.onrender.com.git`
 4. `git add .`
 5. `git commit -m "Initial commit"`
 6. `git push -u origin main`
