@@ -89,6 +89,14 @@ const config = {
             position : 'right',
             items: [
               {
+                label: 'bolt',
+                href: 'https://bolt.new/',
+              },
+              {
+                label: 'v0',
+                href: 'https://v0.dev/chat',
+              },
+              {
                 label: '天工AI',
                 href: 'https://www.tiangong.cn/',
               },
@@ -260,6 +268,7 @@ const config = {
               { label: '免费IT资源', href: 'https://free-for.dev/#/' },
               { label: '免费LOGO设计', href: 'https://www.uugai.com/' },
               { label: 'sinqi tools', href: 'https://sinqi.tools/zh' },
+              { label: '视频转gif', href: 'https://www.apowersoft.cn/video-to-gif-online' },
             ],
           },
           {
