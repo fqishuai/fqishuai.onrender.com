@@ -5,10 +5,11 @@ tags: [js]
 
 ## [JavaScript 标准内置对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects)
 ### Object
-#### Object.fromEntries
+#### `Object.fromEntries`
 :::note
-Object.fromEntries() 方法接收一个键值对的列表参数，并返回一个带有这些键值对的新对象。这个迭代参数应该是一个能够实现@@iterator方法的的对象，返回一个迭代器对象。它生成一个具有两个元素的类数组的对象，第一个元素是将用作属性键的值，第二个元素是与该属性键关联的值。
-Object.fromEntries() 执行与 Object.entries 互逆的操作。
+`Object.fromEntries()` 方法接收一个键值对的列表参数，并返回一个带有这些键值对的新对象。这个迭代参数应该是一个能够实现`@@iterator`方法的的对象，返回一个迭代器对象。它生成一个具有两个元素的类数组的对象，第一个元素是将用作属性键的值，第二个元素是与该属性键关联的值。
+
+`Object.fromEntries()` 执行与 `Object.entries` 互逆的操作。
 :::
 ```js
 // Map 转化为 Object
@@ -22,17 +23,17 @@ const obj = Object.fromEntries(arr);
 console.log(obj); // { 0: "a", 1: "b", 2: "c" }
 ```
 
-#### [Object.create](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
+#### [`Object.create`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
 :::note
-Object.create() 方法用于创建一个新对象，使用现有的对象来作为新创建对象的原型（prototype）。
+`Object.create()` 方法用于创建一个新对象，使用现有的对象来作为新创建对象的原型（prototype）。
 :::
 
-#### [Object.getPrototypeOf](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/GetPrototypeOf)
+#### [`Object.getPrototypeOf`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/GetPrototypeOf)
 :::note
-Object.getPrototypeOf() 方法返回指定对象的原型（内部[[Prototype]]属性的值）。
+`Object.getPrototypeOf()` 方法返回指定对象的原型（内部`[[Prototype]]`属性的值）。
 :::
 
-#### Object.is
+#### `Object.is`
 用于判断两个值是否相同。
 ```js
 // Case 1: Evaluation result is the same as using ===
@@ -60,16 +61,37 @@ Object.is(NaN, 0 / 0); // true
 Object.is(NaN, Number.NaN); // true
 ```
 
-#### Object.entries
+#### `Object.entries`
 ```js
 let a = {1: 'a'};
 Object.entries(a) // [["1","a"]]
 ```
 
-#### Object.values
+#### `Object.values`
 ```js
 let a = {1: 'a'};
 Object.values(a) // ["a"]
+```
+
+#### `Object.freeze`
+可以使一个对象被冻结，冻结对象可以防止扩展，并使现有的属性不可写入和不可配置。
+
+被冻结的对象不能再被更改：不能添加新的属性，不能移除现有的属性，不能更改它们的可枚举性、可配置性、可写性或值，对象的原型也不能被重新指定。
+
+`Object.freeze(obj)` 返回与传入的对象相同的对象。
+
+```js
+const obj = {
+  prop: 42,
+};
+
+Object.freeze(obj);
+
+obj.prop = 33;
+// Throws an error in strict mode
+
+console.log(obj.prop);
+// Expected output: 42
 ```
 
 ### String
