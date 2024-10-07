@@ -152,8 +152,6 @@ const overlayLayer = L.circle([51.505, -0.09], {
 ## `center`
 在Leaflet中，`center`参数用于设置地图的中心点。你可以在初始化地图时通过`setView`方法来设置中心点和缩放级别，也可以在地图初始化后动态设置中心点。`center`参数通常是一个包含纬度和经度的数组。如果你使用的是React和`react-leaflet`，可以通过`MapContainer`组件的`center`属性来设置中心点。
 
-### 示例代码
-
 以下是一个基本示例，展示如何在Leaflet中设置地图的中心点：
 
 ```html
@@ -383,8 +381,6 @@ export function tileLayer(url, options) {
 - `{y}`: 瓦片的y坐标
 - `{s}`: 子域名（如果有）
 
-#### 示例代码
-
 以下是一个基本示例，展示如何在Leaflet中使用`TileLayer`并指定URL模板：
 
 ```html
@@ -576,8 +572,6 @@ export function tileLayer(url, options) {
 
 ### `subdomains`
 在Leaflet中，`subdomains`选项用于指定瓦片图层的子域名。这对于负载均衡和提高瓦片加载速度非常有用，因为浏览器通常对同一域名的并发请求数量有限制。
-
-#### 示例代码
 
 以下是一个示例，展示如何在Leaflet中使用`subdomains`选项：
 
@@ -1081,6 +1075,14 @@ leaflet的类型声明统一在`@types/leaflet`中
 map.fitBounds(bounds, boundsOptions);
 ```
 
+`bounds` 是一个数组，表示要适应的地理边界的西南和东北角。
+```js
+const bounds = [
+  [51.49, -0.08], // 西南角
+  [51.5, -0.06]   // 东北角
+];
+```
+
 `boundsOptions` 是一个对象，可以包含以下属性：
 - `paddingTopLeft`: `Point` - 在地图视图的左上角添加填充。
 - `paddingBottomRight`: `Point` - 在地图视图的右下角添加填充。
@@ -1090,6 +1092,48 @@ map.fitBounds(bounds, boundsOptions);
 - `duration`: `number` - 动画持续时间（以秒为单位）。
 - `easeLinearity`: `number` - 动画的线性度（默认为 `0.25`）。
 - `noMoveStart`: `boolean` - 如果为 `true`，则不会触发 `movestart` 事件。
+
+以下是一个使用 `fitBounds` 方法的示例，展示了如何在 React 中使用 `react-leaflet` 调整地图视图以适应指定的边界：
+```jsx
+import React, { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Rectangle, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const bounds = [
+  [51.49, -0.08], // Southwest corner
+  [51.5, -0.06]   // Northeast corner
+];
+
+const FitBoundsComponent = () => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.fitBounds(bounds, {
+      padding: [50, 50], // Optional padding around the bounds
+      maxZoom: 15,        // Optional maximum zoom level
+      animate: true,
+      duration: 1.0
+    });
+  }, [map]);
+
+  return null;
+};
+
+const MapComponent = () => {
+  return (
+    <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: "100vh", width: "100%" }}>
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      <Rectangle bounds={bounds} />
+      <FitBoundsComponent />
+    </MapContainer>
+  );
+};
+
+export default MapComponent;
+```
 
 ## `map.zoomIn`
 在 Leaflet 中，`map.zoomIn` 方法用于放大地图视图。这个方法可以接受两个可选参数。
@@ -1248,3 +1292,459 @@ map.locate({
   enableHighAccuracy: true
 });
 ```
+
+## `map.invalidateSize`
+在 Leaflet 中，`map.invalidateSize()` 方法用于通知地图容器的大小已发生变化，并强制地图重新计算其尺寸。这在调整地图容器的大小（例如通过 CSS 或 JavaScript）后非常有用，确保地图正确地填充其容器。
+
+以下是一个完整的示例，展示如何在 Flexbox 布局中实现左侧是 Leaflet 渲染的瓦片地图，右侧是可收起的面板，并确保在右侧面板收起后左侧地图能够铺满屏幕：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaflet Flexbox Layout</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .left-panel {
+      flex: 1;
+      position: relative;
+    }
+
+    .right-panel {
+      width: 300px;
+      background-color: #d0d0d0;
+      padding: 20px;
+      transition: width 0.3s, padding 0.3s;
+    }
+
+    .right-panel.collapsed {
+      width: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .toggle-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <button class="toggle-button" id="toggle-button">收起</button>
+      <div id="map"></div>
+    </div>
+    <div class="right-panel" id="right-panel">
+      右侧内容
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // 初始化地图
+    const map = L.map('map').setView([51.505, -0.09], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // 切换右侧面板的显示和隐藏
+    document.getElementById('toggle-button').addEventListener('click', function() {
+      const rightPanel = document.getElementById('right-panel');
+      rightPanel.classList.toggle('collapsed');
+      setTimeout(() => {
+        map.invalidateSize(); // 重新调整地图大小
+      }, 300); // 与 CSS 过渡时间匹配
+    });
+  </script>
+</body>
+</html>
+```
+
+解释：
+1. **HTML 结构**：
+   - `container` 是一个包含两个子元素的父容器：`left-panel` 和 `right-panel`。
+   - `left-panel` 内部包含一个按钮，用于控制右侧面板的收起和展开，以及一个用于渲染地图的 `div` 元素。
+   - `right-panel` 是可收起的面板，包含一些内容。
+
+2. **CSS 样式**：
+   - `container` 使用 `display: flex` 来创建一个 Flexbox 容器。
+   - `left-panel` 使用 `flex: 1` 来占据剩余的空间，并设置 `position: relative` 以便定位按钮。
+   - `right-panel` 设置了固定的宽度 `300px`，并且在添加 `collapsed` 类时将宽度设置为 `0`，并隐藏其内容。
+   - `map` 设置了 `width: 100%` 和 `height: 100%`，以确保地图铺满 `left-panel`。
+
+3. **JavaScript**：
+   - 初始化 Leaflet 地图，并将其添加到 `map` 元素中。
+   - 通过点击按钮，切换 `right-panel` 的 `collapsed` 类，从而控制其显示和隐藏。
+   - 在右侧面板收起或展开后，调用 `map.invalidateSize()` 方法重新调整地图大小，以确保地图铺满 `left-panel`。
+
+这样，当你点击 "收起" 按钮时，右侧面板将收起，左侧地图将铺满整个容器。再次点击按钮，右侧面板将展开，恢复到原来的布局。地图会根据容器的大小自动调整。
+
+## `map.setView`
+在 Leaflet 中，`map.setView` 方法用于设置地图的视图中心和缩放级别。这个方法可以让你动态地调整地图的中心位置和缩放级别，非常适合在用户交互或数据更新时使用。
+
+`map.setView` 方法接受两个主要参数：
+1. **中心位置**：一个包含纬度和经度的数组或 `LatLng` 对象。
+2. **缩放级别**：一个整数，表示地图的缩放级别。
+
+此外，还可以传递一个可选的选项对象来控制动画效果等。
+
+以下是一个使用 `map.setView` 方法的示例，展示如何在 React 中使用 `react-leaflet` 动态调整地图的视图：
+
+```jsx
+import React, { useRef } from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const SetViewComponent = ({ center, zoom }) => {
+  const map = useMap();
+
+  React.useEffect(() => {
+    map.setView(center, zoom, {
+      animate: true,
+      duration: 1.0
+    });
+  }, [map, center, zoom]);
+
+  return null;
+};
+
+const MapComponent = () => {
+  const initialCenter = [51.505, -0.09];
+  const initialZoom = 13;
+
+  const newCenter = [48.8566, 2.3522]; // Paris coordinates
+  const newZoom = 12;
+
+  const mapRef = useRef();
+
+  const handleButtonClick = () => {
+    mapRef.current.setView(newCenter, newZoom, {
+      animate: true,
+      duration: 1.0
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={handleButtonClick}>Go to Paris</button>
+      <MapContainer
+        center={initialCenter}
+        zoom={initialZoom}
+        style={{ height: "100vh", width: "100%" }}
+        whenCreated={mapInstance => { mapRef.current = mapInstance; }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+      </MapContainer>
+    </div>
+  );
+};
+
+export default MapComponent;
+```
+
+解释：
+1. **HTML 结构**：
+   - `MapContainer` 是 `react-leaflet` 提供的组件，用于创建一个 Leaflet 地图容器。
+   - `TileLayer` 是 `react-leaflet` 提供的组件，用于加载瓦片图层。
+   - `SetViewComponent` 是一个自定义组件，用于动态设置地图视图。
+
+2. **CSS 样式**：
+   - `MapContainer` 的 `style` 属性设置了地图容器的高度和宽度，以确保地图铺满整个视口。
+
+3. **JavaScript**：
+   - 使用 `useRef` 钩子创建一个 `mapRef` 引用，用于存储地图实例。
+   - 在 `MapContainer` 的 `whenCreated` 属性中，将地图实例存储到 `mapRef` 中。
+   - 在 `SetViewComponent` 组件中，使用 `useMap` 钩子获取地图实例，并在 `useEffect` 钩子中调用 `map.setView` 方法来动态设置地图视图。
+   - 在按钮的点击事件处理程序中，调用 `mapRef.current.setView` 方法来动态调整地图的中心位置和缩放级别。
+
+### `setView` 方法的选项
+
+`setView` 方法可以接受一个可选的选项对象，以进一步控制视图调整的行为。常用选项包括：
+
+- **animate**：是否使用动画效果调整视图（默认为 `false`）。
+- **duration**：动画效果的持续时间（以秒为单位）。
+- **easeLinearity**：动画效果的线性度（默认为 `0.25`）。
+- **noMoveStart**：如果为 `true`，则不会触发 `movestart` 事件。
+
+例如：
+
+```javascript
+map.setView([48.8566, 2.3522], 12, {
+  animate: true,
+  duration: 1.0,
+  easeLinearity: 0.5,
+  noMoveStart: true
+});
+```
+
+你可以根据需要调整这些选项，以适应你的具体需求。
+
+## `map.getBounds`
+在 Leaflet 中，`map.getBounds()` 返回一个 `LatLngBounds` 对象，该对象表示地图的当前视图范围。`LatLngBounds` 对象有一个 `toBBoxString()` 方法，可以将边界框转换为一个逗号分隔的字符串，格式为 `minLon,minLat,maxLon,maxLat`。
+
+## 获取地图上的所有多边形
+```js
+// 获取地图上的所有多边形
+function getAllPolygons() {
+  const allPolygons = [];
+  map.eachLayer(layer => {
+    if (layer instanceof L.Polygon && !(layer instanceof L.Circle)) {
+      allPolygons.push(layer);
+    }
+  });
+  return allPolygons;
+}
+```
+
+## 渲染大规模的 AOI
+在 Leaflet 中渲染大规模的 AOI（Area of Interest）数据时，可能会遇到性能问题。为了提高渲染性能，可以采用以下几种方法：
+
+1. **简化几何图形**：使用工具或库（如 Turf.js）来简化几何图形，减少顶点数量。
+2. **按需加载数据**：使用瓦片服务或按需加载数据，只加载当前视图范围内的数据。
+3. **使用 WebGL**：使用基于 WebGL 的渲染库（如 Mapbox GL JS）来提高渲染性能。
+4. **虚拟化**：将数据分块处理，逐步加载和渲染。
+
+以下是每种方法的详细说明和示例代码：
+
+### 方法一：简化几何图形
+
+使用 Turf.js 的 `simplify` 方法来简化几何图形，减少顶点数量。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet Simplify Geometry</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/@turf/turf"></script>
+  <script>
+    // 初始化地图
+    const map = L.map('map').setView([51.505, -0.09], 13);
+
+    // 添加 OpenStreetMap 图层
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    // 示例 AOI 数据（GeoJSON 格式）
+    const aoiData = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [-0.1, 51.5],
+                [-0.1, 51.6],
+                [0.1, 51.6],
+                [0.1, 51.5],
+                [-0.1, 51.5]
+              ]
+            ]
+          }
+        }
+      ]
+    };
+
+    // 使用 Turf.js 简化几何图形
+    const simplifiedData = turf.simplify(aoiData, { tolerance: 0.01, highQuality: false });
+
+    // 渲染简化后的数据
+    L.geoJSON(simplifiedData).addTo(map);
+  </script>
+</body>
+</html>
+```
+
+### 方法二：按需加载数据
+
+使用 Leaflet 的 `L.TileLayer` 和 `L.GeoJSON` 结合按需加载数据。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet On-Demand Loading</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // 初始化地图
+    const map = L.map('map').setView([51.505, -0.09], 13);
+
+    // 添加 OpenStreetMap 图层
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    // 按需加载数据
+    function loadGeoJSON(bounds) {
+      // 示例：根据视图范围加载数据
+      const url = `https://example.com/geojson?bbox=${bounds.toBBoxString()}`;
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          L.geoJSON(data).addTo(map);
+        });
+    }
+
+    // 监听视图变化事件
+    map.on('moveend', () => {
+      const bounds = map.getBounds();
+      loadGeoJSON(bounds);
+    });
+
+    // 初始加载
+    loadGeoJSON(map.getBounds());
+  </script>
+</body>
+</html>
+```
+
+### 方法三：使用 WebGL
+
+使用基于 WebGL 的渲染库（如 Mapbox GL JS）来提高渲染性能。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mapbox GL JS</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+  <script>
+    // 初始化 Mapbox GL JS 地图
+    mapboxgl.accessToken = 'your-access-token';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-0.09, 51.505],
+      zoom: 13
+    });
+
+    // 添加 GeoJSON 数据源
+    map.on('load', () => {
+      map.addSource('aoi', {
+        'type': 'geojson',
+        'data': 'https://example.com/large-aoi-data.geojson'
+      });
+
+      // 添加图层
+      map.addLayer({
+        'id': 'aoi-layer',
+        'type': 'fill',
+        'source': 'aoi',
+        'layout': {},
+        'paint': {
+          'fill-color': '#888888',
+          'fill-opacity': 0.4
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+```
+
+### 方法四：虚拟化
+
+将数据分块处理，逐步加载和渲染。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet Virtualization</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // 初始化地图
+    const map = L.map('map').setView([51.505, -0.09], 13);
+
+    // 添加 OpenStreetMap 图层
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    // 示例 AOI 数据（GeoJSON 格式）
+    const aoiData = {
+      "type": "FeatureCollection",
+      "features": [
+        // 大量的多边形数据
+      ]
+    };
+
+    // 分块处理数据
+    const chunkSize = 100; // 每次处理的特征数量
+    let currentIndex = 0;
+
+    function processChunk() {
+      const chunk = aoiData.features.slice(currentIndex, currentIndex + chunkSize);
+      if (chunk.length > 0) {
+        L.geoJSON({ type: 'FeatureCollection', features: chunk }).addTo(map);
+        currentIndex += chunkSize;
+        requestAnimationFrame(processChunk);
+      }
+    }
+
+    // 开始处理
+    processChunk();
+  </script>
+</body>
+</html>
+```
+
+通过这些方法，你可以有效地提高 Leaflet 渲染大规模 AOI 数据的性能。选择适合你项目需求的方法即可。

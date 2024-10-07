@@ -184,8 +184,7 @@ const MapComponent = () => {
 export default MapComponent;
 ```
 
-### 解释
-
+解释:
 1. **初始化地图**：我们首先初始化了地图并添加了 Geoman 控件。
 2. **配置 `snappable` 选项**：通过 `map.pm.setGlobalOptions` 方法，我们可以全局配置 Geoman 的选项。在这个示例中，我们启用了 `snappable` 选项，并设置了 `snapDistance` 为 20 像素。这意味着在绘制或编辑图形时，顶点会自动吸附到距离 20 像素以内的其他顶点或图形上。
 3. **事件监听**：我们还监听了 `pm:create` 和 `pm:edit` 事件，以便在创建或编辑图形时输出相关信息。
@@ -269,3 +268,117 @@ export default MapComponent;
   let geomanCacheMarkers = lastGeomanDrawLayer.pm.markerCache;
   console.log('geomanCacheMarkers::', geomanCacheMarkers)
   ```
+
+可以监听与编辑事件相关的事件:
+- `pm:edit` 编辑图层时触发
+  ```js
+  myLayer.on("pm:edit", (e) => {
+    console.log(e);
+  });
+  ```
+
+- `pm:enable` 当启用图层上的编辑模式时触发
+- `pm:disable` 当禁用图层上的编辑模式时触发
+- `pm:update` 当图层被编辑后有改动且退出编辑模式时触发
+
+使用`off`清除之前的事件监听器，防止重复绑定:
+```js
+myLayer.off('pm:enable')
+myLayer.off('pm:edit')
+myLayer.off('pm:update')
+myLayer.off('pm:disable')
+```
+
+## geoman设置语言及自定义提示
+在 Leaflet-Geoman 中，你可以设置语言和自定义提示信息，以便更好地适应不同的语言环境和用户需求。Leaflet-Geoman 提供了一个 `setLang` 方法，可以用来设置语言和自定义提示信息。
+
+以下是一个详细的示例，展示了如何在 Leaflet-Geoman 中设置语言和自定义提示信息。
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet GeoMan Example</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-geoman-free/dist/leaflet-geoman.css" />
+  <style>
+    #map {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-geoman-free/dist/leaflet-geoman.min.js"></script>
+  <script>
+    // 初始化地图
+    const map = L.map('map').setView([51.505, -0.09], 13);
+
+    // 添加 OpenStreetMap 图层
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    // 启用 GeoMan
+    map.pm.addControls({
+      position: 'topleft',
+      drawPolygon: true,
+      editMode: true,
+      dragMode: true,
+      cutPolygon: false,
+      removalMode: true
+    });
+
+    // 设置语言和自定义提示
+    map.pm.setLang('custom', {
+      tooltips: {
+        placeMarker: '点击地图放置标记',
+        firstVertex: '点击地图放置第一个顶点', // 对应 "click to place first vertex"
+        continueLine: '点击地图继续绘制线', // 对应 "click to continue drawing"
+        finishLine: '点击最后一个点完成线',
+        finishPoly: '点击最后一个点完成多边形', // 绘制多边形时对应 "click first marker to finish"
+        finishRect: '点击完成矩形',
+        startCircle: '点击并拖动以绘制圆',
+        finishCircle: '释放鼠标完成圆',
+        placeCircleMarker: '点击地图放置圆形标记'
+      },
+      actions: {
+        finish: '完成',
+        cancel: '取消',
+        removeLastVertex: '移除最后一个顶点'
+      },
+      buttonTitles: {
+        drawMarkerButton: '绘制标记',
+        drawPolyButton: '绘制多边形',
+        drawLineButton: '绘制线',
+        drawCircleButton: '绘制圆',
+        drawRectButton: '绘制矩形',
+        editButton: '编辑图层',
+        dragButton: '拖动图层',
+        cutButton: '切割图层',
+        deleteButton: '删除图层'
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+解释：
+1. **初始化地图**：
+   - 使用 Leaflet 初始化地图，并设置视图中心和缩放级别。
+   - 添加 OpenStreetMap 图层。
+
+2. **启用 GeoMan**：
+   - 启用 GeoMan 控件，允许用户绘制、编辑和删除多边形等图层。
+
+3. **设置语言和自定义提示**：
+   - 使用 `map.pm.setLang` 方法设置语言和自定义提示信息。
+   - 第一个参数为语言代码（例如 `'custom'`），第二个参数为包含提示信息的对象。
+   - 提示信息包括工具提示（`tooltips`）、操作按钮文本（`actions`）和按钮标题（`buttonTitles`）。
+
+4. **应用自定义语言**：
+   - 再次调用 `map.pm.setLang` 方法，并传入自定义语言代码（例如 `'custom'`），以应用自定义语言设置。
+
+通过这种方式，你可以在 Leaflet-Geoman 中设置语言和自定义提示信息。
