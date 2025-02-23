@@ -89,6 +89,14 @@ const config = {
             position : 'right',
             items: [
               {
+                label: 'deepseek',
+                href: 'https://ai.com/',
+              },
+              {
+                label: '腾讯元宝',
+                href: 'https://yuanbao.tencent.com/',
+              },
+              {
                 label: 'bolt',
                 href: 'https://bolt.new/',
               },
@@ -125,8 +133,8 @@ const config = {
                 href: 'https://metaso.cn/',
               },
               {
-                label: '360AI搜索',
-                href: 'https://sou.com/',
+                label: '纳米AI搜索',
+                href: 'https://www.n.cn/',
               },
             ]
           },
