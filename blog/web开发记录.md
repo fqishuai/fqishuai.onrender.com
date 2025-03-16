@@ -621,6 +621,16 @@ SSR（服务器端渲染）也可以在一定程度上解决微信小程序嵌�
 
 总的来说，SSR能够有效提升微信小程序嵌入H5页面的加载速度和用户体验，但同时也需要考虑到实施SSR可能带来的服务器负载增加和开发复杂度提升等问题。
 
+#### APP拉起小程序
+[官方文档](https://developers.weixin.qq.com/doc/oplatform/Mobile_App/Launching_a_Mini_Program/Launching_a_Mini_Program.html)
+
+考虑到部分场景下 APP 需要通过小程序来承载服务，为此 OpenSDK 提供了移动应用（APP）拉起小程序功能。移动应用（APP）接入此功能后，用户可以在 APP 中跳转至微信某一小程序的指定页面，完成服务后再跳回至原 APP 。
+
+#### [小程序转发朋友和分享朋友圈不可用](https://developers.weixin.qq.com/community/develop/doc/0000ae4fe3ca608fc59fe14875e400?_at=1734404797378)
+只有定义了此事件处理函数，右上角菜单才会显示“转发”按钮。文档：https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html#onShareAppMessage-Object-object
+
+只有定义了此事件处理函数，右上角菜单才会显示“分享到朋友圈”按钮。文档：https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html#onShareTimeline
+
 ## antv使用记录
 > 使用@ant-design/plots，文档也可以参考g2的文档([g2 API](https://g2.antv.vision/zh/docs/api/general/tooltip))，底层用的是g2
 
@@ -792,6 +802,639 @@ setTableDatas(resultWithKey); // Table的数据源需要有key prop，否则不�
 ### 5. `Table`组件列特别多时，设置列宽不生效
 注意设置 `scroll={{ x: '4000px' }}` 这个`x`的宽度首先要能够容纳所有设置的列宽之和('4000px'只是举例)，这样在这个总的宽度之内去设置列宽，才能生效。
 
+### 6. `Table`组件怎么动态控制勾选框的勾中与取消
+在 Ant Design 的 Table 组件中，可以使用 `rowSelection` 属性来动态控制行的勾选状态。`rowSelection` 属性接受一个对象，该对象可以包含 `selectedRowKeys` 和 `onChange` 等属性来管理选中的行。
+
+以下是一个示例，展示了如何动态控制 Table 中勾选框的勾中与取消：
+
+```jsx
+import React, { useState } from 'react';
+import { Table, Button } from 'antd';
+
+const App = () => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const data = [
+    {
+      key: '1',
+      name: 'John Brown',
+      age: 32,
+      address: 'New York No. 1 Lake Park',
+    },
+    {
+      key: '2',
+      name: 'Jim Green',
+      age: 42,
+      address: 'London No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Joe Black',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+  ];
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+    },
+  ];
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+  };
+
+  const toggleSelection = (key) => {
+    setSelectedRowKeys((prevSelectedRowKeys) => {
+      if (prevSelectedRowKeys.includes(key)) {
+        return prevSelectedRowKeys.filter((selectedKey) => selectedKey !== key);
+      } else {
+        return [...prevSelectedRowKeys, key];
+      }
+    });
+  };
+
+  return (
+    <div>
+      <Button onClick={() => toggleSelection('1')}>Toggle Selection for Row 1</Button>
+      <Button onClick={() => toggleSelection('2')}>Toggle Selection for Row 2</Button>
+      <Button onClick={() => toggleSelection('3')}>Toggle Selection for Row 3</Button>
+      <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+    </div>
+  );
+};
+
+export default App;
+```
+
+代码解释:
+
+1. **状态管理**：
+   - 使用 `useState` 钩子来管理选中的行的 `selectedRowKeys`。
+
+2. **数据和列定义**：
+   - `data` 数组定义了表格的数据源。
+   - `columns` 数组定义了表格的列。
+
+3. **行选择配置**：
+   - `rowSelection` 对象包含 `selectedRowKeys` 和 `onChange` 属性。
+   - `selectedRowKeys` 用于存储当前选中的行的键。
+   - `onChange` 回调函数在选中行变化时更新 `selectedRowKeys`。
+
+4. **动态控制勾选状态**：
+   - `toggleSelection` 函数用于动态控制行的选中状态。它接收一个行的 `key` 作为参数，并根据当前的 `selectedRowKeys` 来添加或移除该行的 `key`。
+
+5. **按钮控制**：
+   - 三个按钮分别用于切换对应行的选中状态。点击按钮时调用 `toggleSelection` 函数。
+
+6. **Table 组件**：
+   - `Table` 组件通过 `rowSelection` 属性来控制行的选择状态，并将 `columns` 和 `dataSource` 传递给表格。
+
+通过这种方式，你可以动态地控制 Ant Design 表格中行的勾选和取消。
+
+### 7. `Table`组件需要设置`rowKey`
+不设置`rowKey`的话会控制台报错：
+
+### 8. `message`使用注意事项
+`message`使用报错:
+```
+Uncaught Error: Objects are not valid as a React child (found: object with keys {stack, message, name, code, config, request, response, status}). If you meant to render a collection of children, use an array instead.
+
+The above error occurred in the <span> component:
+
+span
+div
+PureContent
+div
+div
+Notify
+```
+
+这个错误通常是因为你试图直接将一个对象渲染到 React 的 JSX 中，而 React 只能渲染原始类型（如字符串、数字）或 React 元素。如果你在使用 Ant Design 的 `message` 组件时遇到这个错误，可能是因为你试图显示一个对象而不是一个字符串。
+
+为了避免这个错误，你需要确保传递给 `message` 组件的内容是一个字符串或其他可以正确渲染的类型。以下是一些具体的解决方案：确保传递字符串给 `message` 组件
+
+如果你从某个操作（例如 API 请求）中获取了一个错误对象，你需要提取并格式化这个错误信息为字符串，然后再传递给 `message` 组件。
+
+假设你有一个 API 请求，并且在请求失败时需要显示错误信息：
+
+```javascript
+import { message } from 'antd';
+import axios from 'axios';
+
+// 示例 API 请求函数
+async function fetchData() {
+  try {
+    const response = await axios.get('https://api.example.com/data');
+    console.log(response.data);
+  } catch (error) {
+    // 提取并格式化错误信息
+    const errorMessage = error.response && error.response.data && error.response.data.message
+      ? error.response.data.message
+      : error.message;
+
+    // 显示错误信息
+    message.error(`Error: ${errorMessage}`);
+  }
+}
+
+// 调用函数以触发请求
+fetchData();
+```
+
+如果你希望显示更详细的错误信息，可以将错误对象的相关信息提取并格式化为字符串：
+
+```javascript
+import { message } from 'antd';
+import axios from 'axios';
+
+// 示例 API 请求函数
+async function fetchData() {
+  try {
+    const response = await axios.get('https://api.example.com/data');
+    console.log(response.data);
+  } catch (error) {
+    // 提取并格式化错误信息
+    const errorMessage = error.response && error.response.data && error.response.data.message
+      ? error.response.data.message
+      : error.message;
+
+    // 显示错误信息
+    message.error(`Error: ${errorMessage}`);
+    
+    // 如果需要显示更多详细信息，可以进一步提取
+    console.error('Full error details:', error);
+  }
+}
+
+// 调用函数以触发请求
+fetchData();
+```
+
+为了避免 `Uncaught Error: Objects are not valid as a React child` 错误，确保传递给 Ant Design 的 `message` 组件的内容是一个字符串或其他可以正确渲染的类型。通过提取和格式化错误信息，你可以确保 `message` 组件显示的是可读的错误消息，而不是 JavaScript 对象。
+
+### 9. `Upload`限制上传数量
+为了限制 Ant Design 的 `Upload` 组件只上传一张图片，你可以使用以下几种方法：
+
+1. **设置 `maxCount` 属性**：
+   `Upload` 组件在 Ant Design 4.9.0 版本之后新增了 `maxCount` 属性，可以直接限制上传文件的数量。
+
+2. **在 `beforeUpload` 中进行文件数量检查**：
+   在 `beforeUpload` 属性中，你可以检查当前已经上传的文件数量，并在达到限制时阻止新的文件上传。
+
+这里是一个完整的示例，展示了如何使用 `maxCount` 和 `beforeUpload` 来限制上传文件数量为1：
+
+```javascript
+import React, { useState } from 'react';
+import { Upload, Button, message } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+
+const UploadComponent = () => {
+  const [fileList, setFileList] = useState([]);
+
+  const handleChange = (info) => {
+    let newFileList = [...info.fileList];
+
+    // 只保留最新上传的文件
+    newFileList = newFileList.slice(-1);
+
+    setFileList(newFileList);
+
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  };
+
+  const beforeUpload = (file) => {
+    if (fileList.length >= 1) {
+      message.error('You can only upload one file at a time');
+      return Upload.LIST_IGNORE;
+    }
+    return true;
+  };
+
+  return (
+    <Upload
+      action="/upload" // 替换为你的上传接口
+      fileList={fileList}
+      onChange={handleChange}
+      beforeUpload={beforeUpload}
+      maxCount={1} // 限制上传数量为1
+    >
+      <Button icon={<UploadOutlined />}>Upload</Button>
+    </Upload>
+  );
+};
+
+export default UploadComponent;
+```
+
+解释：
+
+1. **`fileList` 状态**：
+   - 使用 `useState` 管理上传的文件列表。
+   - 在 `handleChange` 回调中更新文件列表，确保只保留最新的一个文件。
+
+2. **`handleChange` 回调**：
+   - `info.fileList` 包含当前上传的所有文件。
+   - 使用 `slice(-1)` 方法只保留最新上传的一个文件。
+   - 根据文件状态显示成功或失败的消息。
+
+3. **`beforeUpload` 回调**：
+   - 在文件上传前检查当前文件列表的长度。
+   - 如果文件列表长度已经达到限制（1），则阻止新的文件上传并显示错误消息。
+
+4. **`maxCount` 属性**：
+   - 直接限制上传文件的数量为1。
+
+这个示例展示了如何使用 Ant Design 的 `Upload` 组件来限制用户只能上传一张图片。通过结合 `maxCount` 属性和 `beforeUpload` 回调，可以确保用户上传的文件数量不会超过限制。
+
+### 10. `Form`中使用`Upload`并回显
+在 Ant Design 的表单中使用 `Upload` 组件并实现文件上传后的回显，你可以通过设置 `fileList` 属性来控制上传文件列表，并在表单初始化时设置初始值来回显已上传的文件。
+
+以下是一个完整的示例，展示如何在 Ant Design 表单中使用 `Upload` 组件，并在表单初始化时回显已上传的文件：
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import { Form, Upload, Button, message, Input } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+
+const initialFileList = [
+  {
+    uid: '-1',
+    name: 'example.png',
+    status: 'done',
+    url: 'https://example.com/example.png',
+  },
+];
+
+const UploadForm = () => {
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState(initialFileList);
+
+  useEffect(() => {
+    // 设置表单的初始值，包括上传的文件列表
+    form.setFieldsValue({
+      files: fileList,
+    });
+  }, [form, fileList]);
+
+  const handleChange = (info) => {
+    let newFileList = [...info.fileList];
+
+    // 更新文件列表
+    setFileList(newFileList);
+
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  };
+
+  const beforeUpload = (file) => {
+    // 在这里可以添加文件上传前的检查逻辑
+    return true;
+  };
+
+  const onFinish = (values) => {
+    console.log('Form values:', values);
+  };
+
+  return (
+    <Form form={form} onFinish={onFinish}>
+      <Form.Item
+        name="files"
+        label="Upload"
+        valuePropName="fileList"
+        getValueFromEvent={e => e.fileList}
+      >
+        <Upload
+          action="/upload" // 替换为你的上传接口
+          fileList={fileList}
+          onChange={handleChange}
+          beforeUpload={beforeUpload}
+          listType="picture"
+        >
+          <Button icon={<UploadOutlined />}>Upload</Button>
+        </Upload>
+      </Form.Item>
+      <Form.Item
+        name="description"
+        label="Description"
+        rules={[{ required: true, message: 'Please input your description!' }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+
+export default UploadForm;
+```
+
+解释：
+
+1. **初始文件列表**：
+   - `initialFileList` 是一个包含已上传文件信息的数组。每个文件对象包含 `uid`, `name`, `status`, 和 `url` 属性，用于描述文件的唯一标识、文件名、上传状态和文件 URL。
+
+2. **表单初始化**：
+   - 使用 `useEffect` 钩子在组件挂载时设置表单的初始值，包括 `Upload` 组件的文件列表。
+
+3. **`handleChange` 回调**：
+   - 当上传文件列表发生变化时，更新文件列表状态并根据文件状态显示相应的消息。
+
+4. **`beforeUpload` 回调**：
+   - 在文件上传前可以添加检查逻辑，当前示例中直接返回 `true` 允许所有文件上传。
+
+5. **表单项配置**：
+   - `Form.Item` 使用 `name="files"` 和 `valuePropName="fileList"` 来绑定 `Upload` 组件的文件列表。
+   - `getValueFromEvent` 属性用于从事件中提取文件列表并更新表单值。
+
+6. **表单提交**：
+   - 在 `onFinish` 回调中可以获取表单的所有值，包括上传的文件列表。
+
+通过这种方式，你可以在 Ant Design 表单中使用 `Upload` 组件，并在表单初始化时回显已上传的文件。
+
+### 11. `Form`中动态使用`Upload`并回显
+示例：
+```tsx
+import { Upload, UploadFile } from "antd";
+import { PlusOutlined } from '@ant-design/icons';
+import { UploadFileStatus } from "antd/lib/upload/interface";
+import fetchApiData from "@/api";
+
+export default function Demo() {
+  const [dataInfo, setDataInfo] = useState(null);
+  const [uploadedFilesInfo, setUploadedFilesInfo] = useState<{[key: string]: UploadFile[]}>({});
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    let apiResult = await fetchApiData(`/demoApi`);
+    if (apiResult) {
+      if (apiResult.formList?.length && apiResult.mapInfo) {
+        const imageList = apiResult.formList.filter((formItem) => formItem.type == 'image');
+        let obj: {[key: string]: UploadFile[]} = {};
+        for (let index = 0; index < imageList.length; index++) {
+          const imageFormItem = imageList[index];
+          let uploadFileList = [{
+            url: apiResult.mapInfo[imageFormItem.name] as string,
+            uid: `${apiResult.mapInfo.id+1}`,
+            name: `${imageFormItem.name}.png`,
+            status: 'done' as UploadFileStatus,
+          }];
+          obj[imageFormItem.name] = uploadFileList;
+        }
+        setUploadedFilesInfo(obj);
+      }
+      setDataInfo(apiResult);
+    }
+  }
+
+  const beforeUpload = (file: any) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('只支持上传 JPG/PNG 文件');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('图片大小必须小于 2MB');
+    }
+    return isJpgOrPng && isLt2M;
+  }
+  const handleUploadChange = (info: any, config: IFormConfig) => {
+    let newFiles = [...info.fileList];
+    newFiles = newFiles.map((file) => {
+      if (file.response) {
+        file.url = file.response.url;
+      }
+      return file;
+    });
+    setUploadedFilesInfo({...uploadedFilesInfo, [config.name]: newFiles});
+  }
+
+  return (
+    <Form
+      name="returnForm"
+      form={form}
+      labelCol={{ span: 4 }}
+      wrapperCol={{ span: 16 }}
+      style={{ maxWidth: 600 }}
+      autoComplete="off"
+    >
+      {
+        returnInfo?.formConfigList.map((config) => (
+          <Form.Item
+            key={config.name}
+            name={config.name}
+            label={config.label}
+            // labelCol={{span: (config.type == 'image' || config.type == 'text') ? 4 : 4}}
+            // wrapperCol={{span: (config.type == 'image' || config.type == 'text') ? 16 : 16}}
+            initialValue={`${returnInfo.dataMap[config.name]}`}
+            // valuePropName={config.type=='image' ? 'fileList' : 'value'}
+            // getValueFromEvent={(e) => setFormEvent(e, config)}
+            rules={[{ required: config.required, message: config.message }]}
+          >
+            {
+              config.type == 'select' && !!config.optionsName &&
+              <Select options={getSelectOptions(returnInfo[config.optionsName])} onChange={(value, option) => handleSelectChange(config, value, option)}  />
+            }
+            {
+              config.type == 'text' &&
+              <TextArea rows={4} showCount maxLength={200} placeholder={config.placeholder} className="remark-input" />
+            }
+            {
+              config.type == 'input' &&
+              <Input placeholder={config.placeholder} />
+            }
+            {
+              config.type == 'image' &&
+              <Upload
+                name="fileData"
+                listType="picture-card"
+                className="img-uploader"
+                action="/api/upload/commonUploadFile"
+                maxCount={1}
+                fileList={uploadedFilesInfo[config.name]}
+                // showUploadList={false}
+                beforeUpload={beforeUpload}
+                onChange={(info) => handleUploadChange(info, config)}
+              >
+                <button style={{ border: 0, background: 'none' }} type="button">
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>上传</div>
+                </button>
+              </Upload>
+            }
+          </Form.Item>
+        ))
+      }
+    </Form>
+}
+```
+
+### 12. Upload报错：`(intermediate value).forEach is not a function`
+出现 `(intermediate value).forEach is not a function` 错误通常是因为 `Upload` 组件的 `fileList` 属性传递的值不是一个数组。确保 `fileList` 始终是一个数组类型。
+
+以下是一个完整的示例，展示如何在 Ant Design 表单中使用 `Upload` 组件并正确回显已上传的文件，同时确保 `fileList` 始终是一个数组：
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import { Form, Upload, Button, message, Input } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+
+const initialFileList = [
+  {
+    uid: '-1',
+    name: 'example.png',
+    status: 'done',
+    url: 'https://example.com/example.png',
+  },
+];
+
+const UploadForm = () => {
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState(initialFileList);
+
+  useEffect(() => {
+    // 设置表单的初始值，包括上传的文件列表
+    form.setFieldsValue({
+      files: fileList,
+    });
+  }, [form, fileList]);
+
+  const handleChange = (info) => {
+    let newFileList = [...info.fileList];
+
+    // 更新文件列表
+    setFileList(newFileList);
+
+    if (info.file.status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully`);
+    } else if (info.file.status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  };
+
+  const beforeUpload = (file) => {
+    // 在这里可以添加文件上传前的检查逻辑
+    return true;
+  };
+
+  const onFinish = (values) => {
+    console.log('Form values:', values);
+  };
+
+  return (
+    <Form form={form} onFinish={onFinish}>
+      <Form.Item
+        name="files"
+        label="Upload"
+        valuePropName="fileList"
+        getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+      >
+        <Upload
+          action="/upload" // 替换为你的上传接口
+          fileList={fileList}
+          onChange={handleChange}
+          beforeUpload={beforeUpload}
+          listType="picture"
+        >
+          <Button icon={<UploadOutlined />}>Upload</Button>
+        </Upload>
+      </Form.Item>
+      <Form.Item
+        name="description"
+        label="Description"
+        rules={[{ required: true, message: 'Please input your description!' }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+
+export default UploadForm;
+```
+
+关键点解释:
+
+1. **确保 `fileList` 始终是数组**：
+   - 在 `getValueFromEvent` 属性中，使用 `(e) => (Array.isArray(e) ? e : e && e.fileList)` 确保 `fileList` 始终是一个数组。
+
+2. **初始文件列表**：
+   - `initialFileList` 是一个包含已上传文件信息的数组。每个文件对象包含 `uid`, `name`, `status`, 和 `url` 属性，用于描述文件的唯一标识、文件名、上传状态和文件 URL。
+
+3. **表单初始化**：
+   - 使用 `useEffect` 钩子在组件挂载时设置表单的初始值，包括 `Upload` 组件的文件列表。
+
+4. **`handleChange` 回调**：
+   - 当上传文件列表发生变化时，更新文件列表状态并根据文件状态显示相应的消息。
+
+5. **`beforeUpload` 回调**：
+   - 在文件上传前可以添加检查逻辑，当前示例中直接返回 `true` 允许所有文件上传。
+
+6. **表单项配置**：
+   - `Form.Item` 使用 `name="files"` 和 `valuePropName="fileList"` 来绑定 `Upload` 组件的文件列表。
+   - `getValueFromEvent` 属性用于从事件中提取文件列表并更新表单值。
+
+通过这种方式，你可以在 Ant Design 表单中使用 `Upload` 组件，并在表单初始化时回显已上传的文件，同时确保 `fileList` 始终是一个数组，避免出现 `.forEach is not a function` 的错误。
+
+### 13. `Form`中使用`Select`并回显
+`Form.Item`的`initialValue`
+
+### 14. [`Form.useWatch`](https://ant-design.antgroup.com/components/form-cn#formusewatch)
+用于直接获取 `form` 中字段对应的值。
+
+例如：
+```js
+const reservationStatus = Form.useWatch('reservationStatus', form);
+```
+
+### 15. `Form`中使用`DatePicker`并回显
+`Form.Item`的`initialValue`使用`dayjs`处理
+
+```ts
+<Form.Item
+  key={detailFormItem.itemCode}
+  name={detailFormItem.itemCode}
+  label={detailFormItem.itemName}
+  initialValue={dayjs(detailFormItem.itemValue)}
+  rules={[{ required: detailFormItem.required, message: `请填写${detailFormItem.itemName}` }]}
+></Form.Item>
+```
+
 ## elementui使用记录
 ### 1. `el-radio`切换不了
 - 查看选中的值有没有变
@@ -913,6 +1556,163 @@ handleBeforeUpload(file) {
   return isImage && isLt5M;
 },
 ```
+
+### 4. form表单嵌套upload进行校验
+在使用 Element UI 进行表单验证时，如果表单中嵌套了 `el-upload` 组件，你可以通过自定义校验规则来实现文件上传的验证。以下是一个示例，展示了如何在表单中嵌套 `el-upload` 组件并进行校验：
+
+```html
+<template>
+  <el-form :model="form" :rules="rules" ref="form" label-width="120px">
+    <el-form-item label="Name" prop="name">
+      <el-input v-model="form.name"></el-input>
+    </el-form-item>
+    
+    <el-form-item label="Upload" prop="upload">
+      <el-upload
+        class="upload-demo"
+        action="https://jsonplaceholder.typicode.com/posts/"
+        :on-success="handleSuccess"
+        :before-upload="beforeUpload"
+        :file-list="form.upload"
+      >
+        <el-button slot="trigger" size="small" type="primary">Select File</el-button>
+        <div slot="tip" class="el-upload__tip">Only jpg/png files with a size less than 500kb are allowed.</div>
+      </el-upload>
+    </el-form-item>
+    
+    <el-form-item>
+      <el-button type="primary" @click="submitForm('form')">Submit</el-button>
+      <el-button @click="resetForm('form')">Reset</el-button>
+    </el-form-item>
+  </el-form>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      form: {
+        name: '',
+        upload: []
+      },
+      rules: {
+        name: [
+          { required: true, message: 'Please input name', trigger: 'blur' }
+        ],
+        upload: [
+          { required: true, validator: this.validateUpload, trigger: 'change' }
+        ]
+      }
+    };
+  },
+  methods: {
+    handleSuccess(response, file, fileList) {
+      this.form.upload = fileList;
+    },
+    beforeUpload(file) {
+      const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+      const isLt2M = file.size / 1024 / 1024 < 0.5;
+
+      if (!isJPG) {
+        this.$message.error('Upload image must be JPG or PNG format!');
+      }
+      if (!isLt2M) {
+        this.$message.error('Upload image size cannot exceed 500KB!');
+      }
+      return isJPG && isLt2M;
+    },
+    validateUpload(rule, value, callback) {
+      if (this.form.upload.length === 0) {
+        callback(new Error('Please upload a file'));
+      } else {
+        callback();
+      }
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$message.success('Submit successful!');
+        } else {
+          this.$message.error('Submit failed!');
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+      this.form.upload = [];
+    }
+  }
+};
+</script>
+
+<style>
+.upload-demo {
+  margin-bottom: 20px;
+}
+</style>
+```
+
+在这个示例中，我们做了以下几件事：
+
+1. 在 `el-form` 中定义了一个 `el-upload` 组件来处理文件上传。
+2. 使用 `handleSuccess` 方法在文件上传成功后更新表单模型中的 `upload` 属性。
+3. 使用 `beforeUpload` 方法在上传文件之前进行文件类型和大小的验证。
+4. 定义自定义校验规则 `validateUpload`，确保用户上传了至少一个文件。
+5. 在表单提交时，进行校验并显示相应的消息。
+
+这样，当用户上传文件并提交表单时，表单会进行验证，确保所有必填项包括文件上传都已完成。
+
+### 5. 去掉 Element UI 上传组件的文件列表动画
+要去掉 Element UI 上传组件的文件列表动画，你可以通过覆盖相关的 CSS 样式来实现。以下是几个步骤：
+
+1. 首先，找到上传组件的根元素，通常是 `.el-upload-list`。
+
+2. 然后，覆盖与动画相关的 CSS 属性。主要是 `transition` 属性。
+
+3. 你可以在你的组件或全局样式中添加以下 CSS：
+
+```css
+<style scoped>
+.el-upload-list--text {
+  transition: none !important;
+}
+
+.el-upload-list__item {
+  transition: none !important;
+}
+
+.el-upload-list__item-name {
+  transition: none !important;
+}
+
+/* 如果使用了缩略图模式，也可以添加这个 */
+.el-upload-list--picture .el-upload-list__item {
+  transition: none !important;
+}
+</style>
+```
+
+4. 如果你想全局应用这个样式，可以去掉 `scoped` 属性，或者在你的主 CSS 文件中添加这些样式。
+
+5. 如果以上方法不完全有效，你可能需要使用 `!important` 来确保你的样式覆盖了 Element UI 的默认样式。
+
+6. 对于某些特定的动画，你可能还需要覆盖其他的 CSS 属性，如 `animation`。
+
+例如：
+
+```css
+.el-upload-list__item,
+.el-upload-list__item-name,
+.el-upload-list--picture .el-upload-list__item {
+  transition: none !important;
+  animation: none !important;
+}
+```
+
+请注意，移除动画可能会影响用户体验，因为动画通常用于提供视觉反馈。确保这符合你的设计需求。
+
+如果你只想移除特定实例的动画，而不是全局移除，你可以给你的上传组件一个特定的类名，然后只针对这个类名应用以上的 CSS 样式。
 
 ## vxe-grid使用记录
 :::tip
@@ -1478,3 +2278,758 @@ FileSaver.saveAs(blob, "hello world.txt");
 // Saving URLs
 FileSaver.saveAs("https://httpbin.org/image", "image.jpg");
 ```
+
+## [微信网页开发JS SDK](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html)
+### 微信分享给朋友自定义分享内容
+在微信分享给朋友的内容中，图片的大小是由微信自动调整的，开发者无法直接控制图片的显示大小。但是，开发者可以通过优化图片的尺寸和比例来确保在微信中显示效果良好。以下是一些建议和步骤，帮助你设置分享内容中的图片：
+
+1. 图片尺寸建议
+
+   微信对分享图片有一定的推荐尺寸和比例，以下是一些常见的建议：
+
+   - **缩略图尺寸**：建议使用 300x300 像素或 5:4 比例的图片。
+   - **图片格式**：推荐使用 JPEG 或 PNG 格式。
+   - **文件大小**：尽量保持图片文件大小在 300KB 以内，以确保加载速度和显示效果。
+
+2. 使用微信分享接口
+
+   在微信的开发接口中，通过 `wx.updateAppMessageShareData` 或 `wx.onMenuShareAppMessage` 方法可以设置分享给朋友的内容，包括标题、描述、链接和缩略图。以下是一个示例：
+
+   ```javascript
+   wx.ready(function () {
+       wx.updateAppMessageShareData({ 
+           title: '分享标题', // 分享标题
+           desc: '分享描述', // 分享描述
+           link: 'https://example.com', // 分享链接
+           imgUrl: 'https://example.com/image.jpg', // 分享图标
+           success: function () {
+               // 设置成功
+           }
+       });
+   });
+   ```
+
+3. 图片优化建议
+
+   - **保持图片清晰度**：确保图片在 300x300 像素下仍然清晰可见。
+   - **避免过多文字**：图片中的文字应简洁明了，避免过多的文字内容。
+   - **使用高对比度**：确保图片中的主要元素与背景有足够的对比度，以便在缩略图中仍然清晰可辨。
+
+以下是一个完整的示例，展示如何通过微信 JavaScript SDK 设置分享内容：
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>微信分享示例</title>
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+    <script>
+        // 微信配置
+        wx.config({
+            debug: false,
+            appId: 'your_app_id',
+            timestamp: 'timestamp',
+            nonceStr: 'nonceStr',
+            signature: 'signature',
+            jsApiList: [
+                'updateAppMessageShareData',
+                'onMenuShareAppMessage'
+            ]
+        });
+
+        wx.ready(function () {
+            // 设置分享内容
+            wx.updateAppMessageShareData({ 
+                title: '分享标题', 
+                desc: '分享描述', 
+                link: 'https://example.com', 
+                imgUrl: 'https://example.com/image.jpg', 
+                success: function () {
+                    // 设置成功
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>微信分享示例</h1>
+</body>
+</html>
+```
+
+:::tip
+1. 分享链接的域名必须已经在微信公众平台的“JS接口安全域名”设置中进行过验证和配置。进入“设置” -> “公众号设置” -> “功能设置” -> 在“JS接口安全域名”一栏，添加你的域名并进行验证。
+
+2. 你在调用 `wx.updateAppMessageShareData` 时，传递的 `link` 参数的域名必须与当前页面的域名一致。例如，如果你的页面在 `https://example.com/page`，那么分享链接的域名也必须是 `example.com`。
+:::
+
+## 使用lodash
+为了减少包的体积并仅安装你需要的 `lodash` 函数，你可以使用 `lodash-es` 或者直接从 `lodash` 库中按需导入特定的函数。以下是如何安装和使用最小的 `lodash` 包的详细说明。
+
+### 方法一：使用 `lodash-es`
+
+`lodash-es` 是 `lodash` 的 ES 模块版本，支持按需导入，可以更好地与现代打包工具（如 Vite、Webpack）配合使用。
+
+1. **安装 `lodash-es`**：
+
+```bash
+npm install lodash-es
+npm install --save-dev @types/lodash-es
+```
+
+2. **按需导入 `debounce` 函数**：
+
+```javascript
+import debounce from 'lodash-es/debounce';
+```
+
+### 方法二：按需导入 `lodash` 函数
+
+你也可以直接从 `lodash` 库中按需导入特定的函数，这样可以确保只打包你需要的部分。
+
+1. **安装 `lodash`**：
+
+```bash
+npm install lodash
+```
+
+2. **按需导入 `debounce` 函数**：
+
+```javascript
+import debounce from 'lodash/debounce';
+```
+
+以下是一个示例，展示如何在 React 组件中使用按需导入的 `debounce` 函数。
+
+```jsx
+import React, { useState, useCallback, useEffect } from 'react';
+import debounce from 'lodash-es/debounce'; // 或者使用 'lodash/debounce'
+
+const SearchComponent = () => {
+  const [query, setQuery] = useState('');
+
+  const handleSearch = useCallback(
+    debounce((value) => {
+      console.log('Searching for:', value);
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      handleSearch.cancel();
+    };
+  }, [handleSearch]);
+
+  const handleChange = (event) => {
+    const value = event.target.value;
+    setQuery(value);
+    handleSearch(value);
+  };
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={query}
+        onChange={handleChange}
+        placeholder="Search..."
+      />
+    </div>
+  );
+};
+
+export default SearchComponent;
+```
+
+详细说明:
+
+1. **安装 `lodash-es` 或 `lodash`**：
+   - 使用 `npm install lodash-es` 安装 `lodash-es`，或者使用 `npm install lodash` 安装 `lodash`。
+
+2. **按需导入 `debounce` 函数**：
+   - 使用 `import debounce from 'lodash-es/debounce';` 从 `lodash-es` 导入 `debounce` 函数，或者使用 `import debounce from 'lodash/debounce';` 从 `lodash` 导入 `debounce` 函数。
+
+3. **在 React 组件中使用 `debounce`**：
+   - 使用 `useState` 钩子来管理输入框的状态。
+   - 使用 `useCallback` 钩子来定义一个被 `debounce` 的函数 `handleSearch`。`debounce` 函数接受两个参数：要被限制执行频率的函数和时间间隔（以毫秒为单位）。
+   - 在 `handleChange` 函数中，更新输入框的状态，并调用被 `debounce` 的 `handleSearch` 函数。
+   - 使用 `useEffect` 钩子在组件卸载时清理 `debounce` 函数。
+
+通过这种方式，你可以确保只打包和使用 `lodash` 中你需要的部分，从而减少包的体积。
+
+## 拖拽
+[`react-draggable`](https://github.com/react-grid-layout/react-draggable)
+
+### 拖拽排序
+以下是 `react-beautiful-dnd`、`react-dnd`、`react-sortable-hoc` 和 `dnd-kit` 这几个库的对比：
+
+#### 1. [`react-beautiful-dnd`](https://github.com/atlassian/react-beautiful-dnd)
+33.6k 官方声明2025-4-30弃用改组件库，推荐使用dnd-kit
+
+**优点**：
+- **易用性**：API 设计简洁，易于上手。
+- **用户体验**：提供了良好的拖拽动画和用户体验。
+- **文档**：文档详细，示例丰富。
+
+**缺点**：
+- **灵活性**：对于一些复杂的拖拽需求，可能不够灵活。
+- **性能**：在处理大量元素时，性能可能会有所下降。
+
+**适用场景**：
+- 适用于大多数常见的拖拽排序需求，特别是列表和网格布局。
+
+#### 2. [`react-dnd`](https://github.com/react-dnd/react-dnd)
+21.2k
+
+**优点**：
+- **灵活性**：基于 HTML5 拖放 API，适用于复杂的拖放需求。
+- **可扩展性**：可以处理多种拖放场景，不仅限于排序。
+
+**缺点**：
+- **学习曲线**：API 相对复杂，需要更多的学习和配置。
+- **文档**：文档较为详细，但示例相对较少。
+
+**适用场景**：
+- 适用于需要高度自定义和复杂拖放交互的应用，如看板、树形结构等。
+
+#### 3. [`react-sortable-hoc`](https://github.com/clauderic/react-sortable-hoc)
+10.8k 官方声明该库不再被积极维护。所有开发工作均已转向`@dnd-kit`。它提供功能奇偶性，采用现代且可扩展的架构构建，支持复杂的用例并具有内置的辅助功能。强烈鼓励新消费者采用`@dnd-kit`，而不是采用`react-sortable-hoc`。
+
+
+
+**优点**：
+- **易用性**：API 设计简洁，易于上手。
+- **性能**：性能较好，适用于处理大量元素。
+
+**缺点**：
+- **灵活性**：功能相对单一，主要用于拖拽排序，不适用于复杂的拖放需求。
+- **维护**：库的维护频率较低，可能存在一些未解决的问题。
+
+**适用场景**：
+- 适用于简单的拖拽排序需求，如列表和网格布局。
+
+#### 4. [`dnd-kit`](https://github.com/clauderic/dnd-kit)
+13.6k `npm install @dnd-kit/core`
+
+Dnd Kit 的核心是三个主要的组件：DndContext、Draggable 和 Droppable。
+
+DndContext：作为父组件，管理拖放操作的上下文环境。
+Draggable：表示可以拖动的元素。
+Droppable：表示可以放置拖动元素的目标区域。
+
+
+**优点**：
+- **现代化**：基于现代化的设计，提供了灵活的 API 和良好的性能。
+- **灵活性**：可以处理多种拖放场景，支持复杂的交互。
+- **性能**：性能优异，适用于处理大量元素。
+
+**缺点**：
+- **学习曲线**：API 相对复杂，需要更多的学习和配置。
+- **文档**：文档较为详细，但示例相对较少。
+
+**适用场景**：
+- 适用于需要高度自定义和复杂拖放交互的应用，如看板、树形结构等。
+
+示例：以下是一个使用 `dnd-kit` 实现拖拽排序的示例。这个示例展示了如何使用 `dnd-kit` 库来创建一个简单的拖拽排序列表。
+
+首先，安装 `dnd-kit`：
+
+```bash
+npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/modifiers
+```
+
+然后，创建一个组件来实现拖拽排序：
+
+```jsx
+import React, { useState } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  PointerSensor,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+const SortableItem = ({ id }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    padding: '8px',
+    margin: '4px',
+    backgroundColor: '#f0f0f0',
+    border: '1px solid #ccc',
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {id}
+    </div>
+  );
+};
+
+const DragAndDrop = () => {
+  const [items, setItems] = useState(['Item 1', 'Item 2', 'Item 3', 'Item 4']);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id);
+        const newIndex = items.indexOf(over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        {items.map((id) => (
+          <SortableItem key={id} id={id} />
+        ))}
+      </SortableContext>
+    </DndContext>
+  );
+};
+
+export default DragAndDrop;
+```
+
+代码解释：
+
+1. **安装依赖**：
+   安装 `@dnd-kit/core`、`@dnd-kit/sortable` 和 `@dnd-kit/modifiers` 这三个包。
+
+2. **SortableItem 组件**：
+   - 使用 `useSortable` 钩子来使每个项目可拖拽。
+   - 设置拖拽元素的样式，包括 `transform` 和 `transition`。
+
+3. **DragAndDrop 组件**：
+   - 使用 `useState` 钩子来管理项目列表的状态。
+   - 使用 `useSensors` 和 `useSensor` 来配置传感器，这里使用 `PointerSensor` 来处理拖拽事件。
+   - 在 `DndContext` 中配置 `collisionDetection` 和 `onDragEnd` 回调函数。
+   - 使用 `SortableContext` 包裹可拖拽的项目，并设置排序策略为 `verticalListSortingStrategy`。
+
+4. **handleDragEnd 函数**：
+   - 在拖拽结束时，更新项目列表的顺序。
+
+这个示例展示了如何使用 `dnd-kit` 来实现一个简单的拖拽排序列表。你可以根据需要进一步自定义和扩展这个示例。
+
+
+`activationConstraint` 是 `dnd-kit` 中用于配置拖拽激活条件的一个选项。它允许你设置一些约束条件，只有在满足这些条件时，拖拽操作才会被激活。这样可以避免误触发拖拽操作，提高用户体验。
+
+在 `dnd-kit` 中，`activationConstraint` 可以配置在传感器（如 `PointerSensor`）中。以下是一个示例，展示了如何使用 `activationConstraint` 来设置拖拽激活的距离约束
+
+**`activationConstraint: { distance: 10 }`** 的含义是：
+
+- **distance**：设置拖拽激活的距离约束。只有当用户拖动的距离超过 10 像素时，拖拽操作才会被激活。
+
+除了 `distance` 之外，`activationConstraint` 还可以配置其他类型的约束条件，例如时间约束：
+
+```jsx
+const sensors = useSensors(
+  useSensor(PointerSensor, {
+    activationConstraint: {
+      delay: 250, // 250 毫秒
+      tolerance: 5, // 5 像素
+    },
+  })
+);
+```
+
+- **delay**：设置拖拽激活的时间延迟。只有当用户按住元素超过 250 毫秒时，拖拽操作才会被激活。
+- **tolerance**：设置拖拽激活的容差距离。在延迟时间内，用户可以在 5 像素范围内移动而不会取消拖拽激活。
+
+通过配置 `activationConstraint`，你可以更精确地控制拖拽操作的激活条件，从而提高用户体验，避免误操作。
+
+
+## 平滑滚动
+
+简单滑动使用`window.scrollTo`:
+```js
+// 滑动到顶部
+window.scrollTo({
+  top: 0,
+  behavior: 'smooth' // 平滑滚动
+});
+```
+
+如果你正在寻找类似 `react-scroll` 的库来实现滚动定位功能，以下是一些常用的库和工具，它们可以帮助你在 React 应用中实现平滑滚动和滚动定位功能：
+
+### 1. `react-scroll`
+
+`react-scroll` 是一个非常流行的库，用于在 React 应用中实现平滑滚动和滚动定位功能。4.4k star
+
+安装：
+```bash
+npm install react-scroll
+npm install -D @types/react-scroll
+```
+
+示例：
+
+```jsx
+import React from 'react';
+import { Link, Element, animateScroll as scroll } from 'react-scroll';
+
+const ScrollExample = () => {
+  return (
+    <div>
+      <button onClick={() => scroll.scrollTo(100)}>Scroll to Position 100</button>
+      <Link to="item5" smooth={true} duration={500}>
+        Scroll to Item 5
+      </Link>
+      <div style={{ height: '200px', overflow: 'auto', border: '1px solid #ccc' }}>
+        <ul>
+          {Array.from({ length: 20 }, (_, index) => (
+            <Element name={`item${index + 1}`} key={index}>
+              <li>Item {index + 1}</li>
+            </Element>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default ScrollExample;
+```
+
+#### 遇到的问题
+根据如下官方示例可以实现预期效果：
+```jsx
+import React from 'react';
+import { Link, Element } from 'react-scroll';
+
+function App() {
+  return (
+    <div>
+      <nav>
+        <ul>
+          <li>
+            <Link to="section1" smooth={true} duration={500}>Section 1</Link>
+          </li>
+          <li>
+            <Link to="section2" smooth={true} duration={500}>Section 2</Link>
+          </li>
+          {/* Add more navigation links as needed */}
+        </ul>
+      </nav>
+      <Element name="section1">
+        <section style={{ height: '100vh', backgroundColor: 'lightblue' }}>
+          <h1>Section 1</h1>
+          <p>This is the content of section 1</p>
+        </section>
+      </Element>
+      <Element name="section2">
+        <section style={{ height: '100vh', backgroundColor: 'lightgreen' }}>
+          <h1>Section 2</h1>
+          <p>This is the content of section 2</p>
+        </section>
+      </Element>
+      {/* Add more sections with Element components as needed */}
+    </div>
+  );
+}
+
+export default App;
+```
+
+但是，当把父元素高度固定为`200px`并设置可滚动，`section`高度设为`100px`后，点击`Link`或手动触发滚动都不能生效。解决方案：手动指定父元素为可滚动区域。
+```js
+import { Link, Element, scroller } from "react-scroll";
+
+export default function Demo() {
+  const scrollToSection = () => {
+    scroller.scrollTo('section1', {
+      duration: 500,
+      delay: 0,
+      smooth: 'easeInOutQuart',
+      offset: 50,
+      containerId: 'parent-container' // 指定滚动容器的ID，这个很重要
+    });
+  };
+  return (
+    <div style={{height:'200px', overflow:'auto'}} id="parent-container">
+      <button onClick={scrollToSection}>Scroll to Section 1</button>
+      {/* <nav>
+        <ul>
+          <li>
+            <Link to="section1" smooth={true} duration={500}>Section 1</Link>
+          </li>
+          <li>
+            <Link to="section2" smooth={true} duration={500}>Section 2</Link>
+          </li>
+        </ul>
+      </nav> */}
+      <Element name="section1">
+        <section style={{ height: '100px', backgroundColor: 'lightblue' }}>
+          <h1>Section 1</h1>
+          <p>This is the content of section 1</p>
+        </section>
+      </Element>
+      <Element name="section2">
+        <section style={{ height: '100px', backgroundColor: 'lightgreen' }}>
+          <h1>Section 2</h1>
+          <p>This is the content of section 2</p>
+        </section>
+      </Element>
+      {/* Add more sections with Element components as needed */}
+    </div>
+  )
+}
+```
+
+### 2. `react-scroll-to-component`
+
+`react-scroll-to-component` 是另一个用于在 React 应用中实现平滑滚动的库。168 star
+
+安装：
+
+```bash
+npm install react-scroll-to-component
+```
+
+示例：
+
+```jsx
+import React, { useRef } from 'react';
+import scrollToComponent from 'react-scroll-to-component';
+
+const ScrollToComponentExample = () => {
+  const sectionRef = useRef(null);
+
+  return (
+    <div>
+      <button onClick={() => scrollToComponent(sectionRef.current, { offset: 0, align: 'top', duration: 500 })}>
+        Scroll to Section
+      </button>
+      <div style={{ height: '200px', overflow: 'auto', border: '1px solid #ccc' }}>
+        <div ref={sectionRef} style={{ height: '1000px' }}>
+          <h2>Section</h2>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ScrollToComponentExample;
+```
+
+### 3. `react-router-hash-link`
+
+`react-router-hash-link` 是一个用于在 React Router 中实现平滑滚动的库。735 star
+
+安装：
+
+```bash
+npm install react-router-hash-link
+```
+
+示例：
+
+```jsx
+import React from 'react';
+import { HashLink as Link } from 'react-router-hash-link';
+
+const HashLinkExample = () => {
+  return (
+    <div>
+      <Link smooth to="#section1">Scroll to Section 1</Link>
+      <div style={{ height: '200px', overflow: 'auto', border: '1px solid #ccc' }}>
+        <div id="section1" style={{ height: '1000px' }}>
+          <h2>Section 1</h2>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HashLinkExample;
+```
+
+### 4. `react-scrollspy`
+
+`react-scrollspy` 是一个用于在滚动时高亮导航链接的库。不再主动维护，请改用`@makotot/ghostui`。61 star
+
+安装：
+
+```bash
+npm install react-scrollspy
+```
+
+示例：
+
+```jsx
+import React from 'react';
+import Scrollspy from 'react-scrollspy';
+
+const ScrollSpyExample = () => {
+  return (
+    <div>
+      <Scrollspy items={['section1', 'section2']} currentClassName="is-current">
+        <li><a href="#section1">Section 1</a></li>
+        <li><a href="#section2">Section 2</a></li>
+      </Scrollspy>
+      <div style={{ height: '200px', overflow: 'auto', border: '1px solid #ccc' }}>
+        <div id="section1" style={{ height: '1000px' }}>
+          <h2>Section 1</h2>
+        </div>
+        <div id="section2" style={{ height: '1000px' }}>
+          <h2>Section 2</h2>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ScrollSpyExample;
+```
+
+### 5. `react-scroll-into-view`
+
+`react-scroll-into-view` 是一个用于在 React 应用中实现平滑滚动的库。52 star
+
+安装：
+
+```bash
+npm install react-scroll-into-view
+```
+
+示例：
+
+```jsx
+import React from 'react';
+import ScrollIntoView from 'react-scroll-into-view';
+
+const ScrollIntoViewExample = () => {
+  return (
+    <div>
+      <ScrollIntoView selector="#section1">
+        <button>Scroll to Section 1</button>
+      </ScrollIntoView>
+      <div style={{ height: '200px', overflow: 'auto', border: '1px solid #ccc' }}>
+        <div id="section1" style={{ height: '1000px' }}>
+          <h2>Section 1</h2>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ScrollIntoViewExample;
+```
+
+## 轮询
+### 在 Vue.js 项目中使用 Axios 进行轮询
+在 Vue.js 项目中使用 Axios 进行轮询是一种常见的需求，特别是当你需要定期从服务器获取最新数据时。以下是一个使用 Axios 进行轮询的示例：
+
+```vue
+<template>
+  <div>
+    <h1>Data Polling Example</h1>
+    <div v-if="loading">Loading...</div>
+    <div v-if="error">{{ error }}</div>
+    <ul v-if="data">
+      <li v-for="item in data" :key="item.id">{{ item.title }}</li>
+    </ul>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      data: null,
+      loading: false,
+      error: null,
+      pollingInterval: null
+    };
+  },
+  methods: {
+    async fetchData() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get('https://api.example.com/data');
+        this.data = response.data;
+      } catch (err) {
+        this.error = 'Error fetching data: ' + err.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+    startPolling() {
+      this.fetchData(); // 立即执行一次
+      this.pollingInterval = setInterval(() => {
+        this.fetchData();
+      }, 5000); // 每5秒轮询一次
+    },
+    stopPolling() {
+      clearInterval(this.pollingInterval);
+    }
+  },
+  mounted() {
+    this.startPolling();
+  },
+  beforeDestroy() {
+    this.stopPolling();
+  }
+};
+</script>
+```
+
+这个示例实现了以下功能：
+
+1. `fetchData` 方法使用 Axios 发送 GET 请求到指定 URL。
+
+2. `startPolling` 方法启动轮询：
+   - 立即调用一次 `fetchData`。
+   - 使用 `setInterval` 每 5 秒调用一次 `fetchData`。
+
+3. `stopPolling` 方法用于停止轮询，清除 `setInterval`。
+
+4. 在组件挂载时（`mounted` 钩子）启动轮询。
+
+5. 在组件销毁前（`beforeDestroy` 钩子）停止轮询，以防止内存泄漏。
+
+注意事项：
+
+- 调整轮询间隔（示例中为 5000 毫秒）以适应你的需求。
+- 考虑添加错误处理逻辑，例如在连续失败多次后暂停轮询。
+- 如果你的应用需要在后台持续轮询，考虑使用 Web Workers 或服务端推送技术（如 WebSockets）。
+- 确保你的服务器能够处理频繁的请求，并考虑实现节流或限速机制。
+
+这种轮询方法适用于需要定期更新数据的场景，但要注意不要设置过于频繁的轮询间隔，以免对服务器造成不必要的负担。

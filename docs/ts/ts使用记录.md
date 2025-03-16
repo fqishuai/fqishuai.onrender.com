@@ -260,3 +260,116 @@ type T = {
 ```ts
 type T = Record<string, any>
 ```
+
+## `keyof`
+在 TypeScript 中，你可以使用对象的键（keys）作为类型来确保类型安全性。为了实现这一点，你可以使用 TypeScript 提供的一些内置类型工具，比如 `keyof` 和索引类型查询。
+
+假设你有一个对象，并且你希望使用该对象的键作为另一个类型的键，你可以这样做：
+
+```typescript
+// 假设你有一个对象
+const myObject = {
+  name: "Alice",
+  age: 30,
+  isActive: true,
+};
+
+// 使用 typeof 和 keyof 获取对象的键作为类型
+type MyObjectKeys = keyof typeof myObject;
+
+// 现在 MyObjectKeys 是 "name" | "age" | "isActive"
+
+// 你可以使用这个类型在其他地方
+function getValueByKey(obj: typeof myObject, key: MyObjectKeys) {
+  return obj[key];
+}
+
+// 使用示例
+const name = getValueByKey(myObject, "name"); // 这是合法的
+const age = getValueByKey(myObject, "age");   // 这是合法的
+// const invalid = getValueByKey(myObject, "invalidKey"); // 这会导致类型错误，因为 "invalidKey" 不是 MyObjectKeys 类型的一部分
+```
+
+在上述代码中，`keyof typeof myObject` 表示 `myObject` 对象的所有键的联合类型，即 `"name" | "age" | "isActive"`。这使得 `MyObjectKeys` 类型可以被用作函数参数的类型，从而确保只有合法的键可以被传递。
+
+此外，如果你需要定义一个通用函数来处理任意对象的键，你可以使用泛型：
+
+```typescript
+function getValueByKey<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+// 使用示例
+const value1 = getValueByKey(myObject, "name"); // 这是合法的
+const value2 = getValueByKey(myObject, "age");  // 这是合法的
+// const value3 = getValueByKey(myObject, "invalidKey"); // 这会导致类型错误，因为 "invalidKey" 不是 myObject 的键
+```
+
+在这个泛型函数中，`T` 是对象的类型，`K` 是对象的键类型（它必须是 `T` 的一个键）。这种方法使得函数更通用，可以处理不同类型的对象。
+
+## 类型复用（`Pick`）
+在 TypeScript 中，如果你有一个类型 `B`，并且想要创建一个类型 `A`，其中包含 `B` 的某些类型，同时 `A` 还可以有自己的类型，你可以使用 TypeScript 的类型工具，比如 `Pick`、`Omit` 和交叉类型。
+
+以下是一个示例，展示了如何实现这一目标：
+
+假设你有一个类型 `B`：
+
+```typescript
+type B = {
+  id: number;
+  name: string;
+  age: number;
+  address: string;
+};
+```
+
+现在你想创建一个类型 `A`，它包含 `B` 的 `id` 和 `name` 属性，同时还包含自己的属性 `email` 和 `phone`。
+
+你可以使用 `Pick` 来选择 `B` 中的某些属性，并通过交叉类型来添加新的属性：
+
+```typescript
+type A = Pick<B, 'id' | 'name'> & {
+  email: string;
+  phone: string;
+};
+```
+
+这样，类型 `A` 就包含了 `B` 的 `id` 和 `name` 属性，以及 `A` 自己的 `email` 和 `phone` 属性。
+
+完整的示例代码如下：
+
+```typescript
+type B = {
+  id: number;
+  name: string;
+  age: number;
+  address: string;
+};
+
+type A = Pick<B, 'id' | 'name'> & {
+  email: string;
+  phone: string;
+};
+
+// 示例对象
+const exampleA: A = {
+  id: 1,
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+  phone: '123-456-7890',
+};
+```
+
+解释：
+
+1. **类型 `B`**:
+   - `B` 是一个包含 `id`, `name`, `age`, 和 `address` 属性的类型。
+
+2. **类型 `A`**:
+   - 使用 `Pick<B, 'id' | 'name'>` 从类型 `B` 中选择 `id` 和 `name` 属性。
+   - 使用交叉类型 `&` 添加 `A` 自己的属性 `email` 和 `phone`。
+
+3. **示例对象**:
+   - `exampleA` 是一个符合类型 `A` 的对象，包含 `id`, `name`, `email`, 和 `phone` 属性。
+
+这种方法非常灵活，可以让你在复用现有类型的同时添加新的属性。你也可以使用 `Omit` 来排除某些属性，或者结合使用 `Pick` 和 `Omit` 来创建更加复杂的类型。

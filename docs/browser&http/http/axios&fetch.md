@@ -56,6 +56,47 @@ const axios = require('axios').default;
    axios('/user/12345');
    ```
 
+使用示例：
+```ts title="src/api/index.ts"
+import axios, { type AxiosResponse } from 'axios';
+import { message } from 'antd';
+
+interface IResult {
+  success: boolean
+  errorCode?: string
+  code?: number | string
+  result?: any
+  data?: any
+  localizedMessage?: string
+  message?: string
+}
+
+async function fetchApiData(url: string, method='get', config?: any) {
+  try {
+    let axiosConfig = config ? {
+      ...config,
+      url,
+      method,
+    } : {
+      url,
+      method,
+    }
+    const axiosResponse: AxiosResponse<IResult> = await axios({
+      ...axiosConfig,
+      timeout: 3000,
+      headers: {'X-Requested-With': 'XMLHttpRequest'}
+    });
+    const { data } = axiosResponse;
+    if (!data.success) throw data.localizedMessage || data.message;
+    return data.result || data.data;
+  } catch (error: any) {
+    message.error(error);
+  }
+}
+
+export default fetchApiData;
+```
+
 #### 请求方式别名
 为了方便起见，已经为所有支持的请求方法提供了别名。在使用别名方法时，`url`、`method`、`data` 这些属性都不必在配置中指定。
 - `axios.request(config)`
@@ -491,6 +532,205 @@ controller.abort()
 ```
 
 #### CancelToken(已弃用 deprecated)
+```js
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
+
+axios.get('/user/12345', {
+  cancelToken: source.token
+}).catch(function (thrown) {
+  if (axios.isCancel(thrown)) {
+    console.log('Request canceled', thrown.message);
+  } else {
+    // 处理错误
+  }
+});
+
+axios.post('/user/12345', {
+  name: 'new name'
+}, {
+  cancelToken: source.token
+})
+
+// 取消请求（message 参数是可选的）
+source.cancel('Operation canceled by the user.');
+```
+
+### 取消请求后重新发起该请求
+在使用 `AbortController` 或 `CancelToken` 取消 Axios 请求后，如果你想再次激活或重新发起该请求，你需要重新创建一个新的请求。这是因为请求一旦被取消，原来的 `AbortController` 或 `CancelToken` 就不能再被重用。
+
+#### 示例
+下面是如何在取消请求后重新发起请求的示例：
+
+1. 使用 `AbortController`
+
+   ```javascript
+   const axios = require('axios');
+
+   // 函数：发起请求
+   function makeRequest(controller) {
+     const signal = controller.signal;
+
+     axios.get('https://jsonplaceholder.typicode.com/todos/1', {
+       signal: signal
+     }).then(response => {
+       console.log('请求成功:', response.data);
+     }).catch(error => {
+       if (axios.isCancel(error)) {
+         console.log('请求被取消:', error.message);
+       } else {
+         // 处理其他错误
+         console.error('请求失败:', error);
+       }
+     });
+   }
+
+   // 创建一个 AbortController 实例
+   let controller = new AbortController();
+
+   // 发起请求
+   makeRequest(controller);
+
+   // 取消请求
+   setTimeout(() => {
+     controller.abort();
+     console.log('请求已取消');
+
+     // 重新创建一个新的 AbortController 实例
+     controller = new AbortController();
+
+     // 再次发起请求
+     makeRequest(controller);
+   }, 1000); // 1 秒后取消请求并重新发起
+   ```
+
+2. 使用 `CancelToken`
+
+   ```javascript
+   const axios = require('axios');
+
+   // 函数：发起请求
+   function makeRequest(source) {
+     axios.get('https://jsonplaceholder.typicode.com/todos/1', {
+       cancelToken: source.token
+     }).then(response => {
+       console.log('请求成功:', response.data);
+     }).catch(error => {
+       if (axios.isCancel(error)) {
+         console.log('请求被取消:', error.message);
+       } else {
+         // 处理其他错误
+         console.error('请求失败:', error);
+       }
+     });
+   }
+
+   // 创建一个 CancelToken 源
+   let source = axios.CancelToken.source();
+
+   // 发起请求
+   makeRequest(source);
+
+   // 取消请求
+   setTimeout(() => {
+     source.cancel('取消请求');
+     console.log('请求已取消');
+
+     // 重新创建一个新的 CancelToken 源
+     source = axios.CancelToken.source();
+
+     // 再次发起请求
+     makeRequest(source);
+   }, 1000); // 1 秒后取消请求并重新发起
+   ```
+
+解释：
+1. **定义请求函数**：定义一个函数 `makeRequest`，它接受一个 `AbortController` 或 `CancelToken`，并发起请求。
+2. **创建控制器或取消令牌**：首次创建一个 `AbortController` 或 `CancelToken`。
+3. **发起请求**：调用 `makeRequest` 函数发起请求。
+4. **取消请求**：在需要取消请求的地方调用 `abort` 方法或 `cancel` 方法。
+5. **重新创建控制器或取消令牌**：取消请求后，重新创建一个新的 `AbortController` 或 `CancelToken`。
+6. **再次发起请求**：调用 `makeRequest` 函数再次发起请求。
+
+通过这种方式，你可以在取消请求后重新发起请求。每次取消请求后，都需要创建新的控制器或取消令牌，以确保能够再次发起请求。
+
+#### 实际项目中的使用
+场景：切换tab选项卡请求不同的接口，其中一个tab A请求的接口B响应很慢，切换到其他tab时应该取消接口B的请求，避免超时报错影响当前tab的操作体验，当再次切换到tab A时应该重新发起请求B
+```js title="api.js"
+import axios from 'axios';
+
+export let source = axios.CancelToken.source();
+
+export const queryAPI = (data, newSource) => {
+  if (newSource) source = newSource;
+  axios.post(`/B`, data, {
+    cancelToken: source.token
+  })
+},
+```
+```vue title="tabContainer.vue"
+<template>
+  <el-tabs v-model="activeTabName" type="card" @tab-click="handleTabClick" :before-leave="handleBeforeLeaveTab">
+    <el-tab-pane label="TabA" name="tabA">
+      <TabA :clickTabFlag="clickTabFlag" />
+    </el-tab-pane>
+  </el-tabs>
+</template>
+<script>
+import TabA from './components/TabA.vue'
+import { source } from '@/api'
+
+export default {
+  components: {
+    TabA,
+  },
+  data() {
+    clickTabFlag: false,
+    activeTabName: '',
+  },
+  methods: {
+    handleTabClick() {
+      if (this.activeTabName === 'tabA') {
+        this.clickTabFlag = true;
+      } else {
+       this.clickTabFlag = false;
+      }
+    },
+    handleBeforeLeaveTab(activeName, oldActiveName) {
+      // 离开tabA时取消请求
+      if (oldActiveName === 'tabA') {
+        source.cancel();
+      }
+    },
+  }
+}
+</script>
+```
+```vue title="TabA.vue"
+<script>
+import axios from 'axios'
+import { queryAPI } from '@/api'
+
+export default {
+  watch: {
+     clickTabFlag(newValue, oldValue) {
+       if (newValue) {
+         // 重新创建一个新的 CancelToken 源，用于重新发起请求
+         const newSource = axios.CancelToken.source();
+         this.handleSearch(newSource);
+       }
+     }
+   },
+  methods: {
+    async handleSearch(newSource) {
+      await queryAPI({
+        //...
+      }, newSource)
+    }
+  }
+}
+</script>
+```
 
 ### 请求体编码
 默认情况下，axios将 JavaScript 对象序列化为 JSON 。要以`application/x-www-form-urlencoded`格式发送数据，您可以使用以下选项之一。

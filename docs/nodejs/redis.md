@@ -2,7 +2,7 @@
 tags: [nodejs, redis]
 ---
 
-## `ioredis`
+## [`ioredis`](https://redis.github.io/ioredis/classes/Redis.html)
 在使用 `ioredis` 进行 Redis 操作时，设置键的过期时间是一个常见的需求。你可以使用 Redis 的 `SET` 命令和 `EX` 参数来设置键值对的同时指定过期时间，或者使用 `EXPIRE` 命令来设置现有键的过期时间。
 
 下面是如何使用 `ioredis` 设置键的过期时间的示例：
@@ -445,6 +445,9 @@ redis.on('error', (err) => {
 
 虽然可以通过覆盖 `_readyCheck` 方法或使用低级别的连接选项来跳过默认的 ready check，但这通常不是推荐的做法。确保在充分了解潜在风险的情况下进行自定义，以避免引发不必要的问题。
 
+### GET
+在 Redis 中，如果使用 `GET` 命令获取一个不存在的 `key`，返回值将是 `nil`。在 ioredis 中，这个 `nil` 会被表示为 `null`。
+
 ### 查询所有的键
 在 Redis 中，如果你想查询所有的键（keys），可以使用以下命令：
 
@@ -560,6 +563,16 @@ PSETEX mykey 10000 "value"
 这将设置 `mykey` 的值为 `"value"`，并在 10000 毫秒（即 10 秒）后过期。
 
 #### SET 命令与过期时间选项
+:::tip
+在 Redis 中使用 `SET` 命令时，如果指定的 key 已经存在，它会覆盖原有的值。例如：
+
+```redis
+SET mykey "value1"
+SET mykey "value2"
+```
+
+在这个例子中，`mykey` 最终的值会是 `"value2"`，因为第二个 `SET` 命令覆盖了第一个 `SET` 命令的值。
+:::
 
 `SET` 命令可以使用 `EX` 或 `PX` 参数来设置过期时间。
 
@@ -625,3 +638,120 @@ redis.set('mykey', 'value', 'PX', 10000)
 ```
 
 通过这些命令和示例代码，你可以在 Redis 中灵活地设置键的过期时间。
+
+### 移除过期时间
+你想移除一个键的过期时间，使其变为持久的，可以使用 `PERSIST` 命令：
+```shell
+PERSIST mykey
+```
+
+### 查看redis中key的详细信息
+在Redis中，可以使用多个命令来查看某个键（key）的详细信息。以下是一些常用的命令和方法：
+
+1. `TYPE` 命令
+   
+   首先，你可以使用 `TYPE` 命令来查看键的类型：
+
+   ```shell
+   TYPE key_name
+   ```
+
+2. `TTL` 和 `PTTL` 命令
+   
+   使用 `TTL` 或 `PTTL` 命令来查看键的过期时间（以秒或毫秒为单位）：
+
+   ```shell
+   TTL key_name
+   PTTL key_name
+   ```
+
+   TTL 命令的返回值含义：
+   - 正整数：键的剩余生存时间，单位为秒。
+   - `-1`：键没有设置过期时间（即该键是持久的）。
+   - `-2`：键不存在。
+
+3. `OBJECT` 命令
+   
+   使用 `OBJECT` 命令来获取与键相关的底层信息，例如引用计数、编码类型和空闲时间：
+
+   ```shell
+   OBJECT REFCOUNT key_name
+   OBJECT ENCODING key_name
+   OBJECT IDLETIME key_name
+   ```
+
+4. `MEMORY USAGE` 命令
+  
+   使用 `MEMORY USAGE` 命令来查看键占用的内存大小（以字节为单位）：
+
+   ```shell
+   MEMORY USAGE key_name
+   ```
+
+5. 查看键的值
+  
+   根据键的类型，使用相应的命令来查看键的值：
+
+   - **字符串（String）**：
+     ```shell
+     GET key_name
+     ```
+
+   - **哈希（Hash）**：
+     ```shell
+     HGETALL key_name
+     ```
+
+   - **列表（List）**：
+     ```shell
+     LRANGE key_name 0 -1
+     ```
+
+   - **集合（Set）**：
+     ```shell
+     SMEMBERS key_name
+     ```
+
+   - **有序集合（Sorted Set）**：
+     ```shell
+     ZRANGE key_name 0 -1 WITHSCORES
+     ```
+
+6. 使用 `SCAN` 命令
+  
+   如果你想查看数据库中的所有键，可以使用 `SCAN` 命令：
+
+   ```shell
+   SCAN 0
+   ```
+
+   `SCAN` 命令返回一部分键，并且你需要循环执行该命令直到返回的游标为0。这样可以避免阻塞服务器。
+
+7. 使用 Redis 客户端工具
+   
+   许多 Redis 客户端工具提供了图形界面，使得查看键的详细信息变得更加容易。例如：
+
+   - **Redis Desktop Manager**：一个跨平台的桌面管理工具。
+   - **RedisInsight**：由Redis官方提供的图形化管理工具。
+   - **Medis**：一个Mac上的Redis管理工具。
+
+示例，假设我们有一个键 `user:1001`，它是一个哈希类型的键。我们可以使用以下命令查看详细信息：
+
+```shell
+# 查看键的类型
+TYPE user:1001
+
+# 查看键的过期时间
+TTL user:1001
+
+# 查看键的引用计数、编码类型和空闲时间
+OBJECT REFCOUNT user:1001
+OBJECT ENCODING user:1001
+OBJECT IDLETIME user:1001
+
+# 查看键占用的内存大小
+MEMORY USAGE user:1001
+
+# 查看键的值
+HGETALL user:1001
+```

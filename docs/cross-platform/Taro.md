@@ -47,6 +47,8 @@ tags: [小程序开发,h5开发,跨端]
   - [16.2 PageContainer](#162-pagecontainer)
 - [17. 表单组件](#17-表单组件)
   - [17.1 Picker](#171-picker)
+- [18. 插件](#18-插件)
+  - [18.1 `@tarojs/plugin-inject`](#181-tarojsplugin-inject)
 - [遇到的问题](#遇到的问题)
   - [编译报错](#编译报错)
 
@@ -673,6 +675,10 @@ export default function PageContainerDemo() {
 </Picker>
 ```
 
+## 18. 插件
+### 18.1 `@tarojs/plugin-inject`
+可以为小程序平台注入公共的组件、API 等逻辑
+
 ## 遇到的问题
 ### 编译报错
 1. `thread '<unnamed>' panicked at 'failed to invoke plugin`
@@ -777,3 +783,15 @@ export default function PageContainerDemo() {
 
    set NODE_OPTIONS=
    ```
+
+5. 快手小程序编译报错
+   
+   报错：Error: 插件依赖 "@tarojs/plugin-platform-kwai" 加载失败，请检查插件配置
+
+   发现项目中的依赖为：
+   ```json title="package.json"
+   "@tarojs/plugin-platform-kwai": "^6.0.0",
+   "@tarojs/taro": "3.6.16",
+   ```
+
+   推测是插件和主包版本不一致导致的，将`"@tarojs/plugin-platform-kwai": "^6.0.0"` 改为 `"@tarojs/plugin-platform-kwai": "6.0.0"` 重新安装则编辑成功

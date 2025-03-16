@@ -89,6 +89,10 @@ const config = {
             position : 'right',
             items: [
               {
+                label: 'AI工具集',
+                href: 'https://ai-bot.cn/',
+              },
+              {
                 label: 'deepseek',
                 href: 'https://ai.com/',
               },
@@ -117,8 +121,8 @@ const config = {
                 href: 'https://www.waytoagi.com/',
               },
               {
-                label: 'devv_',
-                href: 'https://devv.ai/',
+                label: '问小白',
+                href: 'https://www.wenxiaobai.com/',
               },
               {
                 label: 'perplexity',
@@ -277,6 +281,7 @@ const config = {
               { label: '免费LOGO设计', href: 'https://www.uugai.com/' },
               { label: 'sinqi tools', href: 'https://sinqi.tools/zh' },
               { label: '视频转gif', href: 'https://www.apowersoft.cn/video-to-gif-online' },
+              { label: 'JSON转Excel', href: 'https://tableconvert.com/zh-cn/json-to-excel' },
             ],
           },
           {
@@ -299,6 +304,10 @@ const config = {
           {
             title: 'Community',
             items: [
+              {
+                label: 'D2终端大会',
+                href: 'https://github.com/d2forum',
+              },
               {
                 label: 'CCF数字图书馆',
                 href: 'https://dl.ccf.org.cn/index.html?_ack=1',

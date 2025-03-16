@@ -163,6 +163,21 @@ div {
 }
 ```
 
+同样可以使用伪类画星号：
+```css
+.required {
+  position: relative;
+  &::before {
+    position: absolute;
+    content: '*';
+    font-size: 14px;
+    color: #E1251B;
+    left: 16px;
+    top: 3px;
+  }
+}
+```
+
 ## 15. 有背景图或背景色时，设置border-radius，圆角超出，可以使用`overflow: hidden;`来解决
 
 ## 16. `-webkit-overflow-scrolling: touch;` 滚动丝滑
@@ -221,7 +236,15 @@ div {
 ## 19. `word-break:break-all;` 或 `word-wrap:break-word;` 汉字、数字、字母超出折行
 `text-overflow: ellipsis;` //文本溢出显示省略号
 
-在使用的时候，有时候发现不会出现省略标记效果，经过测试发现，使用`ellipsis`的时候，必须配合 `overflow:hidden; white-space:nowrap; width:具体值;` 这三个样式共同使用才会有效果。
+在使用的时候，有时候发现不会出现省略标记效果，经过测试发现，使用`ellipsis`的时候，必须配合 `overflow:hidden; white-space:nowrap; width:具体值;` 这三个样式共同使用才会有效果。例如：
+```css
+.ellipsis {
+  width: 2.02rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+```
 
 ## 20. `inline-block`
 - [关于inline-block问题](https://www.jianshu.com/p/381dd29caa57)
@@ -633,7 +656,7 @@ CSS 属性 `font-family` 允许你通过给定一个有先后顺序的，由字�
   background: linear-gradient(blue, pink);
 }
 ```
-- 默认情况下，线性渐变的方向是从上到下，你可以指定一个值来改变渐变的方向。
+- 默认情况下，线性渐变的方向是从上到下(`to bottom`)，你可以指定一个值来改变渐变的方向。`to top`、`to bottom`、`to left` 和 `to right` 分别等价于 `0deg`、`180deg`、`270deg` 和 `90deg`。其余值会被转换为角度。
 ```css
 .horizontal-gradient {
   background: linear-gradient(to right, blue, pink);
@@ -1019,6 +1042,408 @@ img {
   100% {
     transform: scale(0.9,0.9);
     opacity: 0;
+  }
+}
+```
+
+## 58. 循环设置颜色
+在 CSS 中，循环设置颜色可以通过使用 CSS 变量（自定义属性）和一些简单的逻辑来实现。虽然 CSS 本身不支持循环结构，但我们可以结合一些 CSS 技巧来达到类似的效果。
+
+假设你有一组元素，并希望它们的背景颜色在一组预定义的颜色中循环。
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Color Cycling</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="item">Item 1</div>
+        <div class="item">Item 2</div>
+        <div class="item">Item 3</div>
+        <div class="item">Item 4</div>
+        <div class="item">Item 5</div>
+        <div class="item">Item 6</div>
+    </div>
+</body>
+</html>
+```
+
+```css
+:root {
+    --color-1: #FF5733;
+    --color-2: #33FF57;
+    --color-3: #3357FF;
+    --color-4: #FF33A1;
+    --color-5: #A133FF;
+    --color-6: #33FFF3;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.item {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* 使用 nth-child 选择器来循环设置颜色 */
+.item:nth-child(6n+1) { background-color: var(--color-1); }
+.item:nth-child(6n+2) { background-color: var(--color-2); }
+.item:nth-child(6n+3) { background-color: var(--color-3); }
+.item:nth-child(6n+4) { background-color: var(--color-4); }
+.item:nth-child(6n+5) { background-color: var(--color-5); }
+.item:nth-child(6n+6) { background-color: var(--color-6); }
+```
+
+解释:
+1. **CSS 变量**：
+   - 在 `:root` 伪类中定义了一组颜色变量（`--color-1` 到 `--color-6`）。
+   - 这些变量可以在整个文档中使用。
+
+2. **`.container` 和 `.item` 样式**：
+   - `.container` 使用 `flex` 布局来排列子元素。
+   - `.item` 设置了固定的宽度、高度、对齐方式等基本样式。
+
+3. **`nth-child` 选择器**：
+   - 使用 `nth-child` 选择器来循环设置每个 `.item` 的背景颜色。
+   - `6n+1` 表示每 6 个元素中的第 1 个，`6n+2` 表示每 6 个元素中的第 2 个，依此类推。
+   - 这样可以确保颜色在每 6 个元素之后重新开始循环。
+
+
+## 59. `设置背景图`
+要在一个元素的最右侧设置背景图，你可以使用 CSS 中的 `background-position` 属性来控制背景图的位置。具体来说，使用 `background-position: right center;` 可以将背景图定位到元素的右侧中部。
+
+以下是一个完整的示例，展示如何在一个元素的最右侧设置背景图：
+
+```html
+<div class="container">
+  这里是一些内容
+</div>
+```
+
+```css
+.container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  background-image: url('path/to/your/image.jpg');
+  background-repeat: no-repeat; /* 防止背景图重复 */
+  background-position: right center; /* 将背景图定位到元素的右侧中部 */
+  background-size: auto; /* 保持背景图的原始大小 */
+}
+```
+
+解释：
+- `background-image`: 设置背景图像的 URL。
+- `background-repeat: no-repeat;`: 防止背景图像重复显示。
+- `background-position: right center;`: 将背景图像定位到元素的右侧中部。`right` 表示水平位置在右侧，`center` 表示垂直位置在中部。
+- `background-size: auto;`: 保持背景图像的原始大小。你也可以根据需要调整背景图的大小，例如 `cover` 或 `contain`。
+
+
+如果你希望背景图在元素中以特定方式缩放，可以使用 `background-size` 属性。例如：
+
+- `background-size: cover;`: 背景图像将覆盖整个元素，可能会裁剪部分图像以保持宽高比。
+- `background-size: contain;`: 背景图像将缩放以完全包含在元素内，保持宽高比，不会裁剪图像。
+
+```css
+.container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  background-image: url('path/to/your/image.jpg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: cover; /* 根据需要调整背景图大小 */
+}
+```
+
+`background-size` 是一个非常有用的 CSS 属性，用于控制背景图像的大小。它允许你定义背景图像的宽度和高度，或者使用一些预定义的值来自动调整图像的大小。常见的 `background-size` 值:
+1. **`auto`**: 保持背景图像的原始大小。
+2. **`cover`**: 缩放背景图像以完全覆盖容器。图像可能会被裁剪以适应容器的尺寸，但会保持其宽高比。
+3. **`contain`**: 缩放背景图像以完全包含在容器内。图像不会被裁剪，但可能会在容器内留有空白区域，同时保持其宽高比。
+4. **具体尺寸值**: 你可以使用具体的长度值（例如 `px`, `em`, `%` 等）来设置背景图像的宽度和高度。
+
+使用 `auto`:
+```css
+.container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  background-image: url('path/to/your/image.jpg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: auto; /* 保持原始大小 */
+}
+```
+
+使用 `cover`:
+```css
+.container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  background-image: url('path/to/your/image.jpg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: cover; /* 覆盖整个容器 */
+}
+```
+
+使用 `contain`:
+```css
+.container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  background-image: url('path/to/your/image.jpg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: contain; /* 包含在容器内 */
+}
+```
+
+使用具体尺寸值:
+```css
+.container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  background-image: url('path/to/your/image.jpg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 50% 50%; /* 宽度和高度分别为容器的50% */
+}
+```
+
+或者使用不同的单位：
+
+```css
+.container {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  background-image: url('path/to/your/image.jpg');
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 150px 100px; /* 宽度为150px，高度为100px */
+}
+```
+
+## 60. 设置背景颜色占元素的90%
+可以使用渐变：`background: linear-gradient(to right, #3498db 90%, transparent 10%);`
+
+## 61. 设置图片的颜色
+在 CSS 中，你可以通过多种方式设置给定图标的颜色。具体的方法取决于你使用的图标类型。例如，你可以使用字体图标（如 Font Awesome 或 Material Icons）、SVG 图标或图像图标。以下是几种常见的方法：
+
+### 使用字体图标
+
+如果你使用的是字体图标（如 Font Awesome 或 Material Icons），你可以使用 CSS 的 `color` 属性来设置图标的颜色。
+
+#### Font Awesome 示例
+
+首先，确保你已经在项目中引入了 Font Awesome：
+
+```html
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+```
+
+然后，你可以使用 CSS 设置图标的颜色：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Awesome Icon Color</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    .icon {
+      color: red; /* 设置图标颜色为红色 */
+    }
+  </style>
+</head>
+<body>
+  <i class="fas fa-home icon"></i> <!-- 这里的图标颜色会变成红色 -->
+</body>
+</html>
+```
+
+#### Material Icons 示例
+
+首先，确保你已经在项目中引入了 Material Icons：
+
+```html
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+```
+
+然后，你可以使用 CSS 设置图标的颜色：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Material Icons Color</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    .icon {
+      color: blue; /* 设置图标颜色为蓝色 */
+    }
+  </style>
+</head>
+<body>
+  <span class="material-icons icon">home</span> <!-- 这里的图标颜色会变成蓝色 -->
+</body>
+</html>
+```
+
+### 使用 SVG 图标
+
+如果你使用的是 SVG 图标，你可以使用 `fill` 属性来设置图标的颜色。
+
+#### 内联 SVG 示例
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Icon Color</title>
+  <style>
+    .icon {
+      fill: green; /* 设置图标颜色为绿色 */
+    }
+  </style>
+</head>
+<body>
+  <svg class="icon" width="24" height="24" viewBox="0 0 24 24">
+    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+  </svg> <!-- 这里的图标颜色会变成绿色 -->
+</body>
+</html>
+```
+
+#### 外部 SVG 文件示例
+
+如果你使用外部 SVG 文件，你可以通过 CSS 设置其颜色：
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>External SVG Icon Color</title>
+  <style>
+    .icon {
+      fill: purple; /* 设置图标颜色为紫色 */
+    }
+  </style>
+</head>
+<body>
+  <object type="image/svg+xml" data="icon.svg" class="icon"></object> <!-- 这里的图标颜色会变成紫色 -->
+</body>
+</html>
+```
+
+### 使用图片图标
+
+如果你使用的是图片图标（如 PNG 或 JPG），你不能直接通过 CSS 改变图标的颜色。你需要使用图像编辑软件来修改图标的颜色，或者使用 CSS 滤镜来实现一些颜色效果。
+
+#### CSS 滤镜示例
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Icon Color</title>
+  <style>
+    .icon {
+      filter: invert(1) sepia(1) saturate(5) hue-rotate(90deg); /* 设置图标颜色为绿色 */
+    }
+  </style>
+</head>
+<body>
+  <img src="icon.png" alt="Icon" class="icon"> <!-- 这里的图标颜色会被滤镜效果改变 -->
+</body>
+</html>
+```
+
+请注意，使用滤镜可能并不能精确地实现你想要的颜色效果，具体效果取决于原始图像的颜色和滤镜的参数。
+
+通过以上方法，你可以在不同的情况下设置图标的颜色，从而实现所需的视觉效果。
+
+## 62. 设置文本不换行
+```css
+white-space: nowrap;
+```
+
+## 63. 吸顶
+使用`position: sticky`，如下：
+```css
+.parent {
+  .child {
+    position: sticky;
+    top: 0;
+    background-color: #FFFFFF;
+    z-index: 100;
+  }
+}
+```
+
+## 64. 超出两行展示省略号,不超出不展示
+```css
+.ellipsis {
+  overflow: hidden; // 隐藏超出容器的内容
+  text-overflow: ellipsis; // 使用省略号表示被截断的文本
+  display: -webkit-box; // 使用 -webkit-box 作为弹性盒子模型。
+  -webkit-box-orient: vertical; // 设置盒子模型的方向为垂直
+  -webkit-line-clamp: 2; // 限制文本显示的行数为 2 行
+}
+```
+
+目前，`line-clamp` 属性在现代浏览器中得到了较好的支持，但在某些旧版浏览器中可能无法正常工作。如果你需要更好的兼容性，可以考虑使用 polyfill 或其他替代方案。
+
+注意：
+- 容器必须设置一个固定的高度（`height`）或最大高度（`max-height`），否则 `line-clamp` 可能无法正常工作。
+- 字体大小（`font-size`）必须明确设置，否则 `line-clamp` 可能无法正确计算行数。
+
+## 65. 短横线
+```css
+.tab-item {
+  font-size: 0.16rem;
+  font-family: PingFang SC;
+  font-weight: 500;
+  color: rgba(252,55,55,1);
+  height: 0.29rem;
+  &.active {
+    &::after {
+      content: '';
+      display: block;
+      width: 0.16rem;
+      height: 0.03rem;
+      border-radius: 0.02rem;
+      background-color: #FC3737;
+      margin: 0.06rem auto 0;
+    }
   }
 }
 ```

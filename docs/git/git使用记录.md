@@ -357,7 +357,14 @@ git config --global http.version HTTP/1.1
 - 如果这次提交是别的分支合并过来的，按照提示可知需要加参数`-m`: `git revert -m commit_id`
 
 ## 45. 查询本地所有操作记录
-> git reflog
+```bash
+git reflog
+```
+
+查看分支的创建时间：
+```bash
+git reflog --date=iso <branch_name>
+```
 
 ## 46. 创建新分支
 ```bash

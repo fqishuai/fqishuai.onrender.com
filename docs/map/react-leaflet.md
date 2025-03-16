@@ -1672,6 +1672,98 @@ function Example() {
 }
 ```
 
+### 渲染GeoJSON的数据更新了但是地图没有变化
+在使用 `react-leaflet` 时，如果你发现 `GeoJSON` 数据更新了但地图上没有变化，这通常是因为 React 的状态更新没有正确触发 `GeoJSON` 图层的重新渲染。
+
+例如：
+```ts
+function Example() {
+  return <>
+    {
+      list && list.length>0 &&
+      list.map(item => <GeoJSON data={item.unionJson} style={geojsonStyle} />)
+    }
+  </>
+}
+```
+
+为了解决这个问题，你可以尝试以下方法：
+
+1. 使用 `key` 属性强制重新渲染
+
+一个简单的办法是使用 `key` 属性。当 `key` 属性发生变化时，React 会强制卸载并重新挂载组件。这可以确保 `GeoJSON` 图层在数据更新时重新渲染。
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+
+const MapComponent = ({ geoJsonData }) => {
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    // 每当 geoJsonData 改变时，更新 key
+    setKey(prevKey => prevKey + 1);
+  }, [geoJsonData]);
+
+  return (
+    <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: "100vh", width: "100%" }}>
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <GeoJSON key={key} data={geoJsonData} />
+    </MapContainer>
+  );
+};
+
+export default MapComponent;
+```
+
+2. 使用 `useEffect` 手动更新 `GeoJSON` 图层
+
+另一种方法是使用 `useEffect` 钩子来手动更新 `GeoJSON` 图层。你可以通过直接访问 `GeoJSON` 图层的引用来更新其数据。
+
+```jsx
+import React, { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+
+const MapComponent = ({ geoJsonData }) => {
+  const geoJsonLayerRef = useRef();
+
+  useEffect(() => {
+    if (geoJsonLayerRef.current) {
+      geoJsonLayerRef.current.clearLayers().addData(geoJsonData);
+    }
+  }, [geoJsonData]);
+
+  return (
+    <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: "100vh", width: "100%" }}>
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <GeoJSON ref={geoJsonLayerRef} data={geoJsonData} />
+    </MapContainer>
+  );
+};
+
+export default MapComponent;
+```
+
+3. 确保数据引用发生变化
+
+React 依赖于引用的变化来检测状态的更新。如果你只是修改了 `geoJsonData` 的内容而没有改变其引用，React 可能不会检测到变化。确保每次更新 `geoJsonData` 时，创建一个新的对象引用。
+
+```jsx
+const updateGeoJsonData = (newData) => {
+  setGeoJsonData({...newData});
+};
+```
+
+4. 检查数据格式
+
+确保 `geoJsonData` 的格式正确无误，符合 GeoJSON 的规范。任何格式错误都可能导致 `GeoJSON` 图层无法正确更新。
+
+通过以上方法，你应该能够解决 `GeoJSON` 数据更新后地图上没有变化的问题。选择适合你的具体情况的方法即可。
+
 ## `useMapEvents` `useMapEvent`
 Leaflet 提供了许多地图事件，可以帮助你监听和响应用户的交互。以下是一些常见的 Leaflet 地图事件：
 

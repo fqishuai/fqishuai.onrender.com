@@ -231,3 +231,184 @@ http {
 ```
 
 ## [nginx server中的root和location的root的区别](https://blog.csdn.net/fengzyf/article/details/102602782)
+
+## 访问的域名 与 对应的服务器nginx的`server_name` 不一致
+当你访问的域名与对应服务器的 Nginx `server_name` 不一致时，Nginx 会根据其配置来处理这个请求。具体处理方式取决于 Nginx 的配置文件（通常是 `nginx.conf` 或者在 `sites-available` 目录下的配置文件）。
+
+以下是几种常见的处理方式：
+
+1. **默认服务器（Default Server）：**
+   如果请求的域名没有匹配到任何配置的 `server_name`，Nginx 会将请求交给默认服务器处理。默认服务器通常是第一个被定义的服务器块（`server`），或者明确指定为默认服务器的块（通过 `default_server` 选项）。
+
+   ```nginx
+   server {
+       listen 80 default_server;
+       server_name _;
+
+       location / {
+           return 444;  # 关闭连接而不发送响应
+       }
+   }
+   ```
+
+2. **返回 404 或其他错误代码：**
+   你可以配置一个通用的服务器块来处理所有未匹配的请求，并返回一个特定的错误码，例如 404。
+
+   ```nginx
+   server {
+       listen 80;
+       server_name _;
+
+       location / {
+           return 404;
+       }
+   }
+   ```
+
+3. **重定向到特定的域名：**
+   你可以配置 Nginx 将所有未匹配的请求重定向到一个特定的域名。
+
+   ```nginx
+   server {
+       listen 80;
+       server_name _;
+
+       location / {
+           return 301 http://example.com;
+       }
+   }
+   ```
+
+4. **处理所有请求：**
+   你可以配置一个通用的服务器块来处理所有请求，不论域名是否匹配。
+
+   ```nginx
+   server {
+       listen 80;
+       server_name _;
+
+       location / {
+           # 通用处理逻辑
+       }
+   }
+   ```
+
+示例:
+
+假设你有两个服务器块，一个是为 `example.com` 配置的，另一个是默认服务器：
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+
+    location / {
+        # 处理 example.com 的请求
+    }
+}
+
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location / {
+        return 404;  # 未匹配的请求返回 404
+    }
+}
+```
+
+在这种配置下，如果你访问 `example.com`，第一个服务器块会处理请求。如果你访问其他任何域名，如 `otherdomain.com`，第二个服务器块（默认服务器）会处理请求并返回 404 错误。
+
+总结:
+
+Nginx 根据配置文件中的 `server` 块和 `server_name` 指令来处理请求。如果访问的域名与配置的不匹配，Nginx 会将请求交给默认服务器处理，或者根据你的具体配置返回特定的响应。
+
+## nginx配置转发到同应用下的其他页面
+在 Nginx 中，你可以配置将请求转发到同一应用下的其他页面。这样可以实现 URL 重写或路径重定向，以便将用户请求重定向到不同的路径或页面。
+
+示例场景：
+
+假设你有一个应用运行在 `example.com`，并希望实现以下重定向：
+
+- 将 `/old-page` 重定向到 `/new-page`
+- 将 `/blog` 重定向到 `/articles`
+
+
+以下是一个 Nginx 配置示例，展示如何实现上述重定向：
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+
+    # 重定向 /old-page 到 /new-page
+    location /old-page {
+        return 301 /new-page;
+    }
+
+    # 重定向 /blog 到 /articles
+    location /blog {
+        return 301 /articles;
+    }
+
+    # 其他静态文件或应用的处理
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+```
+
+配置解释：
+
+1. **server 块**：定义一个虚拟服务器，监听 `example.com` 域名的 80 端口。
+
+2. **location /old-page**：匹配 `/old-page` 路径的请求，并将其重定向到 `/new-page`。
+   - `return 301 /new-page`：返回 301 永久重定向状态码，并重定向到 `/new-page`。
+
+3. **location /blog**：匹配 `/blog` 路径的请求，并将其重定向到 `/articles`。
+   - `return 301 /articles`：返回 301 永久重定向状态码，并重定向到 `/articles`。
+
+4. **location /**：匹配根路径的请求，尝试查找文件，如果找不到则返回 404 错误。
+
+### 临时重定向
+
+如果你希望使用临时重定向而不是永久重定向，可以使用 302 状态码：
+
+```nginx
+location /old-page {
+    return 302 /new-page;
+}
+
+location /blog {
+    return 302 /articles;
+}
+```
+
+### 重新加载 Nginx 配置
+
+在修改 Nginx 配置文件后，重新加载 Nginx 以使更改生效：
+
+```bash
+sudo nginx -s reload
+```
+
+
+测试配置，确保你的 Nginx 配置语法没有错误：
+
+```bash
+sudo nginx -t
+```
+
+如果测试通过，重新加载 Nginx 配置：
+
+```bash
+sudo systemctl reload nginx
+```
+
+### 注意事项
+
+- **确保路径正确**：在进行重定向时，确保目标路径存在并且正确。
+- **SEO 考虑**：使用 301 永久重定向会告诉搜索引擎该页面已经永久移动，而 302 临时重定向则表示页面暂时移动。
+- **避免循环重定向**：确保重定向不会导致循环重定向（即 A 重定向到 B，B 又重定向到 A）。
+
+通过上述配置，你可以轻松地在 Nginx 中设置 URL 重定向，将用户请求转发到同一应用下的其他页面。

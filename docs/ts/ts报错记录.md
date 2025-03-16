@@ -352,3 +352,87 @@ function App() {
 
 export default App;
 ```
+
+### 20. `No index signature with a parameter of type 'string' was found on type '{ CHANGE_ASSIGN_NEW: string; CHANGE_RESERVE_NEW: string; }'.`
+这个错误通常出现在你尝试通过字符串索引访问一个对象的属性，但该对象的类型没有定义相应的索引签名时。为了更好地理解和解决这个问题，我们需要先了解索引签名和对象类型。
+
+假设你有一个对象，其中包含一些字符串常量：
+
+```typescript
+const actionTypes = {
+  CHANGE_ASSIGN_NEW: 'CHANGE_ASSIGN_NEW',
+  CHANGE_RESERVE_NEW: 'CHANGE_RESERVE_NEW',
+} as const;
+```
+
+并且你想要通过字符串索引来访问这些属性：
+
+```typescript
+function getActionType(action: string): string {
+  return actionTypes[action];
+}
+```
+
+但是上面这种用法会导致 `No index signature with a parameter of type 'string' was found on type` 错误，因为 `actionTypes` 的类型没有定义字符串索引签名。
+
+
+有几种方法可以解决这个问题：
+
+#### 方法一：使用 TypeScript 的类型断言
+
+你可以显式地告诉 TypeScript 这个对象可以通过字符串索引访问：
+
+```typescript
+const actionTypes = {
+  CHANGE_ASSIGN_NEW: 'CHANGE_ASSIGN_NEW',
+  CHANGE_RESERVE_NEW: 'CHANGE_RESERVE_NEW',
+} as const;
+
+function getActionType(action: keyof typeof actionTypes): string {
+  return actionTypes[action];
+}
+```
+
+在这里，我们使用 `keyof typeof actionTypes` 来确保 `action` 参数只能是 `actionTypes` 对象中的键。
+
+#### 方法二：使用类型定义
+
+你可以为对象定义一个索引签名：
+
+```typescript
+type ActionTypes = {
+  [key: string]: string;
+};
+
+const actionTypes: ActionTypes = {
+  CHANGE_ASSIGN_NEW: 'CHANGE_ASSIGN_NEW',
+  CHANGE_RESERVE_NEW: 'CHANGE_RESERVE_NEW',
+};
+
+function getActionType(action: string): string {
+  return actionTypes[action];
+}
+```
+
+这种方法定义了一个通用的索引签名，允许通过字符串索引访问对象的属性。
+
+#### 方法三：使用枚举
+
+如果你希望更严格的类型检查，可以使用 TypeScript 的枚举：
+
+```typescript
+enum ActionTypes {
+  CHANGE_ASSIGN_NEW = 'CHANGE_ASSIGN_NEW',
+  CHANGE_RESERVE_NEW = 'CHANGE_RESERVE_NEW',
+}
+
+function getActionType(action: ActionTypes): string {
+  return action;
+}
+
+// 使用
+const actionType = getActionType(ActionTypes.CHANGE_ASSIGN_NEW);
+console.log(actionType); // 输出: "CHANGE_ASSIGN_NEW"
+```
+
+使用枚举可以确保传递给 `getActionType` 的参数是有效的 `ActionTypes` 枚举值。
