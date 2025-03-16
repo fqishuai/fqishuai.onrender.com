@@ -255,6 +255,51 @@ new Vue({
 ```
 
 ## 9. vue中如何使用节流（throttle）函数
+`import funHelper from 'lodash/function'` 是一种从 Lodash 库中导入函数相关辅助方法的方式。这种导入方式允许你只引入 Lodash 的 function 模块，而不是整个 Lodash 库，这有助于减少最终打包文件的大小。
+
+在这个 `funHelper` 对象中，你可以找到以下常用的函数处理方法：
+
+1. `after(n, func)`: 创建一个函数，当它被调用 n 次或更多次之后将触发 func 。
+
+2. `ary(func, [n=func.length])`: 创建一个调用 func 的函数。调用 func 时最多接受 n 个参数，忽略多出的参数。
+
+3. `before(n, func)`: 创建一个调用 func 的函数，通过 this 绑定和创建函数的参数调用 func，调用次数不超过 n 次。 之后再调用这个函数，将返回一次最后调用 func 的结果。
+
+4. `curry(func, [arity=func.length])`: 创建一个函数，该函数接收 func 的参数，要么调用 func 返回的结果，如果 func 所需参数已经提供，则直接返回 func 所执行的结果。
+
+5. `debounce(func, [wait=0], [options={}])`: 创建一个防抖动函数，该函数会从上一次被调用后，延迟 wait 毫秒后调用 func 方法。
+
+6. `defer(func, [args])`: 延迟调用 func，直到当前堆栈清理完毕。
+
+7. `delay(func, wait, [args])`: 延迟 wait 毫秒后调用 func。
+
+8. `flip(func)`: 创建一个函数，调用 func 时反转传入的参数。
+
+9. `memoize(func, [resolver])`: 创建一个会缓存 func 结果的函数。
+
+10. `negate(predicate)`: 创建一个针对断言函数 func 结果取反的函数。
+
+11. `once(func)`: 创建一个只能调用一次的函数。
+
+12. `overArgs(func, [transforms=[]])`: 创建一个函数，调用 func 时参数会先一对一的调用 transforms 的相应函数处理。
+
+13. `partial(func, [partials])`: 创建一个函数。该函数调用 func，并传入预设的 partials 参数。
+
+14. `throttle(func, [wait=0], [options={}])`: 创建一个节流函数，在 wait 秒内最多执行 func 一次的函数。
+
+使用示例：
+
+```javascript
+import funHelper from 'lodash/function';
+
+const debouncedSave = funHelper.debounce(saveFunction, 300);
+const throttledScroll = funHelper.throttle(scrollHandler, 100);
+const memoizedExpensiveOperation = funHelper.memoize(expensiveFunction);
+```
+
+这些函数在处理事件监听、优化性能、控制函数调用频率等场景中非常有用。根据你的具体需求，你可以选择使用其中的一个或多个函数。
+
+例1:
 ```html
 <div @click="limit">查询</div>
 ```
@@ -272,6 +317,53 @@ export default {
 
     },
   },
+}
+```
+
+例2：
+```html
+<div @click="querySendMsgNum">发送短信</div>
+```
+```js
+import funHelper from 'lodash/function';
+
+export default {
+  methods: {
+      async querySendMsgNum() {
+        try {
+          const apiResult = await getSendMessageNum();
+          if (!apiResult.success) throw apiResult.message;
+          this.$dialog({
+            id: "send-msg-dialog",
+            title: "操作提示",
+            content: `今日短信剩余发送次数为${apiResult.result}次`,
+            okBtnTxt: "发送短信",
+            closeBtn: false,
+            onOkBtn: async (event) => {
+              this.handleSendMsg();
+            }
+          });
+        } catch (error) {
+          console.error('querySendMsgNum:', error);
+          if (typeof error == 'string') {
+            this.$toast.fail(error);
+          }
+        }
+      },
+      handleSendMsg: funHelper.throttle(async () => {
+        try {
+          let apiResult = await sendMessage();
+          if (!apiResult.success) throw apiResult.message;
+          this.$toast.success('发送成功');
+          this.$dialog.closed(); // 关闭当前dialog
+        } catch (error) {
+          console.error('sendMessage:', error);
+          if (typeof error == 'string') {
+            this.$toast.fail(error);
+          }
+        }
+      }, 1000, { 'trailing': false }),
+  }
 }
 ```
 

@@ -10,6 +10,7 @@ tags: [react]
 - [react-router-config](https://www.npmjs.com/package/react-router-config) React Router 的静态路由配置助手。
 :::
 
+## 安装及添加Router
 首先，使用vite创建一个react工程：`npm create vite@latest name-of-your-project -- --template react`
 然后，安装依赖包`react-router-dom`及其他所需的依赖包：`npm install react-router-dom localforage match-sorter sort-by`
 > 使用ts的话需要安装类型声明：`npm install --save-dev @types/sort-by`
@@ -17,6 +18,30 @@ tags: [react]
 
 
 Anytime your app throws an error while rendering, loading data, or performing data mutations, React Router will catch it and render an error screen. 任何时候您的应用程序在渲染、加载数据或执行数据突变时抛出错误，React Router 都会捕获它并渲染错误屏幕。
+
+### 在入口文件中添加路由
+```jsx title="src/main.jsx"
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import "./index.css";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <div>Hello world!</div>,
+  },
+]);
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
+);
+```
 
 ## 选择使用哪个路由
 > [Picking a Router](https://reactrouter.com/en/main/routers/picking-a-router)
@@ -72,7 +97,8 @@ createBrowserRouter(routes, {
   basename: "/app",
 });
 ```
-basename适用于无法部署到域根目录而是子目录的情况:
+### `basename`
+`basename`适用于无法部署到域根目录而是子目录的情况:
 ```tsx
 createBrowserRouter(routes, {
   basename: "/app",
@@ -137,6 +163,49 @@ const router = createBrowserRouter(
 #### `path`
 #### `element`
 #### `errorElement`
+当组件渲染或者loader、action执行过程中产生异常时，`errorElement`将被渲染。
+
+```ts
+<Route
+  path="/"
+  element={<Root />}
+  errorElement={<RootBoundary />}
+>
+  <Route
+    path="projects/:projectId"
+    loader={({ params }) => fetchProject(params.projectId)}
+    element={<Project />}
+  />
+</Route>
+```
+```tsx title="RootBoundary.tsx"
+import { isRouteErrorResponse } from "react-router-dom";
+
+function RootBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    if (error.status === 404) {
+      return <div>This page doesn't exist!</div>;
+    }
+
+    if (error.status === 401) {
+      return <div>You aren't authorized to see this</div>;
+    }
+
+    if (error.status === 503) {
+      return <div>Looks like our API is down</div>;
+    }
+
+    if (error.status === 418) {
+      return <div>🫖</div>;
+    }
+  }
+
+  return <div>Something went wrong</div>;
+}
+```
+
 #### `loader`
 `loader`会在路由渲染之前被调用
 ```tsx
@@ -511,3 +580,184 @@ export default function Home() {
   const loginUser = useLoaderData();
 }
 ```
+
+## 怎么更新loader返回的值
+在 React Router v6 中，`loader` 是一种用于在渲染组件之前加载数据的方法。要更新 `loader` 返回的值，你通常需要触发重新加载数据的操作。以下是一些常见的策略来实现这一点：
+
+1. **使用 `useLoaderData` 钩子获取加载的数据**。
+2. **使用 `useNavigate` 钩子重新导航到当前路由**，以触发 `loader` 重新运行。
+3. **使用 `useFetcher` 钩子，适用于需要在不改变 URL 的情况下重新加载数据的情况**。
+
+### 使用 `useNavigate` 重新导航
+
+假设你有一个路由设置如下：
+
+```jsx
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from './App';
+import Home from './Home';
+import { loader as homeLoader } from './homeLoader';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <App />,
+    children: [
+      {
+        path: 'home',
+        element: <Home />,
+        loader: homeLoader,
+      },
+    ],
+  },
+]);
+
+const Root = () => <RouterProvider router={router} />;
+export default Root;
+```
+
+`homeLoader` 的定义可能如下：
+
+```javascript
+export async function loader() {
+  const response = await fetch('/api/data');
+  const data = await response.json();
+  return data;
+}
+```
+
+在 `Home` 组件中，你可以使用 `useLoaderData` 钩子来获取加载的数据：
+
+```javascript
+import { useLoaderData, useNavigate } from 'react-router-dom';
+
+const Home = () => {
+  const data = useLoaderData();
+  const navigate = useNavigate();
+
+  const refreshData = () => {
+    // 重新导航到当前路径以触发 loader 重新运行
+    navigate('.', { replace: true });
+  };
+
+  return (
+    <div>
+      <h1>Home</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+      <button onClick={refreshData}>Refresh Data</button>
+    </div>
+  );
+};
+
+export default Home;
+```
+
+:::tip
+`navigate`的`replace: true` 指的是替换当前历史记录条目，而不是添加一个新条目。
+:::
+
+### `navigate`使用`replace:true`导航到页面 页面的`useEffect`没执行
+在使用 `react-router-dom` 的 `navigate` 方法时，如果你设置了 `replace: true`，它会替换当前的历史记录条目，而不是添加一个新条目。这可能会影响到某些情况下的组件重新渲染或生命周期方法的调用。
+
+如果你发现 `useEffect` 没有执行，可能是因为组件没有被重新挂载。`useEffect` 依赖于组件的挂载和更新，如果组件没有被卸载和重新挂载，`useEffect` 可能不会被触发。
+
+解决方法:
+
+1. **确保 `useEffect` 依赖项正确**：
+   确保 `useEffect` 的依赖项数组包含所有需要监听的变量。如果依赖项没有变化，`useEffect` 不会重新执行。
+
+2. **使用 `key` 强制重新挂载组件**：
+   你可以使用 `key` 属性来强制 React 重新挂载组件。每次导航时更改 `key` 的值，React 会认为这是一个新的组件，从而重新挂载它。
+
+以下是一个示例，展示如何使用 `key` 属性来强制重新挂载组件：
+
+```jsx
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+
+const Home = () => {
+  const navigate = useNavigate();
+
+  const goToAbout = () => {
+    navigate('/about', { replace: true });
+  };
+
+  return (
+    <div>
+      <h1>Home Page</h1>
+      <button onClick={goToAbout}>Go to About Page</button>
+    </div>
+  );
+};
+
+const About = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    console.log('About component mounted or updated');
+  }, [location.key]); // 使用 location.key 作为依赖项
+
+  return (
+    <div>
+      <h1>About Page</h1>
+    </div>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About key={Math.random()} />} /> {/* 使用随机 key 强制重新挂载 */}
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
+```
+
+详细说明:
+
+1. **Home 组件**：
+   - 使用 `navigate` 方法导航到 `/about` 页面，并设置 `replace: true`。
+
+2. **About 组件**：
+   - 使用 `useLocation` Hook 获取当前的 `location` 对象。
+   - 在 `useEffect` 中，将 `location.key` 作为依赖项。每次 `location.key` 变化时，`useEffect` 会重新执行。
+
+3. **App 组件**：
+   - 在定义路由时，给 `About` 组件添加一个随机的 `key` 属性。每次导航到 `/about` 页面时，`key` 都会变化，从而强制 React 重新挂载 `About` 组件。
+
+通过这种方式，你可以确保在使用 `replace: true` 导航时，目标组件的 `useEffect` 会被正确触发。
+
+### 使用 `useFetcher` 重新加载数据
+
+`useFetcher` 钩子允许你在不改变 URL 的情况下重新加载数据。它适用于需要在组件内部触发数据加载的场景。
+
+```javascript
+import { useLoaderData, useFetcher } from 'react-router-dom';
+
+const Home = () => {
+  const data = useLoaderData();
+  const fetcher = useFetcher();
+
+  const refreshData = () => {
+    // 使用 fetcher.load 重新加载数据
+    fetcher.load('/home');
+  };
+
+  return (
+    <div>
+      <h1>Home</h1>
+      <pre>{JSON.stringify(fetcher.data || data, null, 2)}</pre>
+      <button onClick={refreshData}>Refresh Data</button>
+    </div>
+  );
+};
+
+export default Home;
+```
+
+在这个示例中，`fetcher.load` 可以用来重新加载指定路径的数据，而不需要改变 URL。

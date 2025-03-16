@@ -3,6 +3,8 @@ slug: intro
 tags: [ssr]
 ---
 
+# 服务端渲染
+
 [mustache.js](https://github.com/janl/mustache.js)
 
 在 Web 开发中，渲染是指将应用程序代码转换为交互式网页的过程。

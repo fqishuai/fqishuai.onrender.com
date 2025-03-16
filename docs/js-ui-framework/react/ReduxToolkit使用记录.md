@@ -11,6 +11,9 @@ tags: [react]
 - Redux Toolkit is already written in TypeScript, so its TS type definitions are built in.
 :::
 
+## [Redux](https://redux.js.org/introduction/getting-started)
+
+## [Redux Toolkit](https://redux-toolkit.js.org/)
 ### 1. 安装
 - 新建项目可以使用create-react-app安装：
 ```bash

@@ -1,39 +1,39 @@
 ---
 slug: animation-game-3d
-tags: [animation, game, 3d]
+tags: [animation, game, 3d, visualization]
 ---
 
-## 动画、游戏、3D
+# 动画、游戏、3D
 
-### [TweenMax.js](https://www.tweenmax.com.cn/index.html)
+## [TweenMax.js](https://www.tweenmax.com.cn/index.html)
 适用于移动端和现代互联网的超高性能专业级动画插件
 
 Tweenmax是GreenSock 动画平台的核心，配合其他插件可动画CSS属性、滤镜效果、 颜色、 声音、 色彩、 帧、 饱和度、 对比度、 色调、 色系、 亮度、 贝塞尔
 
-### GSAP (GreenSock Animation Platform)
+## GSAP (GreenSock Animation Platform)
 GSAP 是一个强大的 JavaScript 工具集，构建适用于所有主要浏览器的高性能动画。动画 CSS、SVG、画布、React、Vue、WebGL、颜色、字符串、运动路径、通用对象......任何 JavaScript 可以触及的东西！ GSAP 的 ScrollTrigger 插件可让您以最少的代码创建令人惊叹的基于滚动的动画。
 
 [GreenSock](https://greensock.com/)
 
-### [Spine](http://zh.esotericsoftware.com/spine-in-depth)
+## [Spine](http://zh.esotericsoftware.com/spine-in-depth)
 Spine 是一款针对游戏开发的 2D 骨骼动画编辑工具。 Spine 旨在提供更高效和简洁 的工作流程，以创建游戏所需的动画。
 
-### [Lottie](https://airbnb.design/lottie/)
+## [Lottie](https://airbnb.design/lottie/)
 Lottie 是一个 iOS、Android 和 React Native 库，可以实时渲染 After Effects 动画，让应用程序可以像使用静态图像一样轻松地使用动画。
 
-### [DragonBones](https://docs.egret.com/dragonbones/cn)
+## [DragonBones](https://docs.egret.com/dragonbones/cn)
 DragonBones是一款开源免费的移动游戏骨骼动画解决方案，主要用于创作2D游戏动画和富媒体内容,帮助设计师用更少的美术成本创造更生动的动画效果。 支持多语言，一次制作，全平台发布。
 
-### [phaser3](https://phaser.io/phaser3)
+## [phaser3](https://phaser.io/phaser3)
 Phaser 3 是 Phaser 游戏框架的下一代。每个最后的元素都使用完全模块化的结构从头开始重建，并结合了面向数据的方法。它包括一个全新的自定义 WebGL 渲染器，专为满足现代 2D 游戏的需求而设计。
 
-### [D3.js](https://d3js.org/)
+## [D3.js](https://d3js.org/)
 D3.js 是一个基于数据操作文档的 JavaScript 库。 D3 帮助您使用 HTML、SVG 和 CSS 使数据栩栩如生。 D3 对 Web 标准的强调为您提供了现代浏览器的全部功能，而无需将自己束缚在专有框架中，结合了强大的可视化组件和数据驱动的 DOM 操作方法。
 
-### [highcharts](https://www.highcharts.com.cn/)
+## [highcharts](https://www.highcharts.com.cn/)
 兼容 IE6+、完美支持移动端、图表类型丰富、方便快捷的 HTML5 交互性图表库
 
-### [threejs](https://threejs.org/)
+## [threejs](https://threejs.org/)
 Three.js 是一款基于 WebGL 的强大 JavaScript 库，用于在 Web 浏览器中创建和呈现三维图形。它提供了基础的 3D 渲染功能，包括几何体创建、材质和光照效果。
 
 主要功能：
@@ -63,7 +63,7 @@ Three.js 是一款基于 WebGL 的强大 JavaScript 库，用于在 Web 浏览�
 
 - [glsl.app](https://glsl.app/)
 
-### Cesium
+## Cesium
 Cesium 是一款开源的基于 JavaScript 的 3D 地图框架，它利用了现代 Web 技术，如 HTML5、WebGL 和 WebAssembly，来提供跨平台和跨浏览器的三维地理空间数据可视化。
 
 主要功能:
@@ -89,7 +89,7 @@ Cesium 是一款开源的基于 JavaScript 的 3D 地图框架，它利用了现
 
 - [Cesium 120+ 实战效果](https://blog.csdn.net/weixin_45782925/article/details/123269490)
 
-### Babylon.js
+## Babylon.js
 Babylon.js 是一个开源的 3D 引擎，专门为 Web 浏览器设计，允许开发者创建和展示交互式 3D 内容，无需安装任何插件。
 
 它是基于 WebGL 技术构建的，这意味着它可以利用现代浏览器内置的图形硬件加速功能来渲染 3D 图形。
@@ -123,7 +123,7 @@ Babylon.js 是一个开源的 3D 引擎，专门为 Web 浏览器设计，允许
 
 - [案例大全](https://example.cnbabylon.com/)
 
-### Unreal Engine
+## Unreal Engine
 Unreal Engine（简称 UE）是由 Epic Games 开发的一款功能强大的游戏引擎，它被广泛用于开发各种类型的游戏、模拟、可视化项目以及交互式体验。
 
 Unreal Engine 5（UE5）是最新版本的引擎，它引入了新的技术和功能，如 Lumen 全局光照系统、Nanite 虚拟化微多边形几何技术等，进一步提高了渲染质量和开发效率。

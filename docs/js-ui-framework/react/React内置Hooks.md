@@ -435,6 +435,116 @@ function Form() {
 :::
 
 ### `useReducer`
+在组件的顶层作用域调用 `useReducer` 以创建一个用于管理状态的 `reducer`。
+
+语法：`const [state, dispatch] = useReducer(reducer, initialArg, init?)`
+- `reducer`：用于更新 `state` 的纯函数。参数为 `state` 和 `action`，返回值是更新后的 `state`。`state` 与 `action` 可以是任意合法值。（`action` 可以是任意类型，不过通常至少是一个存在 `type` 属性的对象。也就是说它需要携带计算新的 `state` 值所必须的数据。）
+  ```js
+  function reducer(state, action) {
+    // ...
+  }
+  ```
+- `initialArg`：用于初始化 `state` 的任意值。初始值的计算逻辑取决于接下来的 `init` 参数。
+- 可选参数 `init`：用于计算初始值的函数。如果存在，使用 `init(initialArg)` 的执行结果作为初始值，否则使用 `initialArg`。
+
+`useReducer` 返回一个由两个值组成的数组：
+1. 当前的 `state`。初次渲染时，它是 `init(initialArg)` 或 `initialArg` （如果没有 `init` 函数）。
+2. `dispatch` 函数。它需要传入一个 `action` 作为参数（可以是任意类型的值。通常来说 `action` 是一个对象，其中 `type` 属性标识类型，其它属性携带额外信息。），用于更新 `state` 并触发组件的重新渲染。`dispatch` 函数没有返回值。**React 会把当前的 `state` 和这个 `action` 一起作为参数传给 `reducer` 函数，然后 `reducer` 计算并返回新的 `state`，最后 React 保存新的 `state`，并使用它渲染组件和更新 UI。**
+
+示例：
+```jsx
+import { useReducer } from 'react';
+
+function reducer(state, action) {
+  if (action.type === 'incremented_age') {
+    return {
+      age: state.age + 1
+    };
+  }
+  throw Error('Unknown action.');
+}
+
+export default function Counter() {
+  const [state, dispatch] = useReducer(reducer, { age: 42 });
+
+  return (
+    <>
+      <button onClick={() => {
+        dispatch({ type: 'incremented_age' })
+      }}>
+        Increment age
+      </button>
+      <p>Hello! You are {state.age}.</p>
+    </>
+  );
+}
+```
+
+:::tip
+- `dispatch` 函数 是为下一次渲染而更新 `state`。因此在调用 `dispatch` 函数后读取 `state` 并不会拿到更新后的值，也就是说只能获取到调用前的值。
+
+- 如果你提供的新值与当前的 `state` 相同（使用 `Object.is` 比较），React 会 跳过组件和子组件的重新渲染，这是一种优化手段。虽然在跳过重新渲染前 React 可能会调用你的组件，但是这不应该影响你的代码。
+
+- React 会批量更新 `state`。`state` 会在 所有事件函数执行完毕 并且已经调用过它的 `set` 函数后进行更新，这可以防止在一个事件中多次进行重新渲染。如果在访问 DOM 等极少数情况下需要强制 React 提前更新，可以使用 `flushSync`。
+
+- `useReducer` 和 `useState` 非常相似，但是它可以让你把状态更新逻辑从事件处理函数中移动到组件外部。[对比 `useState` 和 `useReducer`](https://zh-hans.react.dev/learn/extracting-state-logic-into-a-reducer#comparing-usestate-and-usereducer)
+:::
+
+:::warning
+`state` 是只读的。即使是对象或数组也不要尝试修改它：
+
+```js
+function reducer(state, action) {
+  switch (action.type) {
+    case 'incremented_age': {
+      // 🚩 不要像下面这样修改一个对象类型的 state：
+      state.age = state.age + 1;
+      return state;
+    }
+```
+
+正确的做法是返回新的对象：
+
+```
+function reducer(state, action) {
+  switch (action.type) {
+    case 'incremented_age': {
+      // ✅ 正确的做法是返回新的对象
+      return {
+        ...state,
+        age: state.age + 1
+      };
+    }
+```
+:::
+
+#### 避免重新创建初始值 
+```jsx
+function createInitialState(username) {
+  // ...
+}
+
+function TodoList({ username }) {
+  const [state, dispatch] = useReducer(reducer, createInitialState(username));
+  // ...
+```
+
+虽然 `createInitialState(username)` 的返回值只用于初次渲染，但是在每一次渲染的时候都会被调用。如果它创建了比较大的数组或者执行了昂贵的计算就会浪费性能。
+
+你可以通过给 `useReducer` 的第三个参数传入 初始化函数 来解决这个问题：
+```jsx
+function createInitialState(username) {
+  // ...
+}
+
+function TodoList({ username }) {
+  const [state, dispatch] = useReducer(reducer, username, createInitialState);
+  // ...
+```
+
+需要注意的是你传入的参数是 `createInitialState` 这个 函数自身，而不是执行 `createInitialState()` 后的返回值。这样传参就可以保证初始化函数不会再次运行。
+
+在上面这个例子中，`createInitialState` 有一个 `username` 参数。如果初始化函数不需要参数就可以计算出初始值，可以把 `useReducer` 的第二个参数改为 `null`。
 
 ## Context Hooks
 ### `useContext`
@@ -747,37 +857,48 @@ function MyComponent() {
 
 ## Performance Hooks
 ### `useMemo`
+`useMemo` 在多次重新渲染中缓存了 `calculateValue` 函数计算的结果直到依赖项的值发生变化。
+
 语法：`useMemo(calculateValue, dependencies)`：
-- `calculateValue`：要缓存计算值的函数。**它应该是一个没有任何参数的纯函数，并且可以返回任意类型。** React 将会在首次渲染时调用该函数；在之后的渲染中，如果 `dependencies` 没有发生变化，React 将直接返回相同值。否则，将会再次调用 `calculateValue` 并返回最新结果，然后缓存该结果以便下次重复使用。
+- `calculateValue`：要缓存计算值的函数。**它应该是一个没有任何参数的纯函数，并且可以返回任意类型。**
 
-- `dependencies`：所有在 `calculateValue` 函数中使用的响应式变量组成的数组。响应式变量包括 `props`、`state` 和所有你直接在组件中定义的变量和函数。如果你在代码检查工具中 配置了 React，它将会确保每一个响应式数据都被正确地定义为依赖项。依赖项数组的长度必须是固定的并且必须写成 `[dep1, dep2, dep3]` 这种形式。React 使用 `Object.is` 将每个依赖项与其之前的值进行比较。
+- `dependencies`：所有在 `calculateValue` 函数中使用的响应式变量组成的数组。响应式变量包括 `props`、`state` 和所有你直接在组件中定义的变量和函数。依赖项数组的长度必须是固定的并且必须写成 `[dep1, dep2, dep3]` 这种形式。React 使用 `Object.is` 将每个依赖项与其之前的值进行比较。
 
-- 在初次渲染时，`useMemo` 返回不带参数调用 `calculateValue` 的结果。在接下来的渲染中，如果依赖项没有发生改变，它将返回上次缓存的值；否则将再次调用 `calculateValue`，并返回最新结果。
+返回值：
+- 在初次渲染时，你从 `useMemo` 得到的 值 将会是 `calculateValue` 函数执行的结果。
+- 在随后的每一次渲染中，React 将会比较前后两次渲染中的 所有依赖项 是否相同。如果通过 `Object.is` 比较所有依赖项都没有发生变化，那么 `useMemo` 将会返回之前已经计算过的那个值。否则，React 将会重新执行 `calculateValue` 函数并且返回一个新的值。
 
 :::tip
-`useMemo` 不会让首次渲染更快，它只会帮助你跳过不必要的更新工作。
-
 在严格模式下，为了 帮你发现意外的错误，React 将会 调用你的计算函数两次。这只是一个开发环境下的行为，并不会影响到生产环境。如果计算函数是一个纯函数（它本来就应该是），这将不会影响到代码逻辑。其中一次的调用结果将被忽略。
-
-一般来说，除非要创建或循环遍历数千个对象，否则开销可能并不大。可以在控制台来测量花费这上面的时间：
-```js
-onsole.time('filter array');
-const visibleTodos = filterTodos(todos, tab);
-console.timeEnd('filter array');
-```
 :::
 :::warning
-你应该仅仅把 `useMemo` 作为性能优化的手段。如果没有它，你的代码就不能正常工作，那么请先找到潜在的问题并修复它。然后再添加 `useMemo` 以提高性能。
+`useMemo` 不会让首次渲染更快，它只会帮助你跳过不必要的更新工作。你应该仅仅把 `useMemo` 作为性能优化的手段。如果没有它，你的代码就不能正常工作，那么请先找到潜在的问题并修复它。然后再添加 `useMemo` 以提高性能。
 :::
 
-#### 使用场景：组件重新渲染时避免函数的重复调用
+#### 应该在所有地方添加 `useMemo` 吗？
+使用 `useMemo` 进行优化仅在少数情况下有价值：
+- 你在 `useMemo` 中进行的计算明显很慢，而且它的依赖关系很少改变。
+
+- 将计算结果作为 `props` 传递给包裹在 `memo` 中的组件。当计算结果没有改变时，你会想跳过重新渲染。（如下面的使用场景2的示例）
+
+- 你传递的值稍后用作某些 Hook 的依赖项。例如，也许另一个 `useMemo` 计算值依赖它，或者 `useEffect` 依赖这个值。
+
+在实践中，你可以通过遵循一些原则来避免 `useMemo` 的滥用：
+1. 首选本地 `state`，非必要不进行 [状态提升](https://zh-hans.react.dev/learn/sharing-state-between-components)。
+   
+2. 保持你的 [渲染逻辑纯粹](https://zh-hans.react.dev/learn/keeping-components-pure)。如果重新渲染组件会导致一些问题或产生一些明显的视觉错误，那么它就是组件中的错误！修复错误而不是使用记忆化。
+   
+3. 避免 [不必要地更新 state 的 Effect](https://zh-hans.react.dev/learn/you-might-not-need-an-effect)。React 应用程序中的大多数性能问题都是由 Effect 创造的更新链引起的，这些更新链导致组件反复重新渲染。
+   
+4. 尽力 [从 Effect 中移除不必要的依赖项](https://zh-hans.react.dev/learn/removing-effect-dependencies)。例如, 相比于记忆化，在 Effect 内部或组件外部移动某些对象或函数通常更简单。
+
+#### 使用场景1：组件重新渲染时避免函数的重复调用
 **默认情况下，React 会在每次重新渲染时重新运行整个组件。**
 
 例如，如果 `TodoList` 更新了 `state` 或从父组件接收到新的 `props`，`filterTodos` 函数将会重新运行。如果计算速度很快，这将不会产生问题。但是，当正在过滤转换一个大型数组，或者进行一些昂贵的计算，而数据没有改变，那么可能希望跳过这些重复计算。
 ```jsx
 function TodoList({ todos, tab, theme }) {
   const visibleTodos = filterTodos(todos, tab);
-  // ...
 }
 ```
 
@@ -790,12 +911,20 @@ function TodoList({ todos, tab, theme }) {
     () => filterTodos(todos, tab),
     [todos, tab]
   );
-  // ...
 }
 ```
 
-#### 使用场景：组件的`props`是引用型变量时避免组件重新渲染
-**默认情况下，当一个组件重新渲染时，React 会递归地重新渲染它的所有子组件。** 这就是为什么当 `TodoList` 使用不同的 `theme` 重新渲染时，`List` 组件 也会 重新渲染。这对于不需要太多计算来重新渲染的组件来说很好。
+:::tip
+如何衡量计算过程的开销是否昂贵？ 一般来说，除非要创建或循环遍历数千个对象，否则开销可能并不大。可以在控制台来测量花费这上面的时间：
+```js
+onsole.time('filter array');
+const visibleTodos = filterTodos(todos, tab);
+console.timeEnd('filter array');
+```
+:::
+
+#### 使用场景2：结合`memo`避免子组件重新渲染
+**默认情况下，当一个组件重新渲染时，React 会递归地重新渲染它的所有子组件。** 
 ```jsx title="TodoList"
 export default function TodoList({ todos, tab, theme }) {
   // 每当 `theme` 发生变化时，`filterTodos` 函数将会重新运行，这将生成一个不同的数组
@@ -808,15 +937,19 @@ export default function TodoList({ todos, tab, theme }) {
   );
 }
 ```
-但是如果你已经确认重新渲染很慢，你可以通过将它包装在 `memo` 中，这样当它的 `props` 跟上一次渲染相同的时候它就会跳过本次渲染：
+
+使用 `React.memo` 包裹 `List` 后，如果 `List` 的所有 `props` 都与上次渲染时相同，则 `List` 将跳过重新渲染。
 ```jsx title="List"
 import { memo } from 'react';
 
-const List = memo(function List({ items }) {
-  // ...
-});
+function List({ items }) {
+
+}
+
+export default memo(List);
 ```
-在上面的示例中，`filterTodos` 函数总是创建一个不同数组，类似于 `{}` 总是创建一个新对象的方式。通常，这不是问题，但这意味着 `List` 的`props` 永远不会相同，所以你的 `memo` 优化将不起作用。这就是 `useMemo` 派上用场的地方：
+
+但是由于上述 `filterTodos` 函数总是创建一个不同数组，这意味着 `List` 的 `props` 永远不会相同，所以你的 `memo` 优化将不起作用。这就是 `useMemo` 派上用场的地方：
 ```jsx
 export default function TodoList({ todos, tab, theme }) {
   // 告诉 React 在重新渲染之间缓存你的计算结果
@@ -833,6 +966,8 @@ export default function TodoList({ todos, tab, theme }) {
 }
 ```
 通过将 `visibleTodos` 的计算函数包裹在 `useMemo` 中，你可以确保它在重新渲染之间具有相同值，直到依赖项发生变化。
+
+#### 使用场景3：防止过于频繁地触发 Effect
 
 ### `useCallback`
 语法：`useCallback(fn, dependencies)`:
