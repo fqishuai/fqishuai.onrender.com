@@ -10,7 +10,7 @@ const config = {
   tagline: '记录不仅仅是沉淀，也是个理解的过程，杜绝复制粘贴，更禁止只记录别人文章的跳转链接！',
   url: 'https://fqishuai.onrender.com',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'https://s0.lgstatic.com/i/image/M00/41/92/CgpEMllU3hWAFygCAAZ9z9H7nhk224.jpg',
 
@@ -89,6 +89,14 @@ const config = {
             position : 'right',
             items: [
               {
+                label: 'deepseek',
+                href: 'https://ai.com/',
+              },
+              {
+                label: '腾讯元宝',
+                href: 'https://yuanbao.tencent.com/',
+              },
+              {
                 label: 'bolt',
                 href: 'https://bolt.new/',
               },
@@ -125,8 +133,8 @@ const config = {
                 href: 'https://metaso.cn/',
               },
               {
-                label: '360AI搜索',
-                href: 'https://sou.com/',
+                label: '纳米AI搜索',
+                href: 'https://www.n.cn/',
               },
             ]
           },
