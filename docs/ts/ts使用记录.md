@@ -11,6 +11,7 @@ tags: [ts]
 
 ## [模块Modules](https://www.typescriptlang.org/docs/handbook/modules.html)
 > 从 ECMAScript 2015 开始，JavaScript 有了模块的概念。
+
 - TypeScript 也有这个概念。模块在自己的范围内执行，而不是在全局范围内执行；这意味着在模块中声明的变量、函数、类等在模块外部不可见，除非使用其中一种导出形式显式导出它们。相反，要使用从不同模块导出的变量、函数、类、接口等，必须使用其中一种导入形式导入。
 
 - 模块是声明性的；模块之间的关系是根据文件级别的导入和导出来指定的。
@@ -93,6 +94,7 @@ drawAllShapes(new Drawing.Triangle());
 - TypeScript 作为 JavaScript 的超集，在开发过程中不可避免要引用其他第三方的 JavaScript 的库。虽然通过直接引用可以调用库的类和方法，但是却无法使用TypeScript 诸如类型检查等特性功能。声明文件用于解决该问题。
 - 声明文件不包含实现，它只是类型声明。
 :::
+
 - 声明文件以 .d.ts 为后缀
 - 声明文件或模块的语法格式如下：
 ```ts
@@ -259,6 +261,24 @@ type T = {
 使用Record：
 ```ts
 type T = Record<string, any>
+```
+
+如下这个 TypeScript 错误通常出现在你尝试使用数字索引访问一个对象，但该对象没有被定义为允许任意数字索引的情况。
+```ts
+const obj = {
+  3: dayjs(formItemValue[key]).format('YYYY-MM-DD'),
+  9: dayjs(formItemValue[key]).format('YYYY-MM-DD HH:mm:ss'),
+  10: formItemValue[key]?.length>0 ? formItemValue[key][0].response?.url : '',
+};
+console.log((itemType && obj[itemType])) // 报错：Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{ 3: string; 9: string; 10: any; }'
+```
+可以使用Record解决：
+```ts
+const obj: Record<number, any> = {
+  3: dayjs(formItemValue[key]).format('YYYY-MM-DD'),
+  9: dayjs(formItemValue[key]).format('YYYY-MM-DD HH:mm:ss'),
+  10: formItemValue[key]?.length>0 ? formItemValue[key][0].response?.url : '',
+};
 ```
 
 ## `keyof`

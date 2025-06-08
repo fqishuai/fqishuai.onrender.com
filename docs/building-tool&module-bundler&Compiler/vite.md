@@ -202,6 +202,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 - 文件中使用：`import.meta.env.VITE_NODE_ENV`
 
 ### 11.vite开发配置开启https
+:::tip
+`@vitejs/plugin-basic-ssl` 插件会强制开启https
+:::
+
 - 如下配置，浏览器访问时提示“使用了不受支持的协议”，这是因为https协议需要一个合法可用的证书。
   ```ts title="vite.config.ts"
   server: {
@@ -231,6 +235,28 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     },
   }
   ```
+
+动态添加 `@vitejs/plugin-basic-ssl` 插件，从而动态控制是否启用https：
+```json title="package.json"
+"scripts": {
+  "dev-pre": "vite -m pre",
+  "dev-outer-pre": "vite --port 443 -m pre"
+}
+```
+```ts title="vite.config.ts"
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import basicSsl from '@vitejs/plugin-basic-ssl'
+
+const portIndex = process.argv.indexOf('--port')
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    ...(portIndex != -1 ? [basicSsl()] : []),
+  ],
+})
+```
 
 ## 配置项
 - `root` 项目根目录（`index.html` 文件所在的位置）。可以是一个绝对路径，或者一个相对于该配置文件本身的相对路径。默认为`process.cwd()`
@@ -386,3 +412,19 @@ export default defineConfig({
   }
 })
 ```
+
+### 命令解释
+- `vite` 在当前目录下启动 Vite 开发服务器。`vite dev` 和 `vite serve` 是 `vite` 的别名。
+- `vite build` 构建生产版本。
+
+```json
+{
+  "scripts": {
+    "build": "run-p type-check \"build-only {@}\" --", // {@} 是一个特殊的占位符，它会被替换为传递给 npm run build 命令的任何额外参数。例如：npm run build -- --mode production
+    "preview": "vite preview", // 允许你在本地预览构建后的生产版本。
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build", // 这个命令运行 Vue 3 的 TypeScript 类型检查。vue-tsc 是 Vue 3 的 TypeScript 编译器，--build 选项表示它将执行完整的项目构建和类型检查。
+  }
+}
+```
+`run-p` 是 `npm-run-all` 包的一个命令，用于并行运行多个npm脚本。它是 "run parallel" 的缩写。并行执行可以节省时间，特别是在大型项目中。

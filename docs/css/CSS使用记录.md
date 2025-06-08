@@ -1447,3 +1447,332 @@ white-space: nowrap;
   }
 }
 ```
+
+## 66. 上中下布局，上 下固定，怎么适配不同电脑的分辨率保证中间的部分不被下面遮挡？
+对于上中下布局，上下固定高度，中间自适应且不被遮挡，可以使用以下方法：
+1. 使用 calc() 函数:
+
+```html
+<header>顶部内容</header>
+<main>中间内容</main>
+<footer>底部内容</footer>
+```
+
+```css
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh; /* 如果有padding-top，则减去padding-top的值，比如calc(100vh - 16px) */
+}
+
+header {
+  height: 60px;
+}
+
+footer {
+  height: 40px;
+}
+
+main {
+  height: calc(100vh - 100px); /* 100vh减去header和footer的高度 */
+  overflow-y: auto;
+}
+```
+
+2. 使用 Flexbox 布局:
+
+```html
+<div class="container">
+  <header>顶部内容</header>
+  <main>中间内容</main>
+  <footer>底部内容</footer>
+</div>
+```
+
+```css
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  height: 60px; /* 固定高度 */
+}
+
+footer {
+  height: 40px; /* 固定高度 */
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
+}
+```
+
+3. 使用 Grid 布局:
+
+```html
+<div class="container">
+  <header>顶部内容</header>
+  <main>中间内容</main>
+  <footer>底部内容</footer>
+</div>
+```
+
+```css
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: grid;
+  grid-template-rows: 60px 1fr 40px;
+  height: 100vh;
+}
+
+main {
+  overflow-y: auto;
+}
+```
+
+4. 使用绝对定位:
+
+```html
+<header>顶部内容</header>
+<main>中间内容</main>
+<footer>底部内容</footer>
+```
+
+```css
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+}
+
+main {
+  position: fixed;
+  top: 60px;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+}
+```
+
+这些方法的关键点是：
+
+1. 使用 100vh 确保整个布局占满视口高度。
+2. 固定顶部和底部的高度。
+3. 让中间部分占据剩余空间。
+4. 为中间部分设置 overflow-y: auto;，允许内容过多时可滚动。
+
+选择哪种方法主要取决于你的具体需求和浏览器兼容性要求。Flexbox 和 Grid 布局在现代浏览器中都有很好的支持，并提供了更灵活的布局选项。绝对定位和 calc() 函数则可以在更广泛的浏览器中使用。
+
+## 67. 一个div容器中有4个div，父级div使用flex布局，并设置了`justify-content: flex-end;` 生成样式要求在不改变dom结构的前提下让第一个子级div与其他div达到左右布局的效果
+```scss
+.parent-container {
+  display: flex;
+  justify-content: flex-end;
+  
+  .child-div {
+    &:first-child {
+      margin-right: auto;
+    }
+    
+    &:not(:first-child) {
+      flex-shrink: 0;
+    }
+  }
+}
+```
+
+使用 `margin-right: auto;` 将第一个子元素推到左侧，通过 `flex-shrink: 0;` 确保右侧元素不会因空间不足而收缩。
+
+## 68. 父级div是flex布局，设置子元素的宽度
+如果使用固定宽度不生效，可能有几个原因：
+
+1. Flexbox 的默认行为：
+   默认情况下，flex 子项目会尝试适应容器的大小。你可能需要设置 `flex-shrink` 为 0 来防止子元素被压缩：
+
+   ```css
+   .flex-item {
+     width: 100px;
+     flex-shrink: 0;
+   }
+   ```
+
+2. 使用 `flex-basis` 代替 `width`：
+   在 flex 布局中，`flex-basis` 通常比 `width` 更可靠：
+
+   ```css
+   .flex-item {
+     flex-basis: 100px;
+     flex-grow: 0;
+     flex-shrink: 0;
+   }
+   ```
+
+3. 检查是否有其他样式覆盖：
+   确保没有其他 CSS 规则（如 max-width）覆盖了你的宽度设置。
+
+4. 容器宽度不足：
+   如果 flex 容器的宽度不足以容纳所有固定宽度的子元素，子元素可能会被压缩。尝试给容器设置足够的宽度或使用 `flex-wrap: wrap;`。
+
+   ```css
+   .flex-container {
+     display: flex;
+     flex-wrap: wrap;
+   }
+   ```
+
+5. 使用 `!important`（不推荐，但有时有用）：
+   ```css
+   .flex-item {
+     width: 100px !important;
+   }
+   ```
+
+6. 检查 `flex-direction`：
+   如果 `flex-direction` 是 `column`，`width` 可能不会生效，你需要设置 `height`。
+
+7. 使用内联样式测试：
+   直接在 HTML 元素上添加样式，看是否生效：
+   ```html
+   <div class="flex-item" style="width: 100px; flex-shrink: 0;">...</div>
+   ```
+
+8. 检查浏览器开发者工具：
+   使用浏览器的开发者工具检查元素，看看是否有其他样式覆盖了你的设置。
+
+如果尝试了这些方法后仍然不生效，可能需要查看更多的上下文，比如完整的 HTML 结构和相关的 CSS 代码，以便更准确地诊断问题。
+
+## 69. 隐藏滚动条
+```scss
+.content {
+  height: 2.2rem;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+```
+
+## 70. Ant Design 的 Modal 组件的 footer 吸底
+要让 Ant Design 的 Modal 组件的 footer 吸底，你可以使用以下方法：
+
+1. 设置 Modal 的 style 属性，给它一个固定高度和 `overflow: hidden`。
+2. 为 Modal 的内容区域创建一个自定义的 div，并设置它的样式为可滚动。
+3. 为 footer 设置固定定位在底部。
+
+这里是一个示例实现：
+
+```jsx
+import { Modal, Button } from 'antd';
+import { useState } from 'react';
+
+const App = () => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  return (
+    <>
+      <Button onClick={showModal}>Open Modal</Button>
+      <Modal
+        title="Modal with Sticky Footer"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        style={{ height: '400px', top: 20, paddingBottom: 0 }}
+        bodyStyle={{ height: 'calc(100% - 55px - 53px)', overflowY: 'auto' }}
+        footer={
+          <div style={{ position: 'absolute', bottom: 0, width: '100%', borderTop: '1px solid #e8e8e8', padding: '10px 16px', textAlign: 'right', left: 0, background: '#fff' }}>
+            <Button onClick={handleCancel}>Cancel</Button>
+            <Button type="primary" onClick={handleOk}>
+              OK
+            </Button>
+          </div>
+        }
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        {/* 添加更多内容以测试滚动 */}
+        {[...Array(20)].map((_, index) => (
+          <p key={index}>Additional content {index + 1}</p>
+        ))}
+      </Modal>
+    </>
+  );
+};
+
+export default App;
+```
+
+这个实现的关键点：
+
+1. 给 Modal 设置了固定高度 (`height: '400px'`)。
+
+2. 设置 `bodyStyle` 使内容区域可滚动：
+   - `height: 'calc(100% - 55px - 53px)'` 计算了内容区域的高度（总高度减去标题和 footer 的高度）。
+   - `overflowY: 'auto'` 允许内容垂直滚动。
+
+3. 自定义 `footer`，使用绝对定位固定在底部：
+   - `position: 'absolute'`
+   - `bottom: 0`
+   - `width: '100%'`
+   - 添加了一些样式使其看起来更像原生的 Modal footer。
+
+4. 将 Modal 的 `paddingBottom` 设置为 0，以防止内容与吸底的 footer 重叠。
+
+这样，当内容超过 Modal 的高度时，内容区域会出现滚动条，而 footer 始终保持在底部。你可以根据需要调整高度和其他样式。
+
+## 71. 让子级元素在父级元素设置了 `align-items: baseline;` 的情况下上移 4px
+使用 flex 布局的 `align-self` 属性（这会覆盖父元素的 `align-items`）：
+```css
+.parent-element {
+  display: flex;
+  align-items: baseline;
+}
+
+.child-element {
+  align-self: flex-start;
+  margin-top: -4px;
+}
+```

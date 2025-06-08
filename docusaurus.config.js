@@ -89,12 +89,28 @@ const config = {
             position : 'right',
             items: [
               {
+                label: 'State of AI',
+                href: 'https://stateofai.dev/en-US',
+              },
+              {
                 label: 'AI工具集',
                 href: 'https://ai-bot.cn/',
               },
               {
+                label: '搜索MCP Server',
+                href: 'https://mcp.so/'
+              },
+              {
                 label: 'deepseek',
-                href: 'https://ai.com/',
+                href: 'https://deepseek.com/',
+              },
+              {
+                label: 'deepsite(基于deepseek的在线开发工具)',
+                href: 'https://huggingface.co/spaces/enzostvs/deepsite',
+              },
+              {
+                label: 'AI提示词',
+                href: 'https://www.aishort.top/',
               },
               {
                 label: '腾讯元宝',
@@ -156,16 +172,16 @@ const config = {
             position : 'right',
             items: [
               {
+                label: 'Weekly AI Newsletter',
+                href: 'https://medium.com/nlplanet',
+              },
+              {
                 label: 'Frontend Weekly Digest',
                 href: 'https://frontender-ua.medium.com/',
               },
               {
                 label: '前沿技术解析',
                 href: 'https://www.thoughtworks.com/zh-cn/radar',
-              },
-              {
-                label: '字节前端技术周报',
-                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2ODQ1OTExOA==&action=getalbum&album_id=1706105889872527361&scene=173&from_msgid=2247500975&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
               },
               {
                 label: '转转前端周刊',
@@ -176,12 +192,8 @@ const config = {
                 href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg4MTYwMzY1Mw==&action=getalbum&album_id=1899297601078771727&scene=173&from_msgid=2247504287&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
               },
               {
-                label: 'MDH前端周刊',
-                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5NDgyODI4MQ==&action=getalbum&album_id=1862545371797749761&scene=173&from_msgid=2247485744&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
-              },
-              {
-                label: '技术雷达',
-                href: 'https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MjY3OTgwMA==&action=getalbum&album_id=1564396246507847682&scene=173&from_msgid=2652483783&from_itemidx=1&count=3&nolastread=1#wechat_redirect',
+                label: '科技爱好者周刊',
+                href: 'https://www.ruanyifeng.com/blog/weekly/',
               },
             ]
           },
@@ -231,6 +243,14 @@ const config = {
                 href: 'https://risingstars.js.org/',
               },
               {
+                label: 'State of JavaScript',
+                href: 'https://stateofjs.com/en-US',
+              },
+              {
+                label: 'State of React',
+                href: 'https://stateofreact.com/en-US',
+              },
+              {
                 label: 'daily.dev',
                 href: 'https://app.daily.dev/',
               },
@@ -272,6 +292,7 @@ const config = {
           {
             title: 'Tools',
             items: [
+              { label: '开源的UI组件', href: 'https://uiverse.io' },
               { label: 'flash-note', href: 'https://juejin.cn/flash-note/list' },
               { label: '阿里前端图谱', href: 'https://f2e.tech/' },
               { label: '码力全开', href: 'https://maliquankai.com/' },
@@ -280,7 +301,7 @@ const config = {
               { label: '免费IT资源', href: 'https://free-for.dev/#/' },
               { label: '免费LOGO设计', href: 'https://www.uugai.com/' },
               { label: 'sinqi tools', href: 'https://sinqi.tools/zh' },
-              { label: '视频转gif', href: 'https://www.apowersoft.cn/video-to-gif-online' },
+              { label: '视频转gif', href: 'https://www.tutieshi.com/video/' },
               { label: 'JSON转Excel', href: 'https://tableconvert.com/zh-cn/json-to-excel' },
             ],
           },

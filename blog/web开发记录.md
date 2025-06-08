@@ -659,7 +659,220 @@ API：Text Annotation
 - position 文本标注位置
 
 ## ant design使用记录
-### 1. `form`和`select`结合使用，设置`select`的`value`不生效
+### `useForm`
+Ant Design 中的 `useForm` 是一个自定义 Hook，用于在函数组件中创建和管理表单实例。它是 Ant Design 表单库的核心功能之一，提供了一种方便的方式来处理表单状态、验证和提交。
+
+以下是 `useForm` 的主要特点和用法：
+
+1. 创建表单实例：
+   `useForm()` 返回一个表单实例数组，这个数组只包含一个元素（表单实例）。
+
+   ```javascript
+   const [form] = Form.useForm();
+   ```
+
+2. 表单控制：
+   form 实例提供了多种方法来控制表单，如：
+   - `setFieldsValue`: 设置表单字段的值
+   - `getFieldsValue`: 获取表单字段的值
+   - `resetFields`: 重置表单字段
+   - `validateFields`: 验证表单字段
+
+3. 与 Form 组件集成：
+   创建的 form 实例可以传递给 `Form` 组件的 `form` 属性。
+
+   ```jsx
+   <Form form={form} onFinish={onFinish}>
+     {/* 表单项 */}
+   </Form>
+   ```
+
+4. 表单提交：
+   通常与 `onFinish` 事件一起使用，在表单验证通过后触发。
+
+   ```javascript
+   const onFinish = (values) => {
+     console.log('Form values:', values);
+   };
+   ```
+
+5. 手动触发验证：
+   可以在需要的时候手动触发表单验证。
+
+   ```javascript
+   form.validateFields().then(values => {
+     // 处理验证通过的表单数据
+   }).catch(errorInfo => {
+     // 处理验证失败的情况
+   });
+   ```
+
+6. 动态表单操作：
+   `useForm` 使得在复杂的动态表单场景中操作表单变得更加容易。
+
+7. 性能优化：
+   使用 `useForm` 可以避免不必要的重渲染，提高表单的性能。
+
+使用 `useForm` 的一个简单示例：
+
+```jsx
+import { Form, Input, Button } from 'antd';
+import { useForm } from 'antd/lib/form/Form';
+
+const MyForm = () => {
+  const [form] = useForm();
+
+  const onFinish = (values) => {
+    console.log('Success:', values);
+  };
+
+  return (
+    <Form form={form} onFinish={onFinish}>
+      <Form.Item name="username" rules={[{ required: true }]}>
+        <Input />
+      </Form.Item>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+总之，`useForm` 提供了一种强大而灵活的方式来在 React 函数组件中管理表单状态和行为，是 Ant Design 表单开发中的重要工具。
+
+:::tip
+`Form.useForm()` 返回一个只包含单个表单实例的数组看起来有点奇怪，这种设计有几个原因：
+
+1. 一致性与未来扩展性：
+
+   这种设计保持了与 React Hooks 的一致性，特别是像 `useState` 这样的 Hooks。虽然目前只返回一个实例，但这种结构为将来可能的扩展留下了空间，比如可能在未来支持多个表单实例。
+
+2. 解构语法的便利性：
+
+   数组形式允许使用解构语法，这在 React 中是一种常见且简洁的模式。例如：
+   ```javascript
+   const [form] = Form.useForm();
+   ```
+   这种写法简洁明了，与其他 React Hooks 的使用方式保持一致。
+
+3. 与其他自定义 Hooks 保持一致：
+
+   许多自定义 Hooks 遵循类似的模式，返回一个数组而不是单个值或对象。这有助于保持 API 的一致性。
+
+4. 灵活性：
+
+   虽然目前只返回一个实例，但数组形式为用户提供了更多灵活性。例如，用户可以选择是否使用解构，或者直接使用索引：
+   ```javascript
+   const form = Form.useForm()[0];
+   ```
+
+5. 避免破坏性变更：
+
+   如果将来 Ant Design 决定在 `useForm` 中返回额外的值，使用数组可以避免破坏现有的 API，使得向后兼容性更容易维护。
+
+6. 遵循惯例：
+
+   在 React 生态系统中，返回数组的 Hooks 是一种常见模式，特别是当可能返回多个相关值时。
+
+虽然对于只返回单个实例的情况来说，这种设计可能看起来有点过度，但它提供了一致性、灵活性和未来扩展的可能性。这种方法在 React 和许多库的 API 设计中很常见，因为它在简单性和潜在复杂性之间取得了平衡。
+
+总的来说，这种设计选择反映了一种在当前需求和未来可能性之间平衡的努力，同时也考虑到了与 React 生态系统中其他部分的一致性。
+:::
+
+#### 创建多个form实例
+在Ant Design中,你可以根据需要创建任意数量的form实例。这在处理复杂表单或多个相关表单时特别有用。
+
+以下是创建和使用多个form实例的一些方法和注意事项:
+
+1. 创建多个实例:
+
+```javascript
+const [form1] = Form.useForm();
+const [form2] = Form.useForm();
+const [form3] = Form.useForm();
+```
+
+2. 在不同的Form组件中使用:
+
+```jsx
+<Form form={form1}>
+  {/* form1 的字段 */}
+}
+</Form>
+
+<Form form={form2}>
+  {/* form2 的字段 */}
+}
+</Form>
+```
+
+3. 独立操作每个表单:
+
+```javascript
+form1.setFieldsValue({ /* ... */ });
+form2.resetFields();
+form3.validateFields().then(/* ... */);
+```
+
+4. 用途示例:
+   - 步骤表单:每个步骤使用单独的form实例
+   - 动态表单:根据需要动态创建form实例
+   - 相关但独立的表单:如搜索表单和数据编辑表单
+
+5. 注意事项:
+   - 确保每个Form组件使用正确的form实例
+   - 多个form实例可能增加状态管理的复杂性
+   - 考虑是否真的需要多个实例,有时单个复杂表单可能更合适
+
+6. 示例:管理多个相关表单
+
+```jsx
+import { Form, Input, Button } from 'antd';
+
+const MultiFormExample = () => {
+  const [personalForm] = Form.useForm();
+  const [addressForm] = Form.useForm();
+
+  const onSubmitAll = () => {
+    Promise.all([
+      personalForm.validateFields(),
+      addressForm.validateFields()
+    ]).then(([personalValues, addressValues]) => {
+      console.log('Personal:', personalValues);
+      console.log('Address:', addressValues);
+    }).catch(error => {
+      console.error('Validation failed:', error);
+    });
+  };
+
+  return (
+    <>
+      <Form form={personalForm} name="personal">
+        <Form.Item name="name" rules={[{ required: true }]}>
+          <Input placeholder="Name" />
+        </Form.Item>
+      </Form>
+
+      <Form form={addressForm} name="address">
+        <Form.Item name="street" rules={[{ required: true }]}>
+          <Input placeholder="Street" />
+        </Form.Item>
+      </Form>
+
+      <Button onClick={onSubmitAll}>Submit All</Button>
+    </>
+  );
+};
+```
+
+这个例子展示了如何使用两个独立的form实例来管理个人信息和地址信息,并在需要时一起提交它们。
+
+总之,创建多个form实例提供了更大的灵活性,但也需要更谨慎的状态管理。根据你的具体需求,选择最适合的表单结构和实例数量。
+
+### `form`和`select`结合使用，设置`select`的`value`不生效
 被设置了 `name` 属性的 `Form.Item` 包装的控件，表单控件会自动添加 `value`（或 `valuePropName` 指定的其他属性） `onChange`（或 `trigger` 指定的其他属性），数据同步将被 `Form` 接管，这会导致以下结果：
 
 - 你不再需要也不应该用 `onChange` 来做数据收集同步（你可以使用 `Form` 的 `onValuesChange`），但还是可以继续监听 `onChange` 事件。
@@ -673,7 +886,11 @@ API：Text Annotation
   })
   ```
 
-### 2. 表单最后一行右对齐适配电脑分辨率
+:::tip
+`setFieldsValue` 只会更新你指定的字段，不会影响其他字段的值。如果你设置的字段在表单中不存在，这个操作不会有任何效果，也不会报错。这个方法是同步的，设置后立即生效。
+:::
+
+### 表单最后一行右对齐适配电脑分辨率
 使用`Col`嵌套`Row`
 ```jsx
 <Form
@@ -773,7 +990,7 @@ API：Text Annotation
 </Form>
 ```
 
-### 3. 组件的方法自定义传参
+### 组件的方法自定义传参
 - 比如，`DatePicker`的`onChange`
 ```jsx
 const handleDateChange = (_date:unknown,dateString:string,type:string) => {
@@ -788,7 +1005,7 @@ const handleDateChange = (_date:unknown,dateString:string,type:string) => {
 />
 ```
 
-### 4. `Table`组件的数据源需要有`key`这个属性
+### `Table`组件的数据源需要有`key`这个属性
 否则虽然不影响使用但是控制台报错提示
 ```js
 const resultWithKey = res.result.reduce((acc: any[],cur: { key: number; },ind:number) => {
@@ -799,10 +1016,10 @@ const resultWithKey = res.result.reduce((acc: any[],cur: { key: number; },ind:nu
 setTableDatas(resultWithKey); // Table的数据源需要有key prop，否则不影响使用但控制台会报错提示
 ```
 
-### 5. `Table`组件列特别多时，设置列宽不生效
+### `Table`组件列特别多时，设置列宽不生效
 注意设置 `scroll={{ x: '4000px' }}` 这个`x`的宽度首先要能够容纳所有设置的列宽之和('4000px'只是举例)，这样在这个总的宽度之内去设置列宽，才能生效。
 
-### 6. `Table`组件怎么动态控制勾选框的勾中与取消
+### `Table`组件怎么动态控制勾选框的勾中与取消
 在 Ant Design 的 Table 组件中，可以使用 `rowSelection` 属性来动态控制行的勾选状态。`rowSelection` 属性接受一个对象，该对象可以包含 `selectedRowKeys` 和 `onChange` 等属性来管理选中的行。
 
 以下是一个示例，展示了如何动态控制 Table 中勾选框的勾中与取消：
@@ -908,10 +1125,19 @@ export default App;
 
 通过这种方式，你可以动态地控制 Ant Design 表格中行的勾选和取消。
 
-### 7. `Table`组件需要设置`rowKey`
-不设置`rowKey`的话会控制台报错：
+### `Table`组件需要设置`rowKey`
+如果表格中列的值有重复的，比如有一列是sku，可能有重复的sku，这时控制台会报错：`Each child in a list should have a unique "key" prop.`
 
-### 8. `message`使用注意事项
+可以通过设置`rowKey`解决该问题：
+```ts
+<Table 
+  dataSource={dataSource} 
+  rowKey={(record) => record.id} // 假设 'id' 是唯一的
+  ...
+/>
+```
+
+### `message`使用注意事项
 `message`使用报错:
 ```
 Uncaught Error: Objects are not valid as a React child (found: object with keys {stack, message, name, code, config, request, response, status}). If you meant to render a collection of children, use an array instead.
@@ -989,7 +1215,164 @@ fetchData();
 
 为了避免 `Uncaught Error: Objects are not valid as a React child` 错误，确保传递给 Ant Design 的 `message` 组件的内容是一个字符串或其他可以正确渲染的类型。通过提取和格式化错误信息，你可以确保 `message` 组件显示的是可读的错误消息，而不是 JavaScript 对象。
 
-### 9. `Upload`限制上传数量
+### `Upload`的`showUploadList`
+Ant Design 的 Upload 组件中，`showUploadList` 属性用于控制上传列表的显示。这个属性可以是一个布尔值或一个对象，用来定制上传列表的显示行为。下面详细解释其用法和作用：
+
+1. 基本用法（布尔值）：
+
+```jsx
+<Upload showUploadList={true}>
+  <Button icon={<UploadOutlined />}>Upload</Button>
+</Upload>
+```
+
+- 当设置为 `true`（默认值）时，显示上传列表。
+- 当设置为 `false` 时，隐藏上传列表。
+
+2. 高级用法（对象）：
+
+```jsx
+<Upload
+  showUploadList={{
+    showPreviewIcon: true,
+    showRemoveIcon: true,
+    showDownloadIcon: true,
+    removeIcon: <CustomIcon />,
+    downloadIcon: <CustomDownloadIcon />,
+  }}
+>
+  <Button icon={<UploadOutlined />}>Upload</Button>
+</Upload>
+```
+
+对象属性说明：
+
+- `showPreviewIcon`（布尔值）：是否显示预览图标。
+- `showRemoveIcon`（布尔值）：是否显示删除图标。
+- `showDownloadIcon`（布尔值）：是否显示下载图标。
+- `removeIcon`（ReactNode）：自定义删除图标。
+- `downloadIcon`（ReactNode）：自定义下载图标。
+
+3. 实际应用示例：
+
+```jsx
+import React from 'react';
+import { Upload, Button } from 'antd';
+import { UploadOutlined, StarOutlined } from '@ant-design/icons';
+
+const App = () => (
+  <Upload
+    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+    showUploadList={{
+      showPreviewIcon: true,
+      showRemoveIcon: true,
+      showDownloadIcon: true,
+      removeIcon: <StarOutlined onClick={e => console.log(e, 'custom removeIcon event')} />,
+      downloadIcon: <a>Download</a>,
+    }}
+  >
+    <Button icon={<UploadOutlined />}>Upload</Button>
+  </Upload>
+);
+
+export default App;
+```
+
+4. `showUploadList` 的作用：
+
+- 控制可见性：允许你控制整个上传列表或其特定部分的可见性。
+- 自定义图标：可以替换默认的预览、删除和下载图标。
+- 增强用户体验：通过显示或隐藏特定功能，你可以根据需求定制上传组件的用户界面。
+- 简化界面：在某些情况下，你可能只想显示上传按钮而不显示文件列表，这时可以设置 `showUploadList={false}`。
+
+5. 注意事项：
+
+- 当使用对象形式时，未指定的属性会使用默认值。
+- 自定义图标时，确保提供适当的点击处理函数（如果需要）。
+- `showDownloadIcon` 仅在 `listType` 为 'picture' 或 'picture-card' 时有效。
+
+通过灵活使用 `showUploadList`，你可以精确控制 Upload 组件的外观和功能，使其更好地适应你的具体需求和设计要求。
+
+### `Upload`的`fileList`
+Ant Design 的 Upload 组件中，`fileList` 属性是一个非常重要的属性，用于控制和管理上传文件的列表。它的作用和使用方法如下：
+
+1. 基本作用：
+
+- 控制上传文件列表：`fileList` 用于显示和管理已上传或正在上传的文件列表。
+- 状态管理：通过 `fileList`，你可以跟踪每个文件的上传状态、进度等信息。
+- 自定义文件列表：允许你完全控制显示哪些文件，以及如何显示它们。
+
+2. 数据结构：
+
+`fileList` 是一个对象数组，每个对象代表一个文件，通常包含以下字段：
+
+```javascript
+{
+  uid: string;        // 文件唯一标识
+  name: string;       // 文件名
+  status: string;     // 上传状态，可能的值：uploading, done, error, removed
+  url?: string;       // 文件URL（如果已上传）
+  thumbUrl?: string;  // 缩略图URL
+}
+```
+
+3. 使用示例：
+
+```jsx
+import React, { useState } from 'react';
+import { Upload, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+
+const App = () => {
+  const [fileList, setFileList] = useState([
+    {
+      uid: '-1',
+      name: 'xxx.png',
+      status: 'done',
+      url: 'http://www.baidu.com/xxx.png',
+    },
+  ]);
+
+  const handleChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+
+  return (
+    <Upload
+      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+      fileList={fileList}
+      onChange={handleChange}
+    >
+      <Button icon={<UploadOutlined />}>Upload</Button>
+    </Upload>
+  );
+};
+
+export default App;
+```
+
+4. `fileList` 的主要作用：
+
+- 初始化文件列表：可以预先设置已上传的文件列表。
+- 控制文件状态：通过更新 `fileList`，你可以控制文件的上传状态、进度等。
+- 自定义文件操作：可以在 `onChange` 事件中自定义文件的添加、删除、状态更新等操作。
+- 实现受控组件：通过 `fileList` 和 `onChange`，可以将 Upload 组件变为完全受控的组件。
+
+5. 高级用法：
+
+- 过滤文件：可以在 `onChange` 中过滤或修改 `fileList`，以实现自定义的文件验证或处理逻辑。
+- 限制上传数量：通过控制 `fileList` 的长度，可以限制可上传的文件数量。
+- 自定义上传行为：结合 `beforeUpload` 属性，可以在文件上传前对 `fileList` 进行修改。
+
+6. 注意事项：
+
+- 确保为每个文件提供唯一的 `uid`。
+- 当使用 `fileList` 时，Upload 组件变为受控组件，你需要自己管理文件列表的状态。
+- 如果你只想显示文件列表而不控制它，可以使用 `defaultFileList` 属性。
+
+通过合理使用 `fileList`，你可以实现复杂的文件上传逻辑，如批量上传、进度显示、自定义验证等功能，使 Upload 组件更好地适应你的具体需求。
+
+### `Upload`限制上传数量
 为了限制 Ant Design 的 `Upload` 组件只上传一张图片，你可以使用以下几种方法：
 
 1. **设置 `maxCount` 属性**：
@@ -1067,7 +1450,85 @@ export default UploadComponent;
 
 这个示例展示了如何使用 Ant Design 的 `Upload` 组件来限制用户只能上传一张图片。通过结合 `maxCount` 属性和 `beforeUpload` 回调，可以确保用户上传的文件数量不会超过限制。
 
-### 10. `Form`中使用`Upload`并回显
+### 将 `Form.Item` 嵌套的 `Upload` 组件的文件列表与表单的 `name` 绑定
+在 Ant Design 中，要将 Form.Item 嵌套的 Upload 组件的文件列表与表单的 name 绑定，可以使用 Form.Item 的 valuePropName 和 getValueFromEvent 属性，结合 Upload 组件的一些属性。以下是具体的实现方法：
+
+```jsx
+import { Form, Upload, Button } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+
+const App = () => {
+  const [form] = Form.useForm();
+
+  const normFile = (e) => {
+    console.log('Upload event:', e);
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
+
+  const onFinish = (values) => {
+    console.log('Received values of form: ', values);
+  };
+
+  return (
+    <Form
+      form={form}
+      name="upload_form"
+      onFinish={onFinish}
+    >
+      <Form.Item
+        name="upload"
+        label="Upload"
+        valuePropName="fileList"
+        getValueFromEvent={normFile}
+        rules={[{ required: true, message: 'Please upload a file' }]}
+      >
+        <Upload name="file" listType="text" multiple={false}>
+          <Button icon={<UploadOutlined />}>Click to upload</Button>
+        </Upload>
+      </Form.Item>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+
+export default App;
+```
+
+关键点解释：
+
+1. `valuePropName="fileList"`：
+   这告诉 Form.Item 使用 Upload 组件的 fileList 属性来存储和读取值。
+
+2. `getValueFromEvent={normFile}`：
+   这个函数定义了如何从上传事件中提取值。在这个例子中，我们返回整个 fileList。
+
+3. `normFile` 函数：
+   这个函数处理上传事件，确保返回的是一个文件列表数组。
+
+4. Upload 组件配置：
+   - `name="file"`：指定上传的文件字段名。
+   - `listType="text"`：定义上传列表的样式。
+   - `multiple={false}`：这里设置为 false 表示只允许上传单个文件。如果需要多文件上传，可以设置为 true。
+
+5. 表单提交：
+   在 onFinish 函数中，你可以访问上传的文件信息。上传的文件列表将作为 `values.upload` 的值。
+
+注意事项：
+
+- 如果你需要在提交表单时实际上传文件，你需要在 onFinish 函数中手动处理文件上传逻辑，或者使用 Upload 组件的 `action` 属性指定上传 URL。
+- 对于大文件或需要立即上传的场景，你可能需要调整 Upload 组件的配置，比如使用 `beforeUpload` 属性来控制上传行为。
+- 如果需要显示上传进度或处理上传错误，可以使用 Upload 组件的其他属性和事件，如 `onProgress`, `onError` 等。
+
+这种方法可以有效地将 Upload 组件集成到 Form 中，使文件上传成为表单数据的一部分，便于统一管理和提交。
+
+### `Form`中使用`Upload`并回显
 在 Ant Design 的表单中使用 `Upload` 组件并实现文件上传后的回显，你可以通过设置 `fileList` 属性来控制上传文件列表，并在表单初始化时设置初始值来回显已上传的文件。
 
 以下是一个完整的示例，展示如何在 Ant Design 表单中使用 `Upload` 组件，并在表单初始化时回显已上传的文件：
@@ -1179,7 +1640,7 @@ export default UploadForm;
 
 通过这种方式，你可以在 Ant Design 表单中使用 `Upload` 组件，并在表单初始化时回显已上传的文件。
 
-### 11. `Form`中动态使用`Upload`并回显
+### `Form`中动态使用`Upload`并回显
 示例：
 ```tsx
 import { Upload, UploadFile } from "antd";
@@ -1299,7 +1760,7 @@ export default function Demo() {
 }
 ```
 
-### 12. Upload报错：`(intermediate value).forEach is not a function`
+### Upload报错：`(intermediate value).forEach is not a function`
 出现 `(intermediate value).forEach is not a function` 错误通常是因为 `Upload` 组件的 `fileList` 属性传递的值不是一个数组。确保 `fileList` 始终是一个数组类型。
 
 以下是一个完整的示例，展示如何在 Ant Design 表单中使用 `Upload` 组件并正确回显已上传的文件，同时确保 `fileList` 始终是一个数组：
@@ -1411,10 +1872,254 @@ export default UploadForm;
 
 通过这种方式，你可以在 Ant Design 表单中使用 `Upload` 组件，并在表单初始化时回显已上传的文件，同时确保 `fileList` 始终是一个数组，避免出现 `.forEach is not a function` 的错误。
 
-### 13. `Form`中使用`Select`并回显
+### `Form.Item` 的 `getValueFromEvent`属性
+Ant Design 的 Form.Item 组件中，`getValueFromEvent` 是一个非常有用的属性，用于自定义如何从事件中提取表单项的值。这个属性在处理非标准表单控件或需要特殊处理的输入值时特别有用。
+
+以下是关于 `getValueFromEvent` 的详细解释和使用示例：
+
+1. 基本概念：
+
+`getValueFromEvent` 是一个函数，它接收事件对象作为参数，并返回你希望作为表单项值的内容。
+
+2. 基本语法：
+
+```jsx
+<Form.Item
+  name="fieldName"
+  getValueFromEvent={(event) => {
+    // 处理事件并返回值
+    return processedValue;
+  }}
+>
+  <YourComponent />
+</Form.Item>
+```
+
+3. 常见用例：
+
+a. 处理自定义输入组件：
+
+```jsx
+<Form.Item
+  name="customInput"
+  getValueFromEvent={(event) => event.target.value.toUpperCase()}
+>
+  <Input />
+</Form.Item>
+```
+
+这个例子将输入值转换为大写。
+
+b. 处理文件上传：
+
+```jsx
+<Form.Item
+  name="upload"
+  valuePropName="fileList"
+  getValueFromEvent={(e) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
+  }}
+>
+  <Upload>
+    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+  </Upload>
+</Form.Item>
+```
+
+这个例子处理 Upload 组件的文件列表。
+
+c. 处理复选框组：
+
+```jsx
+<Form.Item
+  name="checkboxGroup"
+  getValueFromEvent={(checkedValues) => checkedValues.join(',')}
+>
+  <Checkbox.Group options={['A', 'B', 'C']} />
+</Form.Item>
+```
+
+这个例子将选中的值转换为逗号分隔的字符串。
+
+4. 高级用例：
+
+a. 处理复杂对象：
+
+```jsx
+<Form.Item
+  name="complexObject"
+  getValueFromEvent={(event, prevValue) => {
+    return {
+      ...prevValue,
+      [event.target.name]: event.target.value
+    };
+  }}
+>
+  <ComplexComponent />
+</Form.Item>
+```
+
+这个例子处理一个复杂对象，保留之前的值并更新特定字段。
+
+b. 异步处理：
+
+```jsx
+<Form.Item
+  name="asyncField"
+  getValueFromEvent={async (event) => {
+    const result = await someAsyncOperation(event.target.value);
+    return result;
+  }}
+>
+  <Input />
+</Form.Item>
+```
+
+这个例子展示了如何异步处理输入值。
+
+5. 注意事项：
+
+- `getValueFromEvent` 应该是一个纯函数，不应该有副作用。
+- 确保返回值的类型与表单项期望的类型一致。
+- 对于一些复杂的场景，可能需要结合 `valuePropName` 一起使用。
+- 在处理异步操作时要小心，确保不会影响表单的整体性能。
+
+6. 与其他属性的配合：
+
+`getValueFromEvent` 经常与 `valuePropName` 和 `trigger` 属性一起使用，以完全自定义表单项的行为：
+
+```jsx
+<Form.Item
+  name="customField"
+  valuePropName="checked"
+  trigger="onMyCustomChange"
+  getValueFromEvent={(value) => value ? 'YES' : 'NO'}
+>
+  <CustomToggle />
+</Form.Item>
+```
+
+通过灵活使用 `getValueFromEvent`，你可以处理各种复杂的表单场景，使 Form.Item 能够适应几乎任何类型的输入组件和数据处理需求。这大大增加了 Ant Design Form 的灵活性和可扩展性。
+
+### `Form.Item`嵌套
+`name`设置为数组，如下：
+
+```jsx
+const chineseNumbers = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e?.fileList;
+};
+const beforeUpload = (file: any) => {
+  const isImgAudioVedio = ["image/jpeg", "image/jpg", "image/png", "video/mp4", "video/avi", "video/mov", "video/quicktime", "audio/mpeg", "audio/ogg", "audio/aac"].includes(file.type);
+  if (!isImgAudioVedio) {
+    message.error('只支持上传照片、视频、音频文件');
+  }
+  const isLt50M = file.size / 1024 / 1024 < 50;
+  if (!isLt50M) {
+    message.error('文件大小不超过50MB');
+  }
+  return isImgAudioVedio && isLt50M;
+}
+const handleUploadChange = (uploadInfo: any) => {
+  // 上传状态为完成时设置url
+  if (uploadInfo.file.status === 'done') {
+    uploadInfo.fileList.map((file: any) => {
+      if (file.response) {
+        file.url = file.response[0].path;
+      }
+      return file
+    })
+  }
+}
+
+const nestFormItemRender = () => {
+  return (
+    <div>
+      {
+        nestFormItems?.map((item: any, index: number) => (
+          <div className="nest-item-wrapper" key={item.id}>
+            <div className="item-title">
+              <Form.Item
+                name={['nestItems', index, 'name']}
+                label={`名称${chineseNumbers[index+1]}`}
+                initialValue={item.name}
+                rules={[{ required: true, message: `请选择名称${chineseNumbers[index+1]}` }]}
+              >
+                <Input disabled />
+              </Form.Item>
+            </div>
+            <div className="row">
+              <Form.Item
+                label="数量"
+                name={['nestItems', index, 'num']}
+                initialValue={item.num}
+                rules={[{ required: true }]}
+              >
+                <InputNumber
+                  addonBefore={<img src={numMinusIcon} />}
+                  addonAfter={<img src={numPlusIcon} />}
+                  min={1}
+                  controls={false}
+                  disabled
+                />
+              </Form.Item>
+              <Form.Item
+                label="是否打开"
+                name={['nestItems', index, 'on']}
+                initialValue={item.on}
+                labelCol={{ span: 6 }}
+              >
+                <Switch checkedChildren="是" unCheckedChildren="否" disabled />
+              </Form.Item>
+            </div>
+            <div className="upload-wrapper">
+              <Form.Item
+                label="附件"
+                name={['nestItems', index, 'files']}
+                valuePropName="fileList"
+                getValueFromEvent={normFile}
+                initialValue={item.fileList ? item.fileList.map((ele: any) => ({
+                  name: ele.fileName,
+                  status: 'done',
+                  url: ele.fileUrl,
+                  fileType: ele.fileType,
+                })) : []}
+                rules={[{ required: true, message: '请上传附件' }]}
+              >
+                <Upload
+                  action={'/api/upload/uploadFile'}
+                  name="fileData"
+                  beforeUpload={beforeUpload}
+                  maxCount={5}
+                  onChange={handleUploadChange}
+                >
+                  <div className="upload-btn">
+                    <img src={pcUploadIcon} />
+                    <div>本地上传</div>
+                  </div>
+                </Upload>
+              </Form.Item>
+              <div className="tip">请上传照片、视频、音频文件，每份文件不超过50M，最多上传5份</div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  )
+}
+```
+
+### `Form`中使用`Select`并回显
 `Form.Item`的`initialValue`
 
-### 14. [`Form.useWatch`](https://ant-design.antgroup.com/components/form-cn#formusewatch)
+### [`Form.useWatch`](https://ant-design.antgroup.com/components/form-cn#formusewatch)
 用于直接获取 `form` 中字段对应的值。
 
 例如：
@@ -1422,7 +2127,7 @@ export default UploadForm;
 const reservationStatus = Form.useWatch('reservationStatus', form);
 ```
 
-### 15. `Form`中使用`DatePicker`并回显
+### `Form`中使用`DatePicker`并回显
 `Form.Item`的`initialValue`使用`dayjs`处理
 
 ```ts
@@ -1434,6 +2139,526 @@ const reservationStatus = Form.useWatch('reservationStatus', form);
   rules={[{ required: detailFormItem.required, message: `请填写${detailFormItem.itemName}` }]}
 ></Form.Item>
 ```
+
+### `Form.List` 中的 `Form.Item` 设置 `name`
+在 Ant Design 的 Form.List 中设置表单项的 name 需要结合 Form.List 的 fields 参数和嵌套字段语法。以下是如何正确设置 Form.List 中表单项 name 的方法和示例：
+
+1. 基本语法：
+
+在 Form.List 中，每个字段的 name 应该是一个数组，包含 Form.List 的 name 和当前字段的索引。
+
+```jsx
+<Form.List name="users">
+  {(fields, { add, remove }) => (
+    <>
+      {fields.map((field, index) => (
+        <Form.Item
+          {...field}
+          name={[field.name, 'firstName']}
+          // ...
+        >
+          <Input />
+        </Form.Item>
+      ))}
+    </>
+  )}
+</Form.List>
+```
+
+2. 完整示例：
+
+这里是一个更完整的示例，展示了如何在 Form.List 中设置多个表单项的 name：
+
+```jsx
+import { Form, Input, Button } from 'antd';
+
+const App = () => {
+  const [form] = Form.useForm();
+
+  const onFinish = (values) => {
+    console.log('Received values of form:', values);
+  };
+
+  return (
+    <Form form={form} name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">
+      <Form.List name="users">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map(({ key, name, ...restField }) => (
+              <div key={key} style={{ display: 'flex', marginBottom: 8 }}>
+                <Form.Item
+                  {...restField}
+                  name={[name, 'firstName']}
+                  rules={[{ required: true, message: 'Missing first name' }]}
+                >
+                  <Input placeholder="First Name" />
+                </Form.Item>
+                <Form.Item
+                  {...restField}
+                  name={[name, 'lastName']}
+                  rules={[{ required: true, message: 'Missing last name' }]}
+                >
+                  <Input placeholder="Last Name" />
+                </Form.Item>
+                <Button onClick={() => remove(name)}>Delete</Button>
+              </div>
+            ))}
+            <Form.Item>
+              <Button type="dashed" onClick={() => add()} block>
+                Add field
+              </Button>
+            </Form.Item>
+          </>
+        )}
+      </Form.List>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+
+export default App;
+```
+
+在这个例子中：
+
+- Form.List 的 name 设置为 "users"。
+- 每个表单项的 name 设置为 `[name, 'firstName']` 和 `[name, 'lastName']`，其中 `name` 是 Form.List 提供的字段索引。
+- 这样设置后，提交的表单数据结构会是：
+
+```javascript
+{
+  users: [
+    { firstName: '...', lastName: '...' },
+    { firstName: '...', lastName: '...' },
+    // ...
+  ]
+}
+```
+
+3. 注意事项：
+
+- 确保使用 Form.List 提供的 `field` 对象中的 `name` 属性作为每个字段的索引。
+- 如果需要嵌套更深的结构，可以继续添加数组元素，如 `[name, 'address', 'street']`。
+- 使用 `...restField` 展开 Form.List 提供的其他字段属性，以确保正确的字段绑定。
+
+通过这种方式，你可以灵活地在 Form.List 中设置和管理动态表单项的 name。
+
+### `Form.List` 设置初始值
+可以使用 `Form` 组件的 `initialValues` 属性或者 `Form.List` 的 `initialValue` 属性。如果你的 `Form.List` 结构比较复杂，包含了多个嵌套字段，建议使用 `Form` 的 `initialValues` 属性。
+```tsx
+import { useEffect, useState } from "react";
+import fetchApiData from "@/api";
+import { Form } from "antd";
+
+const chineseNumbers = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+
+export default function Demo() {
+  const [info, setInfo] = useState(null);
+
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    getInfo();
+  }, []);
+
+  const getInfo = async () => {
+    let apiResult = await fetchApiData(`/getInfo`);
+    if (apiResult) {
+      let obj = { ...apiResult };
+      if (obj.infoItems) {
+        // 获取数据后根据Form.List中的Form.Item的name设置初始值
+        obj.infoItems = obj.infoItems.map((item: any) => ({
+          material: item.feeItemName,
+          files: [],
+          ...item,
+        }));
+      }
+      setInfo(obj);
+    }
+  }
+  const normFile = (e: any) => {
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e?.fileList;
+  };
+  const handleUploadChange = (uploadInfo: any) => {
+    // 上传状态为完成时设置url
+    if (uploadInfo.file.status === 'done') {
+      uploadInfo.fileList.map((file: any) => {
+        if (file.response) {
+          file.url = file.response[0].path;
+        }
+        return file
+      })
+    }
+  }
+
+  return (
+    <Form
+      name="demoForm"
+      form={form}
+      autoComplete="off"
+      colon={false}
+      initialValues={{
+        infoItems: info?.infoItems, // 设置name为infoItems的Form.List的初始值
+      }}
+    >
+      <Form.List
+        name="infoItems"
+        rules={[
+          {
+            validator: async (_, infoItems) => {
+              if (!infoItems || infoItems.length == 0) {
+                return Promise.reject(new Error('请添加信息'));
+              }
+            }
+          }
+        ]}
+      >
+        {
+          (fields, { add, remove }, { errors }) => (
+            <>
+              <Form.Item label="信息" rules={[{ required: true }]}>
+                <div className="material-wrapper">
+                  <div onClick={() => add()} className="btn">
+                    <img src={plusIcon} />
+                    <div>添加信息</div>
+                  </div>
+                  <div className="tip">凭证上传要求：支持照片、视频、音频文件，每份文件不超过50M，最多上传5份</div>
+                </div>
+                <Form.ErrorList errors={errors} />
+              </Form.Item>
+              {
+                // 使用 slice().reverse() （这不会改变原数组）使Form.List 中的项目倒序排列
+                fields.slice().reverse().map(({ key, name, ...restField }) => (
+                  <div className="material-item-wrapper" key={key}>
+                    <div className="item-title">
+                      <Form.Item
+                        {...restField}
+                        name={[name, 'material']}
+                        label={`信息${chineseNumbers[name+1]}`}
+                        rules={[{ required: true, message: `请选择信息${chineseNumbers[name+1]}` }]}
+                      >
+                        <Cascader
+                          options={infoOptions}
+                          fieldNames={{
+                            label: 'name',
+                            value: 'code',
+                            children: 'children'
+                          }}
+                          loadData={loadData}
+                          // changeOnSelect
+                          placeholder="请选择"
+                        />
+                      </Form.Item>
+                      <div className="del" onClick={() => remove(name)}>删除</div>
+                    </div>
+                    <div className="row">
+                      <Form.Item
+                        {...restField}
+                        label="数量"
+                        name={[name, 'num']}
+                        rules={[{ required: true }]}
+                      >
+                        <InputNumber
+                          addonBefore={<img src={numMinusIcon} onClick={() => handleMinus([name, 'num'])} />}
+                          addonAfter={<img src={numPlusIcon} onClick={() => handlePlus([name, 'num'])} />}
+                          min={1}
+                          controls={false}
+                        />
+                      </Form.Item>
+                      <Form.Item
+                        {...restField}
+                        label="是否修理"
+                        name={[name, 'repair']}
+                        initialValue={false}
+                        labelCol={{ span: 6 }}
+                      >
+                        <Switch checkedChildren="是" unCheckedChildren="否" />
+                      </Form.Item>
+                    </div>
+                    <div className="upload-wrapper">
+                      <Form.Item
+                        {...restField}
+                        label="附件"
+                        name={[name, 'files']}
+                        valuePropName="fileList"
+                        getValueFromEvent={normFile}
+                        rules={[{ required: true, message: '请上传附件' }]}
+                      >
+                        <Upload
+                          action={'/upload'}
+                          name="fileData"
+                          beforeUpload={beforeUpload}
+                          maxCount={5}
+                          onChange={handleUploadChange}
+                        >
+                          <div className="upload-btn">
+                            <img src={pcUploadIcon} />
+                            <div>本地上传</div>
+                          </div>
+                        </Upload>
+                      </Form.Item>
+                      <div className="tip">请上传照片、视频、音频文件，每份文件不超过50M，最多上传5份</div>
+                    </div>
+                  </div>
+                ))
+              }
+            </>
+          )
+        }
+      </Form.List>
+    </Form>
+  )
+}
+```
+
+### `Cascader`的初始数据是嵌套数据的情况下使用`loadData`
+如果初始数据是嵌套的，我们需要调整 `loadData` 的实现来处理这种情况。以下是一个处理嵌套初始数据的示例：
+
+```jsx
+import React, { useState } from 'react';
+import { Cascader } from 'antd';
+
+const App = () => {
+  const [options, setOptions] = useState([
+    {
+      value: 'zhejiang',
+      label: '浙江',
+      children: [
+        {
+          value: 'hangzhou',
+          label: '杭州',
+          children: [
+            {
+              value: 'xihu',
+              label: '西湖区',
+              isLeaf: true,
+            },
+          ],
+        },
+        {
+          value: 'ningbo',
+          label: '宁波',
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      value: 'jiangsu',
+      label: '江苏',
+      children: [
+        {
+          value: 'nanjing',
+          label: '南京',
+          isLeaf: false, // 标记为可以进一步加载
+        },
+      ],
+    },
+  ]);
+
+  const loadData = (selectedOptions) => {
+    const targetOption = selectedOptions[selectedOptions.length - 1];
+    targetOption.loading = true;
+
+    // 模拟异步请求
+    setTimeout(() => {
+      targetOption.loading = false;
+      if (targetOption.value === 'nanjing') {
+        targetOption.children = [
+          {
+            label: '鼓楼区',
+            value: 'gulou',
+            isLeaf: true,
+          },
+          {
+            label: '玄武区',
+            value: 'xuanwu',
+            isLeaf: true,
+          },
+        ];
+      }
+      setOptions([...options]);
+    }, 1000);
+  };
+
+  const onChange = (value, selectedOptions) => {
+    console.log(value, selectedOptions);
+  };
+
+  return (
+    <Cascader
+      options={options}
+      loadData={loadData}
+      onChange={onChange}
+      changeOnSelect
+    />
+  );
+};
+
+export default App;
+```
+
+关键点解释：
+
+1. 初始数据结构：
+   - 数据已经是嵌套的，包含了多层级的选项。
+   - 某些节点（如 '南京'）标记为 `isLeaf: false`，表示它们可以进一步加载子选项。
+
+2. `loadData` 函数：
+   - 只处理那些标记为 `isLeaf: false` 的选项。
+   - 在这个例子中，只有 '南京' 需要进一步加载数据。
+
+3. 动态加载：
+   - 当用户选择 '南京' 时，`loadData` 函数会被触发。
+   - 模拟异步请求后，为 '南京' 添加子选项。
+
+4. 更新状态：
+   - 使用 `setOptions([...options])` 来触发重新渲染，确保新添加的数据显示出来。
+
+5. `isLeaf` 属性：
+   - 对于确定没有子选项的节点，设置 `isLeaf: true`。
+   - 对于可能有子选项但尚未加载的节点，设置 `isLeaf: false`。
+
+注意事项：
+
+- **确保正确设置 `isLeaf` 属性。只有 `isLeaf: false` 的选项才会触发 `loadData`。**
+- 对于已经有子选项的节点，不需要设置 `isLeaf`，Cascader 会自动处理。
+- 在实际应用中，你可能需要根据后端 API 的响应动态设置 `isLeaf`。
+- 考虑添加错误处理，以应对数据加载失败的情况。
+
+这种方法允许你在初始时加载部分数据，然后根据用户的选择动态加载更多数据。这对于处理大型数据集或需要逐步从服务器获取数据的场景非常有用，可以提高初始加载速度和整体性能。
+
+### InputNumber自定义加减号
+使用 `addonBefore` 和 `addonAfter` ，以下是一种实现方法：
+
+```jsx
+import React from 'react';
+import { InputNumber, Button } from 'antd';
+
+const App = () => {
+  const handleAddonBeforeClick = () => {
+    console.log('AddonBefore clicked');
+    // 在这里添加你的逻辑
+  };
+
+  const handleAddonAfterClick = () => {
+    console.log('AddonAfter clicked');
+    // 在这里添加你的逻辑
+  };
+
+  return (
+    <InputNumber
+      addonBefore={
+        <Button 
+          type="text" 
+          onClick={handleAddonBeforeClick}
+          style={{ border: 'none', padding: 0 }}
+        >
+          Before
+        </Button>
+      }
+      addonAfter={
+        <Button 
+          type="text" 
+          onClick={handleAddonAfterClick}
+          style={{ border: 'none', padding: 0 }}
+        >
+          After
+        </Button>
+      }
+      controls={false}
+    />
+  );
+};
+
+export default App;
+```
+
+关键点解释：
+
+1. 自定义 addonBefore 和 addonAfter：
+   - 使用 Button 组件作为自定义的 addon 内容。
+   - 设置 Button 的 type 为 "text"，使其看起来像普通文本。
+
+2. 添加点击事件处理器：
+   - 为 Button 组件添加 onClick 事件处理器。
+
+3. 样式调整：
+   - 使用 style 属性移除 Button 的边框和内边距，使其看起来更像 InputNumber 的一部分。
+
+4. 事件处理函数：
+   - `handleAddonBeforeClick` 和 `handleAddonAfterClick` 函数用于处理点击事件。
+   - 你可以在这些函数中添加自定义逻辑。
+
+注意事项：
+
+- 这种方法会改变 addonBefore 和 addonAfter 的默认外观。如果你想保持原有的外观，可能需要进一步调整样式。
+
+- 如果你需要更复杂的交互，可以考虑使用自定义的 React 组件作为 addon。
+
+- 确保点击事件不会干扰到 InputNumber 的正常使用。
+
+- 如果你需要访问 InputNumber 的值或其他属性，可以将这个组件封装在一个父组件中，并通过 props 传递必要的信息和回调函数。
+
+示例扩展：如果你需要在点击事件中访问 InputNumber 的值，可以这样修改：
+
+```jsx
+import React, { useState } from 'react';
+import { InputNumber, Button } from 'antd';
+
+const App = () => {
+  const [value, setValue] = useState(0);
+
+  const handleAddonBeforeClick = () => {
+    console.log('AddonBefore clicked, current value:', value);
+    // 其他逻辑...
+  };
+
+  const handleAddonAfterClick = () => {
+    console.log('AddonAfter clicked, current value:', value);
+    // 其他逻辑...
+  };
+
+  const handleChange = (newValue) => {
+    setValue(newValue);
+  };
+
+  return (
+    <InputNumber
+      value={value}
+      onChange={handleChange}
+      addonBefore={
+        <Button 
+          type="text" 
+          onClick={handleAddonBeforeClick}
+          style={{ border: 'none', padding: 0 }}
+        >
+          Before
+        </Button>
+      }
+      addonAfter={
+        <Button 
+          type="text" 
+          onClick={handleAddonAfterClick}
+          style={{ border: 'none', padding: 0 }}
+        >
+          After
+        </Button>
+      }
+    />
+  );
+};
+
+export default App;
+```
+
+这种方法允许你在 addonBefore 和 addonAfter 的点击事件中访问和操作 InputNumber 的当前值。
 
 ## elementui使用记录
 ### 1. `el-radio`切换不了
